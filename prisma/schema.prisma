@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId], map: "Account_userId_fkey")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "Session_userId_fkey")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String?    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  Volunteer     Volunteer?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Volunteer {
+  id                                             String                 @id @default(uuid())
+  userId                                         String                 @unique
+  groupId                                        String                 @unique(map: "groupId_UNIQUE")
+  leaderStatus                                   Boolean?               @default(false)
+  User                                           User                   @relation(fields: [userId], references: [id])
+  WorkLogEntry_WorkLogEntry_loggedByToVolunteer  WorkLogEntry[]         @relation("WorkLogEntry_loggedByToVolunteer")
+  WorkLogEntry_WorkLogEntry_loggedForToVolunteer WorkLogEntry[]         @relation("WorkLogEntry_loggedForToVolunteer")
+  VolunteerToWorkGroup                           VolunteerToWorkGroup[]
+
+  @@index([groupId], map: "groupID_idx")
+  @@index([userId], map: "uid_idx")
+}
+
+model WorkGroup {
+  id                   String                 @id @unique(map: "gid_UNIQUE") @default(uuid())
+  name                 String                 @db.VarChar(45)
+  leaderTitle          String                 @db.VarChar(45)
+  description          String
+  VolunteerToWorkGroup VolunteerToWorkGroup[]
+}
+
+model WorkLog {
+  id           String        @id
+  workTime     DateTime      @db.Timestamp(0)
+  createTime   DateTime      @default(now()) @db.Timestamp(0)
+  duration     Int
+  comment      String?       @db.VarChar(120)
+  WorkLogEntry WorkLogEntry?
+}
+
+model WorkLogEntry {
+  id                                          String    @id @default(uuid())
+  loggedBy                                    String
+  loggedFor                                   String
+  WorkLog                                     WorkLog   @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "id")
+  Volunteer_WorkLogEntry_loggedByToVolunteer  Volunteer @relation("WorkLogEntry_loggedByToVolunteer", fields: [loggedBy], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "loggedBy")
+  Volunteer_WorkLogEntry_loggedForToVolunteer Volunteer @relation("WorkLogEntry_loggedForToVolunteer", fields: [loggedFor], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor")
+
+  @@index([id], map: "logID_idx")
+  @@index([loggedBy], map: "loggedBy_idx")
+  @@index([loggedFor], map: "logged_for_idx")
+}
+
+model VolunteerToWorkGroup {
+  volunteerId String
+  workGroupId String
+  Volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade, map: "_VolunteerToWorkGroup_A_fkey")
+  WorkGroup   WorkGroup @relation(fields: [workGroupId], references: [id], onDelete: Cascade, map: "_VolunteerToWorkGroup_B_fkey")
+
+  @@unique([volunteerId, workGroupId], map: "_VolunteerToWorkGroup_AB_unique")
+  @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
+  @@map("_VolunteerToWorkGroup")
+}
