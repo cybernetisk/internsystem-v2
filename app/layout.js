@@ -15,6 +15,8 @@ import {
   Card,
 } from "@mui/material";
 
+import { DrawerHeader, Drawer, AppBar } from "./components/Drawer/Drawer";
+import { DrawerItemElement, DrawerItems } from "./components/Drawer/DrawerItems";
 import { Suspense, useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@emotion/react";
@@ -28,7 +30,7 @@ import WebsiteBreadcrumbs from "./components/Breadcrumbs";
 
 export default function RootLayout({ children }) {
   
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
   const [collapsed, setCollapsed] = useState({});
   const pathname = usePathname();
   const breadcrumbs = WebsiteBreadcrumbs("", pathname);
@@ -72,13 +74,17 @@ export default function RootLayout({ children }) {
             
             <AppBar position="fixed" open={drawerOpen}>
               <Toolbar>
-                {/* <IconButton
+                <IconButton
                   color="inherit"
                   edge="start"
                   onClick={() => toggleDrawer()}
+                  sx={{
+                    marginRight: 5,
+                    ...(drawerOpen && { display: "none" }),
+                  }}
                 >
                   <Menu />
-                </IconButton> */}
+                </IconButton>
                 <Typography
                   variant="h6"
                   noWrap
@@ -94,6 +100,66 @@ export default function RootLayout({ children }) {
               </Toolbar>
             </AppBar>
 
+            <Drawer
+              variant="permanent"
+              open={drawerOpen}
+              style={{ display: "flex", backgroundColor: "purple" }}
+            >
+              <DrawerHeader>
+                <IconButton onClick={() => toggleDrawer()}>
+                  <ChevronRight />
+                </IconButton>
+              </DrawerHeader>
+
+              <List
+                style={{
+                  flexGrow: "1",
+                  backgroundColor: cybTheme.palette.background.default,
+                }}
+              >
+                {DrawerItems.map((item) => (
+                  <div key={`drawer_item_container_${item.id}`}>
+                    <DrawerItemElement
+                      elem={item}
+                      pathname={pathname}
+                      drawerOpen={drawerOpen}
+                      setCollapsed={collapseHandler}
+                    />
+                    {item.children ? (
+                      <Collapse
+                        key={`drawer_item_container_collapse_${item.id}`}
+                        in={collapsed[item.id]}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <Card
+                          key={`drawer_item_container_card_${item.id}`}
+                          elevation={0}
+                          // elevation={3}
+                          sx={{
+                            backgroundColor: cybTheme.palette.background.paper,
+                          }}
+                        >
+                          {item.children.map((ec) => (
+                            <DrawerItemElement
+                              key={`drawer_item_element_${ec.id}`}
+                              elem={ec}
+                              pathname={pathname}
+                              drawerOpen={drawerOpen}
+                              setCollapsed={collapseHandler}
+                            />
+                          ))}
+                        </Card>
+                      </Collapse>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                ))}
+              </List>
+
+            </Drawer>
+
             <Container
               maxWidth="md"
               sx={{
@@ -102,6 +168,7 @@ export default function RootLayout({ children }) {
                 height: "100%",
               }}
             >
+              <DrawerHeader />
 
               <Container sx={{ p: 2, height: "100%" }}>
                 <Breadcrumbs separator="›">{breadcrumbs}</Breadcrumbs>
