@@ -39,9 +39,9 @@ jobs:
         EOT
         git pull origin main
         npm install
-        dotenv -e .env.temp npx prisma db pull
+        npx dotenv -e .env.temp npx prisma db pull
         npx prisma generate
         npm run build
-        pm2 restart ISV2_start_script
+        npx pm2 restart ISV2_start_script
         rm .env.temp
         EOF
