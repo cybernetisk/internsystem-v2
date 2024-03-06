@@ -24,7 +24,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ env.TEMP_SERVER_USER }}@${{ env.TEMP_SERVER_ADDRESS }} << 'EOF'
           cd auth-cyb
           cat <<EOT > .env.test
-            DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
+            DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
             
             NEXTAUTH_URL = '${{ env.NEXTAUTH_URL }}'
             NEXTAUTH_CALLBACK = '${{ secrets.NEXTAUTH_URL }}/pages/home'
