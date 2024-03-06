@@ -10,7 +10,7 @@ export default function Home() {
 
   return (
     <Typography variant="h3">
-      Welcome {name ? "," : ""} {name}
+      {/* Welcome {name ? "," : ""} {name} */}
     </Typography>
   );
 }

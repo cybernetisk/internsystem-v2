@@ -1,20 +1,19 @@
-
 import { createTheme } from "@mui/material";
 
 export const cybTheme = createTheme({
   palette: {
-    mode: "light",
+    mode: "dark",
     primary: {
-      main: "#0E0E0E",
+      main: "#d2a30e",
     },
     secondary: {
-      main: "#d48212",
+      main: "#ac0bce",
     },
     warning: {
       main: "#ffe358",
     },
     background: {
-      paper: "#E8E8E8",
+      paper: "#181817",
     },
   },
 });
