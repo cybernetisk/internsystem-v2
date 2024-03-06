@@ -19,7 +19,7 @@
     "@sanity/image-url": "^1.0.2",
     "@sanity/orderable-document-list": "^1.2.1",
     "@sanity/vision": "^3.31.0",
-    "dotenv": "^16.4.5",
+    "dotenv-cli": "^7.3.0",
     "next": "14.1.0",
     "next-auth": "^4.24.5",
     "next-sanity": "^7.1.4",
