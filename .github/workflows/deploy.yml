@@ -22,8 +22,8 @@ jobs:
     - name: Connect and deploy
       run: |
         ssh -o StrictHostKeyChecking=no ${{ vars.TEMP_SERVER_USER }}@${{ vars.TEMP_SERVER_ADDRESS }} << 'EOF'
-        cd auth-cyb
-        cat <<'EOT' > .env.test
+        cd internsystem-v2
+        cat <<'EOT' > .env.temp
         DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
         
         NEXTAUTH_URL = '${{ vars.NEXTAUTH_URL }}'
@@ -37,4 +37,11 @@ jobs:
         NEXT_PUBLIC_SANITY_DATASET = '${{ vars.NEXT_PUBLIC_SANITY_DATASET }}'
         NEXT_PUBLIC_SANITY_PROJECT_ID = '${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}'
         EOT
+        git pull origin main
+        npm install
+        dotenv -e .env.temp npx prisma db pull
+        npx prisma generate
+        npm run build
+        pm2 restart ISV2_start_script
+        rm .env.temp
         EOF
