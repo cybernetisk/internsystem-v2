@@ -40,8 +40,8 @@ export default function UserAvatarMenu() {
         {image ? (
           <Avatar alt={name} src={image} />
         ) : (
-          <Avatar sx={{ bgcolor: cybTheme.palette.secondary.main }}>
-            <Person sx={{ color: cybTheme.palette.primary.main }} />
+          <Avatar sx={{ bgcolor: cybTheme.palette.primary.main }}>
+            <Person sx={{ color: cybTheme.palette.background.main }} />
           </Avatar>
         )}
       </IconButton>
