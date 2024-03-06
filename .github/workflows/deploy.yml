@@ -24,17 +24,17 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ vars.TEMP_SERVER_USER }}@${{ vars.TEMP_SERVER_ADDRESS }} << 'EOF'
           cd auth-cyb
           cat <<EOT > .env.test
-            DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
-            
-            NEXTAUTH_URL = '${{ vars.NEXTAUTH_URL }}'
-            NEXTAUTH_CALLBACK = '${{ secrets.NEXTAUTH_URL }}/pages/home'
-            NEXTAUTH_SECRET = '${{ secrets.NEXTAUTH_SECRET }}'
-            
-            NEXTAUTH_GITHUB_CLIENT_ID = '${{ vars.NEXTAUTH_GITHUB_CLIENT_ID }}'
-            NEXTAUTH_GITHUB_CLIENT_SECRET = '${{ secrets.NEXTAUTH_GITHUB_CLIENT_SECRET }}'
-            
-            NEXT_PUBLIC_SANITY_API_VERSION = '${{ vars.NEXT_PUBLIC_SANITY_API_VERSION }}'
-            NEXT_PUBLIC_SANITY_DATASET = '${{ vars.NEXT_PUBLIC_SANITY_DATASET }}'
-            NEXT_PUBLIC_SANITY_PROJECT_ID = '${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}'
+          DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
+          
+          NEXTAUTH_URL = '${{ vars.NEXTAUTH_URL }}'
+          NEXTAUTH_CALLBACK = '${{ secrets.NEXTAUTH_URL }}/pages/home'
+          NEXTAUTH_SECRET = '${{ secrets.NEXTAUTH_SECRET }}'
+          
+          NEXTAUTH_GITHUB_CLIENT_ID = '${{ vars.NEXTAUTH_GITHUB_CLIENT_ID }}'
+          NEXTAUTH_GITHUB_CLIENT_SECRET = '${{ secrets.NEXTAUTH_GITHUB_CLIENT_SECRET }}'
+          
+          NEXT_PUBLIC_SANITY_API_VERSION = '${{ vars.NEXT_PUBLIC_SANITY_API_VERSION }}'
+          NEXT_PUBLIC_SANITY_DATASET = '${{ vars.NEXT_PUBLIC_SANITY_DATASET }}'
+          NEXT_PUBLIC_SANITY_PROJECT_ID = '${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}'
           EOT
         EOF
