@@ -2,20 +2,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Stack, Typography } from "@mui/material";
+import { sanityClient } from "../../../sanity/client";
+import PageBuilder from "../../components/sanity/PageBuilder";
 
-export default function AboutCYBPage(params) {
+async function sanityFetch(setPage) {
+  const query = `*[_type == "page" && title == "About Escape"] {
+    pageBuilder[] {
+      _type,
+      heading,
+      _type == "textblock" => {
+        body
+      },
+      _type == "gallery" => {
+        images
+      }
+    }
+  }[0]`;
 
-  return (
-    <Stack
-      spacing={4}
-      direction="column"
-      alignContent="center"
-      sx={{ height: "100%" }}
-    >
-      
+  const page = await sanityClient.fetch(query);
 
-      
-    </Stack>
-  );
+  setPage(page);
+}
+
+export default function AboutCYBPage() {
+
+  const [page, setPage] = useState(null);
+
+  useEffect(() => {
+    sanityFetch(setPage);
+  }, []);
+  
+  return page?.pageBuilder ? PageBuilder(page) : <></>;
 }

@@ -1,16 +1,36 @@
+
 "use client";
 
-import { useSession } from "next-auth/react";
-import { Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { sanityClient } from "../../../sanity/client"
+import PageBuilder from "../../components/sanity/PageBuilder"
+
+async function sanityFetch(hook) {
+  const query = `*[_type == "page" && title == "Home"] {
+    pageBuilder[] {
+      _type,
+      heading,
+      _type == "textblock" => {
+        body
+      },
+      _type == "gallery" => {
+        images
+      }
+    }
+  }[0]`;
+
+  const pages = await sanityClient.fetch(query);
+
+  hook(pages);
+}
 
 export default function Home() {
-  const session = useSession();
 
-  const name = session.data ? session.data.user.name : "";
-
-  return (
-    <Typography variant="h3">
-      {/* Welcome {name ? "," : ""} {name} */}
-    </Typography>
-  );
+  const [page, setPage] = useState([]);
+  
+  useEffect(() => {
+    sanityFetch(setPage);
+  }, []);
+  
+  return page?.pageBuilder ? PageBuilder(page, 2) : <></>;
 }
