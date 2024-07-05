@@ -1,44 +1,69 @@
+
 "use client";
 
-import { Button, Container } from "@mui/material";
-import { signOut, signIn, useSession } from "next-auth/react";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { signIn, useSession } from "next-auth/react";
+import { Person } from "@mui/icons-material";
 import { cybTheme } from "../themeCYB";
+import { useRouter } from "next/navigation";
+// import { useEffect, useState } from "react";
 
-export default function AccountSignIn() {
+export default function LoginButton() {
+  
+  // const [firstName, setFirstName] = useState("");
+  
+  const router = useRouter();
   const session = useSession();
-
-  const handleSignIn = () => {
-    signIn();
+  
+  const handleClick = (event) => {
+    if (session.status == "authenticated") {
+      router.push("/pages/main/profile");
+    } else {
+      signIn();
+    }
   };
-
-  const handleSignOut = () => {
-    signOut({
-      callbackUrl: process.NEXTAUTH_CALLBACK_SIGNOUT,
-    });
-  };
-
-  const accountAction = () => session.status === "authenticated" ? handleSignOut() : handleSignIn();
-  const loginText = session.status === "authenticated" ? "Sign out" : "Sign in";
+  
+  // console.log("AvatarMenu: session", session);
+  
+  // 
+  // useEffect(() => {
+  //   if (session.status == "authenticated") {
+  //     setFirstName(session.data.user.firstName);
+  //   }
+  // }, [session]);
 
   return (
-    <Container
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "10px",
-        backgroundColor: cybTheme.palette.background.default,
-      }}
-    >
-      <Button variant="contained" onClick={accountAction}>
-        {loginText}
-      </Button>
+    <Box>
+      <Card sx={{ display: "flex", flexDirection: "row" }}>
+        <CardActionArea onClick={handleClick}>
+          <CardContent>
+            <Stack
+              spacing={2}
+              direction="row"
+              alignContent="center"
+              alignItems="center"
+            >
+              <Typography>{session.data != undefined ? session.data.user.firstName : "Login"}</Typography>
 
-      {/* <AccountPopover
-              anchorEl={accountPopover.anchorRef.current}
-              open={true}
-              onClose={accountPopover.handleClose}
-            /> */}
-    </Container>
+              {false ? (
+                <Avatar alt="Image of user" src={""} />
+              ) : (
+                <Avatar sx={{ bgcolor: cybTheme.palette.primary.main }}>
+                  <Person sx={{ color: cybTheme.palette.background.main }} />
+                </Avatar>
+              )}
+            </Stack>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Box>
   );
 }
