@@ -1,5 +1,6 @@
 
-import { Stack, Typography } from "@mui/material";
+import { imageBuilder } from "@/sanity/client";
+import { Box, Stack, Typography } from "@mui/material";
 
 export default function PageBuilder(pageContent) {
   let contentSpacing = 2;
@@ -29,19 +30,25 @@ export default function PageBuilder(pageContent) {
               </Stack>
             );
           case "gallery":
+          
+            const images = e.images.map((f, i) => {
+              return (
+                <Box
+                  component="img"
+                  key={"sanity_image_" + i}
+                  alt={f.alt}
+                  src={imageBuilder.image(f).url()}
+                />
+              );
+            })
+          
             return (
               <Stack
                 key={"pagebuilder_stack_" + i}
                 direction="column"
                 spacing={contentSpacing}
               >
-                <Typography
-                  key={"pagebuilder_theader" + i}
-                  variant={headerSize}
-                >
-                  {e.heading}
-                </Typography>
-                {/* <Typography variant="body2">{e.image}</Typography> */}
+                {images}
               </Stack>
             );
           default:
