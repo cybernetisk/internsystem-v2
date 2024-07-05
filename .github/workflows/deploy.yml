@@ -27,7 +27,7 @@ jobs:
         DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
         
         NEXTAUTH_URL = '${{ vars.NEXTAUTH_URL }}'
-        NEXTAUTH_CALLBACK = '${{ secrets.NEXTAUTH_URL }}/pages/home'
+        NEXTAUTH_CALLBACK = '${{ secrets.NEXTAUTH_URL }}/pages/main/home'
         NEXTAUTH_SECRET = '${{ secrets.NEXTAUTH_SECRET }}'
         
         NEXTAUTH_GITHUB_CLIENT_ID = '${{ vars.NEXTAUTH_GITHUB_CLIENT_ID }}'
