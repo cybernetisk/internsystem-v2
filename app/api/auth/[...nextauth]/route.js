@@ -25,6 +25,10 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user }) {
       
+      if (user.email != "buttonscadbury@gmail.com" || user.email != "ericatsvebakk@gmail.com") {
+        throw "Not Eric"
+      }
+      
       const cybUser = await prisma.user.findFirst({
         where: {
           email: user.email
