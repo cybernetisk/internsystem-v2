@@ -1,6 +1,7 @@
 
 import { Typography } from "@mui/material";
 import Link from "next/link";
+import { cybTheme } from "../themeCYB";
 
 /**
  * Generates breadcrumbs from path-url
@@ -11,7 +12,7 @@ import Link from "next/link";
 export default function WebsiteBreadcrumbs(path, navItems) {
 
   let pathBits = path.split("/").filter((e) => e);
-  pathBits = pathBits.slice(1, pathBits.length);
+  pathBits = pathBits.slice(2, pathBits.length); // Remove /pages/main
 
   const mapPath2Name = {};
   
@@ -25,12 +26,13 @@ export default function WebsiteBreadcrumbs(path, navItems) {
     const path = `/${pathBits.slice(0, index + 1).join("/")}`;
 
     return (
-      <Link key={"link_" + path} href={"/pages/" + path}>
+      <Link key={"link_" + path} href={"/pages/main/" + path}>
         <Typography
-          color="text.primary"
+          // color="text.primary"
           variant="body2"
           key={"typography" + path}
           alignSelf="center"
+          sx={{ "&:hover": { color: cybTheme.palette.primary.main } }}
         >
           {mapPath2Name[path] ? mapPath2Name[path] : value}
         </Typography>
