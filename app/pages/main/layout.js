@@ -1,24 +1,24 @@
 "use client";
 
-import "./../globals.css";
+// import "./../globals.css";
+import "./../../globals.css";
 
 import { EmojiPeople, Groups, Home, PersonAdd } from "@mui/icons-material";
 import { Box, CssBaseline, Container, Breadcrumbs } from "@mui/material";
-import { NavBarOffset, NavBar } from "../components/layout/AppBar";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@emotion/react";
 import { usePathname } from "next/navigation";
-import { cybTheme } from "./../components/themeCYB";
-
-import WebsiteBreadcrumbs from "../components/layout/Breadcrumbs";
-import LayoutFooter from "../components/layout/Footer";
+import { NavBarOffset, NavBar } from "@/app/components/layout/AppBar";
+import { cybTheme } from "@/app/components/themeCYB";
+import WebsiteBreadcrumbs from "@/app/components/layout/Breadcrumbs";
+import LayoutFooter from "@/app/components/layout/Footer";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },
   { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <PersonAdd /> },
   { id: "aboutEscape", path: "aboutEscape", name: "About Escape", icon: <Groups /> },
   { id: "volunteering", path: "volunteering", name: "Volunteering", icon: <EmojiPeople /> },
-  { id: "admin", path: "admin", name: "Admin", icon: <EmojiPeople /> },
+  // { id: "admin", path: "admin", name: "Admin", icon: <EmojiPeople /> },
 ];
 
 const SocialMedia = [
@@ -63,7 +63,7 @@ export default function RootLayout({ children }) {
             <NavBar currentPath={pathname} navItems={NavItems} />
 
             <Container
-              maxWidth="md"
+              maxWidth="lg"
               sx={{
                 backgroundColor: cybTheme.palette.background.paper,
                 height: "auto",
@@ -72,9 +72,11 @@ export default function RootLayout({ children }) {
               <NavBarOffset />
 
               <Container sx={{ p: 2, minHeight: "100vh" }}>
-                <Breadcrumbs>{breadcrumbs}</Breadcrumbs>
+                <Box sx={{ backgroundColor: "rgba(0,0,0, 0.2)" }}>
+                  <Breadcrumbs>{breadcrumbs}</Breadcrumbs>
+                </Box>
 
-                <Container sx={{ my: 6, px: 0 }} disableGutters>
+                <Container sx={{ my: 3, px: 0 }} disableGutters>
                   <SessionProvider>{children}</SessionProvider>
                 </Container>
               </Container>

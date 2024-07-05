@@ -12,10 +12,10 @@ import {
 import { SessionProvider } from "next-auth/react";
 import { Component } from "react";
 import { cybTheme } from "./../themeCYB";
-import UserAvatarMenu from "../Login/UserAvatarMenu";
 import cybLogo from "./../../icon.png";
 import Image from "next/image";
 import Link from "next/link";
+import LoginButton from "../Login/LoginButton";
 
 const drawerWidth = 240;
 
@@ -26,8 +26,8 @@ export class NavBar extends Component {
     return (
       <AppBar position="fixed">
         <Toolbar>
-          <Avatar sx={{ marginRight: 5 }}>
-            <Image src={cybLogo} alt="cyb logo" fill />
+          <Avatar sx={{ marginRight: 5, height: 45, width: 45 }}>
+            <Image src={cybLogo} alt="cyb logo" fill/>
           </Avatar>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
@@ -35,7 +35,7 @@ export class NavBar extends Component {
           </Box>
 
           <SessionProvider>
-            <UserAvatarMenu />
+            <LoginButton/>
           </SessionProvider>
         </Toolbar>
       </AppBar>
@@ -77,7 +77,7 @@ function NavItemElement(item, currentPath) {
     return (
       <Link
         key={`link_${item.id}`}
-        href={`/pages/${item.path}`}
+        href={`/pages/main/${item.path}`}
         // passHref
         style={{ textDecoration: "none" }}
       >
@@ -87,7 +87,7 @@ function NavItemElement(item, currentPath) {
               key={`link_item_text_${item.id}`}
               sx={{
                 color:
-                  currentPath == `/pages/${item.path}`
+                  currentPath == `/pages/main/${item.path}`
                     ? cybTheme.palette.primary.main
                     : cybTheme.palette.text.primary,
               }}

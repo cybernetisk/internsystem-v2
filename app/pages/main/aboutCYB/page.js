@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
-import { sanityClient } from "../../../sanity/client";
-import PageBuilder from "../../components/sanity/PageBuilder";
+import { sanityClient } from "@/sanity/client";
+import PageBuilder from "@/app/components/sanity/PageBuilder";
 
 async function sanityFetch(setHS, setKS, setPage) {
   const query1 = (name) => `*[_type == "${name}"]|order(orderRank) {

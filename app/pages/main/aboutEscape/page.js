@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { sanityClient } from "../../../sanity/client";
-import PageBuilder from "../../components/sanity/PageBuilder";
+import { sanityClient } from "@/sanity/client";
+import PageBuilder from "@/app/components/sanity/PageBuilder";
 
 async function sanityFetch(setPage) {
   const query = `*[_type == "page" && title == "About Escape"] {

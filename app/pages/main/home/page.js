@@ -2,8 +2,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { sanityClient } from "../../../sanity/client"
-import PageBuilder from "../../components/sanity/PageBuilder"
+import { sanityClient } from "@/sanity/client";
+import PageBuilder from "@/app/components/sanity/PageBuilder";
+import { Box } from "@mui/material";
 
 async function sanityFetch(hook) {
   const query = `*[_type == "page" && title == "Home"] {
@@ -24,7 +25,7 @@ async function sanityFetch(hook) {
   hook(pages);
 }
 
-export default function Home() {
+export default function HomePage(params) {
 
   const [page, setPage] = useState([]);
   
@@ -32,5 +33,9 @@ export default function Home() {
     sanityFetch(setPage);
   }, []);
   
-  return page?.pageBuilder ? PageBuilder(page, 2) : <></>;
+  return (
+    <Box>
+      {page?.pageBuilder ? PageBuilder(page, 2) : <></>}
+    </Box>
+  )
 }
