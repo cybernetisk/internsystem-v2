@@ -1,10 +1,10 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
+import { Avatar, Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import { sanityClient } from "@/sanity/client";
 import PageBuilder from "@/app/components/sanity/PageBuilder";
+import { useRouter } from "next/navigation";
 
 async function sanityFetch(setHS, setKS, setPage) {
   const query1 = (name) => `*[_type == "${name}"]|order(orderRank) {
@@ -38,44 +38,44 @@ async function sanityFetch(setHS, setKS, setPage) {
   setPage(page);
 }
 
-
 export default function AboutCYBPage() {
+  const [hs, setHS] = useState([]);
+  const [ks, setKS] = useState([]);
+  const [page, setPage] = useState(null);
+  
+  const router = useRouter();
 
-    const [hs, setHS] = useState([]);
-    const [ks, setKS] = useState([]);
-    const [page, setPage] = useState(null);
+  useEffect(() => {
+    sanityFetch(setHS, setKS, setPage);
+  }, []);
 
-    useEffect(() => {
-      sanityFetch(setHS, setKS, setPage);
-    }, []);
+  console.log(page);
 
-    console.log(page);
+  const pageContent = page?.pageBuilder ? PageBuilder(page, 2) : <></>;
 
-    const pageContent = page?.pageBuilder ? PageBuilder(page, 2) : <></>;
+  return (
+    <Stack
+      spacing={4}
+      direction="column"
+      alignContent="center"
+      sx={{ height: "100%" }}
+    >
+      {pageContent}
 
-    return (
-      <Stack
-        spacing={4}
-        direction="column"
-        alignContent="center"
-        sx={{ height: "100%" }}
-      >
-        {pageContent}
-
-        <Stack spacing={2} direction="row" sx={{ width: "100%" }}>
-          <Stack spacing={1} direction="column" sx={{ width: "100%" }}>
-            <Typography variant="h6">Hovedstyret</Typography>
-            {hs ? card(hs) : <></>}
-          </Stack>
-          <Stack spacing={1} direction="column" sx={{ width: "100%" }}>
-            <Typography variant="h6">Kjellerstyret</Typography>
-            {ks ? card(ks) : <></>}
-          </Stack>
+      <Stack spacing={2} direction="row" sx={{ width: "100%" }}>
+        <Stack spacing={1} direction="column" sx={{ width: "100%" }}>
+          <Typography variant="h6">Hovedstyret</Typography>
+          {hs ? card(hs) : <></>}
+        </Stack>
+        <Stack spacing={1} direction="column" sx={{ width: "100%" }}>
+          <Typography variant="h6">Kjellerstyret</Typography>
+          {ks ? card(ks) : <></>}
         </Stack>
       </Stack>
-    );
+      {/* <Button onClick={() => router.push("aboutCYB/pastBoardmembers")}>Explore</Button> */}
+    </Stack>
+  );
 }
-
 
 const card = (list) => {
   return list.map((p) => {
