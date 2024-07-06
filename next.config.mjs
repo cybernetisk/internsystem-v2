@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // basePath: "/pages",
   async redirects() {
     return [
       {
         source: "/",
-        destination: "/main/pages/home",
+        destination: "/pages/main/home",
         permanent: true,
         basePath: false,
       },
