@@ -1,8 +1,8 @@
 import { orderRankField } from "@sanity/orderable-document-list";
 
 export default {
-  name: "verv",
-  title: "CYB verv",
+  name: "boardPosition",
+  title: "CYB board position",
   type: "document",
   fields: [
     {

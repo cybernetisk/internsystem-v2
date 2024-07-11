@@ -12,7 +12,7 @@ const board = (name, title) => {
         name: "title",
         title: "Title",
         type: "reference",
-        to: [{ type: "verv" }],
+        to: [{ type: "boardPosition" }],
       },
       {
         name: "name",

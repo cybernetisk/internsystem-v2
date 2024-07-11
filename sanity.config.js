@@ -27,10 +27,13 @@ export default defineConfig({
           .title("Content")
           .items([
             // Minimum required configuration
-            orderableDocumentListDeskItem({ type: "hovedstyret", title: "Hovedstyret", S, context }),
-            orderableDocumentListDeskItem({ type: "kjellerstyret", title: "Kjellerstyret", S, context }),
-            S.documentTypeListItem("verv"),
+            // orderableDocumentListDeskItem({ type: "hovedstyret", title: "Hovedstyret", S, context }),
+            // orderableDocumentListDeskItem({ type: "kjellerstyret", title: "Kjellerstyret", S, context }),
+            S.documentTypeListItem("boardPosition"),
             S.documentTypeListItem("page"),
+            S.documentTypeListItem("event"),
+            orderableDocumentListDeskItem({ type: "workGroup", title: "Work groups", S, context }),
+            // S.documentTypeListItem("interngruppe"),
           ]);
       },
     }),
