@@ -1,9 +1,8 @@
 "use client";
 
-// import "./../globals.css";
 import "./../../globals.css";
 
-import { EmojiPeople, Groups, Home, PersonAdd } from "@mui/icons-material";
+import { Coffee, EmojiPeople, Groups, Home, PersonAdd } from "@mui/icons-material";
 import { Box, CssBaseline, Container, Breadcrumbs } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@emotion/react";
@@ -15,10 +14,9 @@ import LayoutFooter from "@/app/components/layout/Footer";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },
-  { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <PersonAdd /> },
-  { id: "aboutEscape", path: "aboutEscape", name: "About Escape", icon: <Groups /> },
+  { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
+  { id: "aboutEscape", path: "aboutEscape", name: "About Escape", icon: <Coffee /> },
   { id: "volunteering", path: "volunteering", name: "Volunteering", icon: <EmojiPeople /> },
-  // { id: "admin", path: "admin", name: "Admin", icon: <EmojiPeople /> },
 ];
 
 const SocialMedia = [
@@ -35,7 +33,12 @@ const SocialMedia = [
   {
     name: "wiki",
     value: "CYB",
-    link: "https://wiki.cyb.no"
+    link: "https://wiki.cyb.no",
+  },
+  {
+    name: "Github",
+    value: "cybernetisk",
+    link: "https://github.com/cybernetisk",
   },
 ];
 
