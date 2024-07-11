@@ -55,6 +55,8 @@ export default class CustomTable extends Component {
     let tableHeaderData = headers ? headers : [];
     // let sortBy = headers ? headers[0].id : "";
     let rawTableData = data;
+    
+    // console.log(data)
 
     const tableRowData = rawTableData
       ? rawTableData
@@ -63,8 +65,15 @@ export default class CustomTable extends Component {
             let elemB = b[sortBy];
 
             switch (typeof elemA) {
+              case "number":
+                return elemB - elemA;
               case "string":
-                return elemA.toLowerCase().localeCompare(elemB.toLowerCase());
+                if (typeof elemB == "string" && elemB.length != 0) {
+                  return elemA.toLowerCase().localeCompare(elemB.toLowerCase());
+                }
+                return elemA
+              case "object":
+                return elemA
               default:
                 return elemB - elemA;
             }
@@ -89,7 +98,7 @@ export default class CustomTable extends Component {
                     textDecoration: h.id == sortBy ? "underline" : "none",
                     ":hover": {
                       cursor: "pointer",
-                      opacity: 0.9,
+                      // opacity: 0.9,
                     },
                   }}
                   onClick={() => this.updateSortBy(h.id)}

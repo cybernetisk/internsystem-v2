@@ -41,29 +41,27 @@ export default function LoginButton() {
   // }, [session]);
 
   return (
-    <Box>
-      <Card sx={{ display: "flex", flexDirection: "row" }}>
-        <CardActionArea onClick={handleClick}>
-          <CardContent>
-            <Stack
-              spacing={2}
-              direction="row"
-              alignContent="center"
-              alignItems="center"
-            >
-              <Typography>{session.data != undefined ? session.data.user.firstName : "Login"}</Typography>
+    <Card sx={{ display: "flex", flexDirection: "row" }}>
+      <CardActionArea onClick={handleClick}>
+        <CardContent>
+          <Stack
+            spacing={2}
+            direction="row"
+            alignContent="center"
+            alignItems="center"
+          >
+            <Typography>{session.data != undefined ? session.data.user.firstName : "Login"}</Typography>
 
-              {false ? (
-                <Avatar alt="Image of user" src={""} />
-              ) : (
-                <Avatar sx={{ bgcolor: cybTheme.palette.primary.main }}>
-                  <Person sx={{ color: cybTheme.palette.background.main }} />
-                </Avatar>
-              )}
-            </Stack>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </Box>
+            {false ? (
+              <Avatar alt="Image of user" src={""} />
+            ) : (
+              <Avatar sx={{ bgcolor: cybTheme.palette.primary.main }}>
+                <Person sx={{ color: cybTheme.palette.background.main }} />
+              </Avatar>
+            )}
+          </Stack>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 }
