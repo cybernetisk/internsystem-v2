@@ -41,6 +41,16 @@ jobs:
         NEXT_PUBLIC_SANITY_PROJECT_ID = '${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}'
         EOT
         rm prisma/schema.prisma
+        cat <<'EOT' > prisma/schema.prisma
+        generator client {
+          provider = "prisma-client-js"
+        }
+        
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+        EOT
         git pull origin main
         npm install
         npx dotenv -e .env.production npx prisma db pull
