@@ -23,6 +23,8 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ vars.TEMP_SERVER_USER }}@${{ vars.TEMP_SERVER_ADDRESS }} << 'EOF'
         cd internsystem-v2
+        git checkout -f
+        git pull origin main
         cat <<'EOT' > .env.production
         DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
         
@@ -40,21 +42,9 @@ jobs:
         NEXT_PUBLIC_SANITY_DATASET = '${{ vars.NEXT_PUBLIC_SANITY_DATASET }}'
         NEXT_PUBLIC_SANITY_PROJECT_ID = '${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}'
         EOT
-        rm prisma/schema.prisma
-        cat <<'EOT' > prisma/schema.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-        
-        datasource db {
-          provider = "mysql"
-          url      = env("DATABASE_URL")
-        }
-        EOT
-        git pull origin main
         npm install
-        npx dotenv -e .env.production npx prisma db pull
         npx prisma generate
         npm run build
         npx pm2 restart ISV2_start_script
+        rm .env.production
         EOF
