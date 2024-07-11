@@ -1,13 +1,14 @@
 
 "use client"
 
-import { prismaRequest } from "@/app/components/prisma/prismaRequest"
-import { Avatar, Box, Button, Stack, TextField, Typography } from "@mui/material"
+import authWrapper from "@/app/middleware/authWrapper"
+import { prismaRequest } from "@/app/middleware/prisma/prismaRequest"
+import { Avatar, Box, Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material"
 import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function ProfilePage() {
+function ProfilePage() {
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -16,9 +17,7 @@ export default function ProfilePage() {
   const session = useSession();
   const router = useRouter()
   
-  if (session.status == "unauthenticated") {
-    router.push("home")
-  }
+  const userRoles = session.data.user.roles.map((e) => e.name);
   
   // queries database for user data
   useEffect(() => {
@@ -37,6 +36,8 @@ export default function ProfilePage() {
         <Stack
           direction="column"
           spacing={2}
+          // maxWidth={250}
+          sx={{ border: "1px solid red" }}
         >
           {CheckedTextField("First name", firstName, setFirstName)}
           {CheckedTextField("Last name", lastName, setLastName)}
@@ -44,10 +45,23 @@ export default function ProfilePage() {
           <Button variant="outlined">Update</Button>
         </Stack>
 
-        <Stack direction="column">
-          <Button variant="outlined" onClick={() => router.push("admin")}>
-            Admin settings
-          </Button>
+        <Stack direction="column" spacing={1} sx={{ border: "1px solid red" }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Roles:</Typography>
+              
+              {userRoles.map((e) => <Typography key={e} variant="body1">{e}</Typography>)}
+              
+              <Typography variant="body1">
+                {userRoles.length == 0 ? "none": ""}
+              </Typography>
+            </CardContent>
+            
+          </Card>
+          
+          
+          
+          {AdminRedirectButton(session, router)}
         </Stack>
       </Stack>
 
@@ -55,6 +69,19 @@ export default function ProfilePage() {
         sign out
       </Button>
     </Stack>
+  );
+}
+
+const AdminRedirectButton = (session, router) => {
+  
+  const userRoles = session.data.user.roles.map((e) => e.name)
+  
+  if (!userRoles.includes("admin")) return
+  
+  return (
+    <Button variant="outlined" onClick={() => router.push("admin")}>
+      Admin settings
+    </Button>
   );
 }
 
@@ -70,3 +97,5 @@ const CheckedTextField = (title, textValue, textCallback) => {
     />
   );
 };
+
+export default authWrapper(ProfilePage)

@@ -2,20 +2,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Autocomplete, Button, Grid, Paper, Stack, TextField, Typography } from "@mui/material";
-import CustomTable from "@/app/components/table";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { prismaRequest } from "@/app/components/prisma/prismaRequest";
-import { format, parseISO } from "date-fns"
+import { Autocomplete, Button, Card, Grid, Paper, Stack, TextField, Typography } from "@mui/material";
+import CustomTable from "@/app/components/table";
+import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import handleWorkGroups from "./handleWorkGroups";
+import useRole from "@/app/middleware/useRole";
+import authWrapper from "@/app/middleware/authWrapper";
+import handleRoles from "./handleRoles";
 
 const TABLE_HEADERS_USERS = [
   { id: "firstName", name: "First name" },
   { id: "lastName", name: "Last name" },
   { id: "email", name: "Email" },
   { id: "createdAt", name: "member since" },
-  { id: "active", name: "active" },
+  // { id: "active", name: "active" },
   {
     id: "delete",
     name: "delete",
@@ -32,23 +34,57 @@ const TABLE_HEADERS_GROUPS = [
 
 
 
-export default function AdminPage(params) {
+function AdminPage(params) {
 
   const [users, setUsers] = useState([])
   const [groups, setGroups] = useState([])
-  const [refresh, setRefresh] = useState(false)
+  const [roles, setRoles] = useState([]);
   
-  const session = useSession()
   const router = useRouter()
-  
-  if (session.status == "unauthenticated") {
-    router.push("home");
-  }
+  // const roleAdmin = useRole("admin")
+  // const session = useSession({
+  //   required: true,
+  //   onUnauthenticated() {
+  //     router.push("home");
+  //   }
+  // })
   
   useEffect(() => {
-    handlePrisma("user", "find", {}, setUsers);
-    handlePrisma("workGroup", "find", {include: { VolunteerToWorkGroup: true }},  (data) => setGroups(data.map((e) => { return { ...e, userCount: e.VolunteerToWorkGroup.length }; })));
-  }, [refresh])
+    prismaRequest({
+      model: "user",
+      method: "find",
+      request: {},
+      callback: (data) => setUsers(data.data),
+    })
+    
+    prismaRequest({
+      model: "role",
+      method: "find",
+      request: {},
+      callback: (data) => setRoles(data.data),
+      debug: true
+    })
+    
+    prismaRequest({
+      model: "workGroup",
+      method: "find",
+      request: {
+        include: { VolunteerToWorkGroup: true },
+      },
+      callback: (data) =>
+        setGroups(
+          data.data.map((e) => {
+            return {
+              ...e,
+              userCount: e.VolunteerToWorkGroup.length,
+              
+            };
+          })
+        ),
+    });
+  }, [])
+  
+  
   
   
   return (
@@ -58,6 +94,22 @@ export default function AdminPage(params) {
       alignContent="center"
       sx={{ height: "100%" }}
     >
+      <Button
+        onClick={() => {
+          prismaRequest({
+            model: "role",
+            method: "create",
+            request: {
+              data: {
+                name: "finance",
+              },
+            },
+          });
+        }}
+      >
+        add admin role
+      </Button>
+
       <Typography variant="h4">Admin panel</Typography>
 
       <CustomTable headers={TABLE_HEADERS_USERS} data={users} />
@@ -69,13 +121,17 @@ export default function AdminPage(params) {
             item
             xs={4}
             // sx={{ border: "1px solid red" }}
-           padding={3}>
-            {handleWorkGroups(groups, refresh, setRefresh)}
+            padding={3}
+          >
+            {handleWorkGroups(groups, setGroups)}
           </Grid>
 
-          <Grid item xs={4}
-          // sx={{ border: "1px solid red" }}
-          padding={3}>
+          <Grid
+            item
+            xs={4}
+            // sx={{ border: "1px solid red" }}
+            padding={3}
+          >
             <Stack direction="column" spacing={2}>
               <Typography variant="h6">Volunteers</Typography>
               <Autocomplete
@@ -89,7 +145,7 @@ export default function AdminPage(params) {
                   />
                 )}
               />
-              
+
               <Autocomplete
                 size="small"
                 options={users.map((e) => e.firstName)}
@@ -105,34 +161,17 @@ export default function AdminPage(params) {
             </Stack>
           </Grid>
 
-          <Grid item xs={4}
-          // sx={{ border: "1px solid red" }}
-          padding={3}>
+          <Grid
+            item
+            xs={4}
+            padding={3}
+            // sx={{ border: "1px solid red" }}
+          >
+            <Card>
+              
+            </Card>
             <Stack direction="column" spacing={2}>
-              <Typography variant="h6">Work Logs</Typography>
-              {/* <Autocomplete
-                size="small"
-                options={users.map((e) => e.firstName)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputLabelProps={{ shrink: true }}
-                    label="User"
-                  />
-                )}
-              />
-              <Autocomplete
-                size="small"
-                options={users.map((e) => e.firstName)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputLabelProps={{ shrink: true }}
-                    label="Work Group"
-                  />
-                )}
-              /> */}
-              {/* <Button variant="outlined">Add/Remove</Button> */}
+              {handleRoles(users, roles, setRoles)}
             </Stack>
           </Grid>
         </Grid>
@@ -141,17 +180,4 @@ export default function AdminPage(params) {
   );
 }
 
-async function handlePrisma(model, method, request, callback) {
-  
-  console.log("query", model, method, request)
-  
-  let data = await prismaRequest({
-    model: model,
-    method: method,
-    request: request
-  })
-  
-  console.log(data)
-  
-  callback(data)
-}
+export default authWrapper(AdminPage, "admin", "profile")

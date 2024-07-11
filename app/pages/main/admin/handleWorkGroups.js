@@ -1,9 +1,10 @@
 
 import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { prismaRequest } from "@/app/components/prisma/prismaRequest";
+// import { prismaRequest } from "@/app/middleware/prisma/prismaRequest";
+import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 
-export default function handleWorkGroups(groups, refresh, setRefresh) {
+export default function handleWorkGroups(groups, setGroups) {
   
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -29,8 +30,18 @@ export default function handleWorkGroups(groups, refresh, setRefresh) {
       <Button
         variant="outlined"
         onClick={() => {
-          handleAddition(name, description, refresh, setRefresh);
-          
+          prismaRequest({
+            model: "workGroup",
+            method: "create",
+            request: {
+              data: {
+                name: name,
+                description: description,
+                leaderTitle: "",
+              },
+            },
+            callback: (data) => setGroups(data.data)
+          });
         }}
       >
       Add
@@ -54,8 +65,16 @@ export default function handleWorkGroups(groups, refresh, setRefresh) {
       <Button
         variant="outlined"
         onClick={() => {
-          handleDeletion(selectedGroup, refresh, setRefresh);
-          
+          prismaRequest({
+            model: "workGroup",
+            method: "delete",
+            request: {
+              where: {
+                id: selectedGroup.id,
+              },
+            },
+            callback: (data) => setGroups(data.data),
+          });          
         }}
       >
       Remove
@@ -65,35 +84,35 @@ export default function handleWorkGroups(groups, refresh, setRefresh) {
   
 }
 
-async function handleAddition(name, description, refresh, setRefresh) {
+// async function handleAddition(name, description, refresh, setRefresh) {
   
-  const data = await prismaRequest({
-    model: "workGroup",
-    method: "create",
-    request: {
-      data: {
-        name: name,
-        description: description,
-        leaderTitle: "",
-      }
-    },
-  });
+//   const data = await prismaRequest({
+//     model: "workGroup",
+//     method: "create",
+//     request: {
+//       data: {
+//         name: name,
+//         description: description,
+//         leaderTitle: "",
+//       }
+//     },
+//   });
   
-  setRefresh(!refresh);
-}
+//   setRefresh(!refresh);
+// }
 
-async function handleDeletion(group, refresh, setRefresh) {
-  console.log(group)
+// async function handleDeletion(group, refresh, setRefresh) {
+//   console.log(group)
   
-  const data = await prismaRequest({
-    model: "workGroup",
-    method: "delete",
-    request: {
-      where: {
-        id: group.id
-      },
-    },
-  });
+//   const data = await prismaRequest({
+//     model: "workGroup",
+//     method: "delete",
+//     request: {
+//       where: {
+//         id: group.id
+//       },
+//     },
+//   });
   
-  setRefresh(!refresh);
-}
+//   setRefresh(!refresh);
+// }
