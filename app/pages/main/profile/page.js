@@ -37,7 +37,7 @@ function ProfilePage() {
           direction="column"
           spacing={2}
           // maxWidth={250}
-          sx={{ border: "1px solid red" }}
+          // sx={{ border: "1px solid red" }}
         >
           {CheckedTextField("First name", firstName, setFirstName)}
           {CheckedTextField("Last name", lastName, setLastName)}
@@ -45,7 +45,9 @@ function ProfilePage() {
           <Button variant="outlined">Update</Button>
         </Stack>
 
-        <Stack direction="column" spacing={1} sx={{ border: "1px solid red" }}>
+        <Stack direction="column" spacing={1}
+          // sx={{ border: "1px solid red" }}
+        >
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>Roles:</Typography>
