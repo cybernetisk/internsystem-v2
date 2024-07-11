@@ -5,9 +5,6 @@ import Email from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/prisma/prismaClient";
 
-
-
-
 const handler = NextAuth({
   providers: [
     Email({
@@ -24,10 +21,6 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user }) {
-      
-      if ((user.email != "buttonscadbury@gmail.com") && (user.email != "ericatsvebakk@gmail.com")) {
-        throw "Not Eric"
-      }
       
       const cybUser = await prisma.user.findFirst({
         where: {
@@ -50,21 +43,33 @@ const handler = NextAuth({
       const cybUser = await prisma.user.findFirst({
         where: {
           email: session.user.email
+        },
+        include: {
+          roles: {
+            include: {
+              role: true
+            }
+          }
         }
       })
       
       if (cybUser) {
         session.user.name = `${cybUser.firstName} ${cybUser.lastName}`
         delete session.user.name;
-        session.user.firstName = cybUser.firstName;
-        session.user.lastName = cybUser.lastName;
+        
+        session.user = {
+          ...session.user,
+          ...cybUser,
+          roles: cybUser.roles.map((e) => e.role),
+          name: `${cybUser.firstName} ${cybUser.lastName}`
+        }
       }
       
       return session
     }
   },
   pages: {
-  signIn: "/pages/auth/signIn"
+    signIn: "/pages/auth/signIn"
   },
   adapter: PrismaAdapter(prisma),
 });
