@@ -46,5 +46,4 @@ jobs:
         npx prisma generate
         npm run build
         npx pm2 restart ISV2_start_script
-        rm .env.production
         EOF
