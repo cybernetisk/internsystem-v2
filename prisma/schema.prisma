@@ -36,34 +36,6 @@ model Session {
   @@index([userId], map: "Session_userId_fkey")
 }
 
-model User {
-  id            String     @id @default(cuid())
-  firstName     String?
-  lastName      String?
-  // name          String?
-  email         String?    @unique
-  emailVerified DateTime?
-  image         String?
-  active        Boolean    @default(false)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  Volunteer     Volunteer?
-
-  ActivateToken ActivateToken[]
-}
-
-model ActivateToken {
-  id          String    @id @default(cuid())
-  token       String    @unique
-  activatedAt DateTime?
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -72,15 +44,52 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model User {
+  id            String          @id @default(cuid())
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  active        Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  firstName     String?
+  lastName      String?
+  accounts      Account[]
+  ActivateToken ActivateToken[]
+  sessions      Session[]
+  roles         UserRole[]
+  volunteer     Volunteer?
+  VoucherLog    VoucherLog[]
+  loggedByUser  WorkLog[]       @relation("WorkLog_loggedByToUser")
+  LoggedForUser WorkLog[]       @relation("WorkLog_loggedForToUser")
+}
+
+model Role {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  users     UserRole[]
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, roleId])
+  @@index([roleId], map: "UserRole_roleId_fkey")
+}
+
 model Volunteer {
-  id                                             String                 @id @default(uuid())
-  userId                                         String                 @unique
-  groupId                                        String                 @unique(map: "groupId_UNIQUE")
-  leaderStatus                                   Boolean?               @default(false)
-  User                                           User                   @relation(fields: [userId], references: [id])
-  WorkLogEntry_WorkLogEntry_loggedByToVolunteer  WorkLogEntry[]         @relation("WorkLogEntry_loggedByToVolunteer")
-  WorkLogEntry_WorkLogEntry_loggedForToVolunteer WorkLogEntry[]         @relation("WorkLogEntry_loggedForToVolunteer")
-  VolunteerToWorkGroup                           VolunteerToWorkGroup[]
+  id                   String                 @id @default(uuid())
+  userId               String                 @unique
+  groupId              String                 @unique(map: "groupId_UNIQUE")
+  leaderStatus         Boolean?               @default(false)
+  User                 User                   @relation(fields: [userId], references: [id])
+  VolunteerToWorkGroup VolunteerToWorkGroup[]
 
   @@index([groupId], map: "groupID_idx")
   @@index([userId], map: "uid_idx")
@@ -94,28 +103,6 @@ model WorkGroup {
   VolunteerToWorkGroup VolunteerToWorkGroup[]
 }
 
-model WorkLog {
-  id           String        @id
-  workTime     DateTime      @db.Timestamp(0)
-  createTime   DateTime      @default(now()) @db.Timestamp(0)
-  duration     Int
-  comment      String?       @db.VarChar(120)
-  WorkLogEntry WorkLogEntry?
-}
-
-model WorkLogEntry {
-  id                                          String    @id @default(uuid())
-  loggedBy                                    String
-  loggedFor                                   String
-  WorkLog                                     WorkLog   @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "id")
-  Volunteer_WorkLogEntry_loggedByToVolunteer  Volunteer @relation("WorkLogEntry_loggedByToVolunteer", fields: [loggedBy], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "loggedBy")
-  Volunteer_WorkLogEntry_loggedForToVolunteer Volunteer @relation("WorkLogEntry_loggedForToVolunteer", fields: [loggedFor], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor")
-
-  @@index([id], map: "logID_idx")
-  @@index([loggedBy], map: "loggedBy_idx")
-  @@index([loggedFor], map: "logged_for_idx")
-}
-
 model VolunteerToWorkGroup {
   volunteerId String
   workGroupId String
@@ -125,4 +112,239 @@ model VolunteerToWorkGroup {
   @@unique([volunteerId, workGroupId], map: "_VolunteerToWorkGroup_AB_unique")
   @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
   @@map("_VolunteerToWorkGroup")
+}
+
+model varer_konto {
+  id                       Int               @id
+  innkjopskonto            Int               @db.SmallInt
+  varelagerkonto           Int               @db.SmallInt
+  beholdningsendringskonto Int               @db.SmallInt
+  salgskonto               Int               @db.SmallInt
+  navn                     String            @db.VarChar(30)
+  gruppe                   String            @db.VarChar(20)
+  kommentar                String?           @db.Text
+  varer_raavare            varer_raavare[]
+  varer_salgsvare          varer_salgsvare[]
+}
+
+model varer_leverandor {
+  id                Int                 @id
+  navn              String              @db.VarChar(100)
+  kommentar         String?             @db.Text
+  varer_raavarepris varer_raavarepris[]
+}
+
+model varer_raavare {
+  id                     Int                      @id
+  kategori               String?                  @db.VarChar(50)
+  navn                   String                   @db.VarChar(100)
+  mengde                 Float
+  mengde_svinn           Float
+  enhet                  String                   @db.VarChar(20)
+  innkjopskonto_id       Int
+  status                 String                   @db.VarChar(10)
+  lenket_salgsvare_id    Int?
+  antall                 Float
+  type                   String?                  @db.VarChar(20)
+  varer_konto            varer_konto              @relation(fields: [innkjopskonto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavare_ibfk_1")
+  varer_salgsvare        varer_salgsvare?         @relation(fields: [lenket_salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavare_ibfk_2")
+  varer_raavarepris      varer_raavarepris[]
+  varer_salgsvareraavare varer_salgsvareraavare[]
+  varer_varetellingvare  varer_varetellingvare[]
+
+  @@index([innkjopskonto_id], map: "innkjopskonto_id")
+  @@index([lenket_salgsvare_id], map: "lenket_salgsvare_id")
+}
+
+model varer_raavarepris {
+  id               Int               @id
+  bestillingskode  String?           @db.VarChar(30)
+  pris             Float
+  dato             DateTime          @db.Date
+  leverandor_id    Int?
+  raavare_id       Int
+  pant             Float
+  aktiv            Boolean
+  type             String            @db.VarChar(10)
+  antall           Int
+  varer_leverandor varer_leverandor? @relation(fields: [leverandor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavarepris_ibfk_1")
+  varer_raavare    varer_raavare     @relation(fields: [raavare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavarepris_ibfk_2")
+
+  @@index([leverandor_id], map: "leverandor_id")
+  @@index([raavare_id], map: "raavare_id")
+}
+
+model varer_salgskalkyle {
+  id                     Int                      @id
+  navn                   String                   @db.VarChar(30)
+  kommentar              String?                  @db.Text
+  dato                   DateTime                 @db.Date
+  varer_salgskalkylevare varer_salgskalkylevare[]
+}
+
+model varer_salgskalkylevare {
+  id                 Int                @id
+  interngrad         Float?
+  antall             Int
+  kalkyle_id         Int
+  salgsvare_id       Int
+  varer_salgskalkyle varer_salgskalkyle @relation(fields: [kalkyle_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgskalkylevare_ibfk_1")
+  varer_salgsvare    varer_salgsvare    @relation(fields: [salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgskalkylevare_ibfk_2")
+
+  @@index([kalkyle_id], map: "kalkyle_id")
+  @@index([salgsvare_id], map: "salgsvare_id")
+}
+
+model varer_salgsvare {
+  id                     Int                      @id
+  kategori               String?                  @db.VarChar(50)
+  navn                   String                   @db.VarChar(100)
+  salgskonto_id          Int
+  status                 String                   @db.VarChar(10)
+  kassenr                Int?                     @db.SmallInt
+  kassenavn              String?                  @db.VarChar(25)
+  varer_raavare          varer_raavare[]
+  varer_salgskalkylevare varer_salgskalkylevare[]
+  varer_konto            varer_konto              @relation(fields: [salgskonto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvare_ibfk_1")
+  varer_salgsvarepris    varer_salgsvarepris[]
+  varer_salgsvareraavare varer_salgsvareraavare[]
+
+  @@index([salgskonto_id], map: "salgskonto_id")
+}
+
+model varer_salgsvarepris {
+  id              Int             @id
+  status          String          @db.VarChar(3)
+  dato            DateTime        @db.Date
+  mva             Int             @db.SmallInt
+  pris_intern     Int?            @db.SmallInt
+  pris_ekstern    Int?            @db.SmallInt
+  salgsvare_id    Int
+  varer_salgsvare varer_salgsvare @relation(fields: [salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvarepris_ibfk_1")
+
+  @@index([salgsvare_id], map: "salgsvare_id")
+}
+
+model varer_salgsvareraavare {
+  id              Int             @id
+  mengde          Float
+  raavare_id      Int
+  salgsvare_id    Int
+  varer_raavare   varer_raavare   @relation(fields: [raavare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvareraavare_ibfk_1")
+  varer_salgsvare varer_salgsvare @relation(fields: [salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvareraavare_ibfk_2")
+
+  @@index([raavare_id], map: "raavare_id")
+  @@index([salgsvare_id], map: "salgsvare_id")
+}
+
+model varer_varetelling {
+  id                    Int                     @id
+  tittel                String                  @db.VarChar(50)
+  kommentar             String?                 @db.Text
+  tid                   DateTime                @db.Timestamp(0)
+  ansvarlig             String                  @db.VarChar(100)
+  is_locked             Boolean
+  varer_varetellingvare varer_varetellingvare[]
+}
+
+model varer_varetellingvare {
+  id                Int               @id
+  sted              String?           @db.VarChar(50)
+  antall            Float
+  kommentar         String?           @db.VarChar(150)
+  raavare_id        Int
+  varetelling_id    Int
+  antallpant        Float?
+  added_by_id       Int?
+  time_added        DateTime          @db.Timestamp(0)
+  time_price        DateTime?         @db.Date
+  varer_varetelling varer_varetelling @relation(fields: [varetelling_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_varetellingvare_ibfk_1")
+  varer_raavare     varer_raavare     @relation(fields: [raavare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_varetellingvare_raavare")
+
+  @@index([raavare_id], map: "varer_varetellingvare_raavare_idx")
+  @@index([varetelling_id], map: "varetelling_id")
+}
+
+model ActivateToken {
+  id          String    @id
+  token       String    @unique
+  activatedAt DateTime?
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime?
+  userId      String
+  User        User      @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "ActivateToken_userId_fkey")
+}
+
+model VoucherLog {
+  id          String   @id @default(cuid())
+  loggedFor   String
+  usageTime   DateTime @default(now()) @db.Timestamp(0)
+  amount      Int
+  description String   @db.VarChar(120)
+  User        User     @relation(fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor0")
+
+  @@index([id], map: "logID_idx")
+  @@index([loggedFor], map: "loggedFor_idx")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model WorkLog {
+  id            String    @id @default(cuid())
+  loggedBy      String
+  loggedFor     String
+  workTime      DateTime? @db.Timestamp(0)
+  createTime    DateTime? @default(now()) @db.Timestamp(0)
+  duration      Int?
+  description   String?   @db.VarChar(120)
+  LoggedByUser  User      @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedBy")
+  LoggedForUser User      @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor")
+
+  @@index([id], map: "logID_idx")
+  @@index([loggedBy], map: "loggedBy_idx")
+  @@index([loggedFor], map: "loggedFor_idx")
+}
+
+model UserMembership {
+  id                Int       @id
+  lifetime          Boolean
+  honorary          Boolean
+  date_joined       DateTime  @db.DateTime(0)
+  name              String    @db.VarChar(50)
+  email             String    @db.VarChar(254)
+  seller_id         Int
+  semester_id       Int
+  user_id           String?   @db.VarChar(50)
+  uio_username      String?   @db.VarChar(15)
+  date_lifetime     DateTime? @db.DateTime(0)
+  comments          String?   @db.Text
+  last_edited_by_id Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model core_user {
+  id           Int       @id
+  password     String?   @db.VarChar(128)
+  last_login   DateTime? @db.DateTime(0)
+  is_superuser Boolean?
+  username     String?   @db.VarChar(30)
+  realname     String?   @db.VarChar(60)
+  email        String?   @db.VarChar(254)
+  is_staff     Boolean?
+  is_active    Boolean?
+  date_joined  DateTime? @db.DateTime(0)
+  phone_number String?   @db.VarChar(128)
+}
+
+model memberLog {
+  id   String  @id
+  name String? @db.VarChar(45)
+  year Int?
+}
+
+model semester {
+  id       String  @id
+  semester String? @db.VarChar(45)
+  year     Int?
 }
