@@ -1,4 +1,6 @@
 
+"use client"
+
 import {
   AppBar as MuiAppBar,
   styled,
@@ -8,6 +10,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  IconButton,
 } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { Component } from "react";
@@ -16,6 +19,7 @@ import cybLogo from "./../../icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import LoginButton from "../Login/LoginButton";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = 240;
 
@@ -23,20 +27,28 @@ export class NavBar extends Component {
   render() {
     const { currentPath, navItems } = this.props;
 
+    // const router = useRouter();
+    
     return (
       <AppBar position="fixed">
         <Toolbar>
-          <Avatar sx={{ marginRight: 5, height: 45, width: 45 }}>
-            <Image src={cybLogo} alt="cyb logo" fill/>
+          <Avatar sx={{ marginRight: { xs: 0, md: 5 }, height: 45, width: 45 }}>
+            <Image src={cybLogo} alt="cyb logo" fill />
           </Avatar>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {navItems.map((item) => NavItemElement(item, currentPath))}
           </Box>
 
-          <SessionProvider>
-            <LoginButton/>
-          </SessionProvider>
+          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }, alignContent: "streth" }}>
+            {navItems.map((item) => NavIconElement(item, currentPath))}
+          </Box>
+
+          <Box sx={{ marginLeft: "auto" }}>
+            <SessionProvider>
+              <LoginButton />
+            </SessionProvider>
+          </Box>
         </Toolbar>
       </AppBar>
     );
@@ -104,4 +116,25 @@ function NavItemElement(item, currentPath) {
       <ListItemText primary={"undefined"} />
     </ListItem>
   );
+}
+
+function NavIconElement(item, currentPath, router) {
+  
+  // const router = useRouter()
+  
+  if (item) {
+    return (
+      <Link
+        key={`link_${item.id}`}
+        href={`/pages/main/${item.path}`}
+        // passHref
+        style={{ textDecoration: "none" }}
+      >
+        <IconButton size="large">
+          {item.icon}
+        </IconButton>
+      </Link>
+    )
+  }
+  
 }

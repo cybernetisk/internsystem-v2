@@ -32,7 +32,10 @@ export default function WebsiteBreadcrumbs(path, navItems) {
           variant="body2"
           key={"typography" + path}
           alignSelf="center"
-          sx={{ "&:hover": { color: cybTheme.palette.primary.main } }}
+          sx={{
+            "&:hover": { color: cybTheme.palette.primary.main },
+            textTransform: "lowercase",
+          }}
         >
           {mapPath2Name[path] ? mapPath2Name[path] : value}
         </Typography>
