@@ -20,17 +20,11 @@ export async function POST(req) {
         { status: 405 }
       );
     }
-
-    console.log("PMH Request", args);
+    // console.log("PMH Request", args);
     
     try {
       switch (args.method) {
-        case "create":
-          // console.log("create")
-          data = await prisma[args.model].create(args.request);
-          break;
         case "find":
-          // console.log("find")
           if (Object.hasOwn(args.request, "where")) {
             data = await prisma[args.model].findFirst(args.request);
           }
@@ -38,11 +32,25 @@ export async function POST(req) {
             data = await prisma[args.model].findMany(args.request);
           }
           break;
+        case "create":
+          data = await prisma[args.model].create(args.request);
+          break;
+        case "update":
+          data = await prisma[args.model].update(args.request);
+          break;
         case "delete": 
           data = await handleDelete(args)
           break;
         default:
           throw new Error(`Invalid method ${args.method} for request`);
+      }
+      
+      if (args.fields) {
+        return NextResponse.json({
+          data: data,
+          fields: Object.keys(prisma[args.model].fields),
+          extra: prisma[args.model].fields,
+        });
       }
 
       return NextResponse.json({ data: data });
@@ -76,12 +84,10 @@ async function handleDelete(args) {
       const user = await prisma.user.findUnique({
         ...args.request,
         include: {
-          ActivateToken: true,
+          activateToken: true,
           sessions: true
         }
       });
-      
-      console.log("USER?", user)
       
       const data = await prisma.$transaction([
         prisma.activateToken.deleteMany({
@@ -104,7 +110,6 @@ async function handleDelete(args) {
           },
         }),
       ]);
-      console.log("DATA?", data)
       
       return data;
       
