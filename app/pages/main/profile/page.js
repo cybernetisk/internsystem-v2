@@ -2,7 +2,7 @@
 "use client"
 
 import authWrapper from "@/app/middleware/authWrapper"
-import { prismaRequest } from "@/app/middleware/prisma/prismaRequest"
+import prismaRequest from "@/app/middleware/prisma/prismaRequest"
 import { Avatar, Box, Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material"
 import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
@@ -28,6 +28,25 @@ function ProfilePage() {
     }
   }, [session])
   
+  const handleUpdateData = () => {
+    
+    prismaRequest({
+      model: "user",
+      method: "update",
+      request: {
+        where: {
+          email: session.data.user.email
+        },
+        data: {
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+        }
+      }
+    })
+    
+  }
+  
   return (
     <Stack direction="column" spacing={8}>
       <Typography variant="h4">Profile</Typography>
@@ -42,34 +61,45 @@ function ProfilePage() {
           {CheckedTextField("First name", firstName, setFirstName)}
           {CheckedTextField("Last name", lastName, setLastName)}
           {CheckedTextField("Email", email, setEmail)}
-          <Button variant="outlined">Update</Button>
+          <Button variant="outlined" onClick={handleUpdateData}>
+            Update
+          </Button>
         </Stack>
 
-        <Stack direction="column" spacing={1}
+        <Stack
+          direction="column"
+          spacing={1}
           // sx={{ border: "1px solid red" }}
         >
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>Roles:</Typography>
-              
-              {userRoles.map((e) => <Typography key={e} variant="body1">{e}</Typography>)}
-              
+              <Typography variant="h6" gutterBottom>
+                Roles:
+              </Typography>
+
+              {userRoles.map((e) => (
+                <Typography key={e} variant="body1">
+                  {e}
+                </Typography>
+              ))}
+
               <Typography variant="body1">
-                {userRoles.length == 0 ? "none": ""}
+                {userRoles.length == 0 ? "none" : ""}
               </Typography>
             </CardContent>
-            
           </Card>
-          
-          
-          
+
           {AdminRedirectButton(session, router)}
+          <Button variant="outlined" onClick={() => signOut()}>
+            sign out
+          </Button>
+          <Stack sx={{ pt: 4 }} spacing={2}>
+            <Button variant="outlined" color="error" onClick={() => signOut()}>
+              Delete account
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
-
-      <Button onClick={() => signOut()} variant="outlined">
-        sign out
-      </Button>
     </Stack>
   );
 }
