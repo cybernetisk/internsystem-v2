@@ -1,14 +1,12 @@
 
 "use client"
 
+import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import { Box, Button, Skeleton, Stack, TextField, Typography } from "@mui/material";
-import { PrismaClient } from "@prisma/client";
-import { randomBytes, randomUUID } from "crypto";
-// import { randomUUID } from "crypto";
-import { useEffect, useState } from "react";
-
-const prisma = new PrismaClient()
+import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import { randomBytes } from "crypto";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function registerPage() {
   
@@ -19,9 +17,14 @@ export default function registerPage() {
   
   const handleRegister = async () => {
     
+    const debug = false
+    
     try {
+      let existingUser;
+      let newUser;
+      let activateToken;
       
-      const existingUser = await prismaRequest({
+      await prismaRequest({
         model: "user",
         method: "find",
         request: {
@@ -29,9 +32,10 @@ export default function registerPage() {
             email: email,
           },
         },
+        callback: (data) => existingUser = data.data.length > 0 ? data.data[0] : null
       });
       
-      console.log("User exists?", !!existingUser, existingUser);
+      if (debug) console.log("User exists?", !!existingUser, existingUser);
       
       // Check if user exists
       if (!!existingUser) {
@@ -39,7 +43,7 @@ export default function registerPage() {
         return
       }
       
-      const newUser = await prismaRequest({
+      await prismaRequest({
         model: "user",
         method: "create",
         request: {
@@ -49,9 +53,10 @@ export default function registerPage() {
             email: email,
           },
         },
+        callback: (data) => newUser = data.data != undefined ? data.data : null
       });
       
-      console.log("User created?", !!newUser, newUser);
+      if (debug) console.log("User created?", !!newUser, newUser);
       
       // Check if user is created
       if (!newUser) {
@@ -59,7 +64,7 @@ export default function registerPage() {
         return;
       }
       
-      const activateToken = await prismaRequest({
+      await prismaRequest({
         model: "activateToken",
         method: "create",
         request: {
@@ -67,17 +72,17 @@ export default function registerPage() {
             token: `${randomBytes(32).toString("hex")}`,
             userId: newUser.id,
           },
-        }
+        },
+        callback: (data) => activateToken = data.data != undefined ? data.data : null
       })
       
-      console.log("Activate token created?", !!activateToken, activateToken);
+      if (debug) console.log("Activate token created?", !!activateToken, activateToken);
 
       // Check if user is created
       if (!activateToken) {
         setResponse("Unable to create activate token");
         return;
       }
-      
 
       fetch("/api/sendVerification/", {
         method: "post",
@@ -91,7 +96,7 @@ export default function registerPage() {
         }),
       })
       .then((data) => {
-        console.log(data);
+        if (debug) console.log(data);
         setResponse("User created! Please verify your Email");
       });
       
@@ -105,53 +110,60 @@ export default function registerPage() {
   
   return (
     <Box>
-      <Stack direction="column" spacing={1} padding={4}>
-        <Typography variant="h6">Register new user</Typography>
+      <Grid
+        container
+        spacing={2}
+        direction="column"
+        padding={4}
+        width={{ xs: "100vw", md: "30vw" }}
+      >
+        <Grid item>
+          <Typography variant="h6">Register new user</Typography>
+        </Grid>
 
         {CheckedTextField("First name", firstName, setFirstName)}
         {CheckedTextField("Last name", lastName, setLastName)}
         {CheckedTextField("Email", email, setEmail)}
 
-        {/* <TextField
-          variant="filled"
-          label="First name"
-          value={firstName}
-          onChange={(event) => setFirstName(event.target.value)}
-          InputLabelProps={{ shrink: true }}
-        /> */}
+        <Grid item>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => handleRegister()}
+          >
+            Register
+          </Button>
+        </Grid>
 
-        {/* <TextField
-          variant="filled"
-          label="Last name"
-          value={lastName}
-          onChange={(event) => setLastName(event.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
+        <Grid item container direction="row" justifyContent="flex-end">
+          <Link
+            href="/pages/auth/signIn"
+            passHref
+            style={{ textDecoration: "none", cursor: "pointer" }}
+          >
+            <Typography
+              variant="subtitle1"
+              color={{ color: cybTheme.palette.primary.main }}
+            >
+              Log in
+            </Typography>
+          </Link>
+        </Grid>
 
-        <TextField
-          variant="filled"
-          label="Email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          InputLabelProps={{ shrink: true }}
-        /> */}
-
-        <Button variant="contained" onClick={() => handleRegister()}>
-          Register
-        </Button>
-
-        <Typography variant="caption">
-          {response != "" ? (
-            response
-          ) : (
-            <Skeleton
-              animation={false}
-              variant="text"
-              sx={{ bgcolor: "inherit" }}
-            />
-          )}
-        </Typography>
-      </Stack>
+        <Grid item>
+          <Typography variant="caption">
+            {response != "" ? (
+              response
+            ) : (
+              <Skeleton
+                animation={false}
+                variant="text"
+                sx={{ bgcolor: "inherit" }}
+              />
+            )}
+          </Typography>
+        </Grid>
+      </Grid>
     </Box>
   );
   
@@ -160,14 +172,17 @@ export default function registerPage() {
 const CheckedTextField = (title, textValue, textCallback) => {
   
   return (
-    <TextField
-      required
-      variant="filled"
-      label={title}
-      value={textValue}
-      onChange={(event) => textCallback(event.target.value)}
-      InputLabelProps={{ shrink: true }}
-    />
+    <Grid item>
+      <TextField
+        fullWidth
+        required
+        variant="filled"
+        label={title}
+        value={textValue}
+        onChange={(event) => textCallback(event.target.value)}
+        InputLabelProps={{ shrink: true }}
+      />
+    </Grid>
   );
   
 }

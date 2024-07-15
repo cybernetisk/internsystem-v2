@@ -24,7 +24,7 @@ const BUTTON_CONTENT_2 = [
     external: true,
   },
   { title: "Volunteer groups", path: "groups" },
-  { title: "Traditions", path: "", wip: true },
+  { title: "Traditions", path: "traditions", wip: true },
 ];
 
 

@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function authWrapper(WrappedComponent, requiredRole="", redirect="/pages/main/home") {
+export default function authWrapper(WrappedComponent, requiredRole="", redirect="/pages/main/unauthorized") {
   return function AuthenticatedComponent(props) {
     
     const router = useRouter();

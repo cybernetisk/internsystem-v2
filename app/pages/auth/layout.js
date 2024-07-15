@@ -25,29 +25,24 @@ export default function AuthLayout({ children }) {
             }}
           >
             <CssBaseline />
-            <SessionProvider>
               
-              <Box>
-                <Stack
-                  height="100%"
-                  direction="column"
-                  alignContent="center"
-                  justifyContent="center"
-                  alignItems="center"
-                  sx={{ minHeight: "100vh" }}
-                  
-                >
-                  
-                  <Paper sx={{ width: "30vw" }}>
-                    
-                    {/* <Stack direction="column" spacing={1} padding={4}> */}
-                      {children}
-                    {/* </Stack> */}
-                  </Paper>
-                </Stack>
-              </Box>
+            <Box>
+              <Stack
+                height="100%"
+                direction="column"
+                alignContent="center"
+                justifyContent="center"
+                alignItems="center"
+                sx={{ minHeight: "100vh" }} 
+              >
+                <Paper>
+                  <SessionProvider> 
+                    {children}
+                  </SessionProvider>
+                </Paper>
+              </Stack>
+            </Box>
               
-            </SessionProvider>
           </Box>
         </ThemeProvider>
       </body>

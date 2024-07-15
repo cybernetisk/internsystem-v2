@@ -8,6 +8,18 @@ const nextConfig = {
         permanent: true,
         basePath: false,
       },
+      {
+        source: "/pages",
+        destination: "/pages/main/home",
+        permanent: true,
+        basePath: false,
+      },
+      {
+        source: "/pages/main",
+        destination: "/pages/main/home",
+        permanent: true,
+        basePath: false,
+      },
     ];
   },
   images: {
