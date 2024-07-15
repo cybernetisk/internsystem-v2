@@ -13,6 +13,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@mdi/js": "^7.4.47",
+    "@mdi/react": "^1.6.1",
     "@mui/icons-material": "^5.15.6",
     "@mui/material": "^5.15.6",
     "@mui/x-date-pickers": "^7.9.0",
@@ -22,6 +24,7 @@
     "@sanity/image-url": "^1.0.2",
     "@sanity/orderable-document-list": "^1.2.1",
     "@sanity/react-loader": "^1.10.4",
+    "@sanity/structure": "^2.36.2",
     "@sanity/vision": "^3.31.0",
     "@sanity/visual-editing": "^2.1.6",
     "date-fns": "^3.6.0",
