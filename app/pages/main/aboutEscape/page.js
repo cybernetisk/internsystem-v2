@@ -33,7 +33,7 @@ export default function AboutCYBPage() {
       <Divider sx={{ mb: 4 }}></Divider>
 
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid item md={6} xs={12}>
           {page != null ? (
             page.content
           ) : (
@@ -46,7 +46,7 @@ export default function AboutCYBPage() {
             </Box>
           )}
         </Grid>
-        <Grid item xs={6}>
+        <Grid item md={6} xs={12}>
           {page != null ? (
             page.images
           ) : (

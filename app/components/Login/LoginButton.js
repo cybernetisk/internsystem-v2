@@ -39,6 +39,7 @@ export default function LoginButton() {
   const avatarProps = {
     height: 45,
     width: 45,
+    bgcolor: cybTheme.palette.primary.main,
   };
   
   return (
@@ -54,17 +55,18 @@ export default function LoginButton() {
             {/* <Typography sx={{ flexGrow: 0 }}>
               {session.data != undefined ? "Logged in" : "Login"}
             </Typography> */}
-            <Typography variant="body1" width="3em">
+            
+            <Typography variant="body1" width="3em" sx={{ display: { xs: "none", md: "flex"  } }} >
               {session.data != undefined ? "Profile" : "Login"}
             </Typography>
 
             {session.status == "authenticated" ? (
-              <Avatar alt="Image of user" sx={{ ...avatarProps, bgcolor: cybTheme.palette.primary.main, p:1 }}>
-                <Icon path={mdiPenguin} color={cybTheme.palette.background.main}/>
+              <Avatar alt="Image of user" sx={{ ...avatarProps, p:1 }}>
+                <Icon path={mdiPenguin} color={cybTheme.palette.background.main }/>
                 {/* <icon component={mdiPenguin}/> */}
               </Avatar>
             ) : (
-              <Avatar sx={{ ...avatarProps, bgcolor: cybTheme.palette.primary.main }}>
+              <Avatar sx={{ ...avatarProps }}>
                 <Person sx={{ color: cybTheme.palette.background.main }} />
               </Avatar>
             )}
