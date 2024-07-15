@@ -48,7 +48,6 @@ model User {
   id            String          @id @default(cuid())
   email         String?         @unique
   emailVerified DateTime?
-  image         String?
   active        Boolean         @default(false)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -280,7 +279,7 @@ model ActivateToken {
 model VoucherLog {
   id          String   @id @default(cuid())
   loggedFor   String
-  usageTime   DateTime @default(now()) @db.Timestamp(0)
+  usedAt      DateTime @default(now()) @db.Timestamp(0)
   amount      Int
   description String   @db.VarChar(120)
   User        User     @relation(fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor0")
@@ -294,8 +293,8 @@ model WorkLog {
   id            String    @id @default(cuid())
   loggedBy      String
   loggedFor     String
-  workTime      DateTime? @db.Timestamp(0)
-  createTime    DateTime? @default(now()) @db.Timestamp(0)
+  workedAt      DateTime? @db.Timestamp(0)
+  createdAt     DateTime? @default(now()) @db.Timestamp(0)
   duration      Int?
   description   String?   @db.VarChar(120)
   LoggedByUser  User      @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedBy")
@@ -344,7 +343,7 @@ model memberLog {
 }
 
 model semester {
-  id       String  @id
+  id       Int     @id
   semester String? @db.VarChar(45)
   year     Int?
 }

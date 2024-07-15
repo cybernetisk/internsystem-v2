@@ -7,13 +7,18 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  // Icon,
   Stack,
+  SvgIcon,
   Typography,
 } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import { Person } from "@mui/icons-material";
 import { cybTheme } from "../themeCYB";
 import { useRouter } from "next/navigation";
+
+import { mdiPenguin } from '@mdi/js';
+import Icon from "@mdi/react";
 // import { useEffect, useState } from "react";
 
 export default function LoginButton() {
@@ -30,18 +35,14 @@ export default function LoginButton() {
       signIn();
     }
   };
-  
-  // console.log("AvatarMenu: session", session);
-  
-  // 
-  // useEffect(() => {
-  //   if (session.status == "authenticated") {
-  //     setFirstName(session.data.user.firstName);
-  //   }
-  // }, [session]);
 
+  const avatarProps = {
+    height: 45,
+    width: 45,
+  };
+  
   return (
-    <Card sx={{ display: "flex", flexDirection: "row" }}>
+    <Card sx={{ display: "flex", flexDirection: "row",  }}>
       <CardActionArea onClick={handleClick}>
         <CardContent>
           <Stack
@@ -50,12 +51,20 @@ export default function LoginButton() {
             alignContent="center"
             alignItems="center"
           >
-            <Typography>{session.data != undefined ? session.data.user.firstName : "Login"}</Typography>
+            {/* <Typography sx={{ flexGrow: 0 }}>
+              {session.data != undefined ? "Logged in" : "Login"}
+            </Typography> */}
+            <Typography variant="body1" width="3em">
+              {session.data != undefined ? "Profile" : "Login"}
+            </Typography>
 
-            {false ? (
-              <Avatar alt="Image of user" src={""} />
+            {session.status == "authenticated" ? (
+              <Avatar alt="Image of user" sx={{ ...avatarProps, bgcolor: cybTheme.palette.primary.main, p:1 }}>
+                <Icon path={mdiPenguin} color={cybTheme.palette.background.main}/>
+                {/* <icon component={mdiPenguin}/> */}
+              </Avatar>
             ) : (
-              <Avatar sx={{ bgcolor: cybTheme.palette.primary.main }}>
+              <Avatar sx={{ ...avatarProps, bgcolor: cybTheme.palette.primary.main }}>
                 <Person sx={{ color: cybTheme.palette.background.main }} />
               </Avatar>
             )}

@@ -14,26 +14,19 @@ export default function authWrapper(WrappedComponent, requiredRole="", redirect=
       }
     });
     
-    // check if user has correct role
-    useEffect(() => {
-      if (requiredRole == "") {
-        return
-      }
-      
-      if (status == "authenticated") {
-        const userRoles = data.user.roles.map((e) => e.name)
-        const missingRole = !userRoles.includes(requiredRole)
-        
-        if (missingRole) {
-          router.push(redirect)
-        } 
-      }
-    }, [status, data, router])
-    
-    // show placeholder if content is not loaded
     if (status == "loading") {
       return <div>Loading...</div>
     }
+    else if (status == "authenticated" && requiredRole != "") {
+      
+      const userRoles = data.user.roles.map((e) => e.name)
+      const missingRole = !userRoles.includes(requiredRole)
+      
+      if (missingRole) {
+        router.push(redirect)
+      } 
+    }
+    
 
     // show content
     return <WrappedComponent {...props} />;

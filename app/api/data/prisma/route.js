@@ -25,12 +25,12 @@ export async function POST(req) {
     try {
       switch (args.method) {
         case "find":
-          if (Object.hasOwn(args.request, "where")) {
-            data = await prisma[args.model].findFirst(args.request);
-          }
-          else {
-            data = await prisma[args.model].findMany(args.request);
-          }
+          data = await prisma[args.model].findMany(args.request);
+          // if (Object.hasOwn(args.request, "where")) {
+          // }
+          // else {
+          //   data = await prisma[args.model].findMany(args.request);
+          // }
           break;
         case "create":
           data = await prisma[args.model].create(args.request);

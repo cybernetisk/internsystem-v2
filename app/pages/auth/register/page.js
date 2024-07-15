@@ -1,7 +1,7 @@
 
 "use client"
 
-import { prismaRequest } from "@/app/middleware/prisma/prismaRequest";
+import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { PrismaClient } from "@prisma/client";
 import { randomBytes, randomUUID } from "crypto";
