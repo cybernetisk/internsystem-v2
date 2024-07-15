@@ -148,7 +148,7 @@ function NavIconElement(item, currentPath, router) {
         style={{ textDecoration: "none" }}
       >
         <IconButton size="large">
-          <Avatar sx={{ width: 45, height: 45 }}>
+          <Avatar sx={{ width: 30, height: 30 }}>
             {item.icon}
           </Avatar>
         </IconButton>

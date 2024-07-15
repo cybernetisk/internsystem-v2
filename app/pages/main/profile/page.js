@@ -3,7 +3,7 @@
 
 import authWrapper from "@/app/middleware/authWrapper"
 import prismaRequest from "@/app/middleware/prisma/prismaRequest"
-import { Avatar, Box, Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material"
+import { Avatar, Box, Button, Card, CardContent, Container, Divider, Grid, Stack, TextField, Typography } from "@mui/material"
 import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -47,71 +47,87 @@ function ProfilePage() {
     
   }
   
+  const buttonProps = {
+    fullWidth: true,
+    variant: "outlined"
+  }
+  
   return (
-    <Stack direction="column" spacing={8}>
+    <Box>
       <Typography variant="h4">Profile</Typography>
+      <Divider sx={{ mb: 4 }}></Divider>
 
-      <Stack direction="row" justifyContent="space-between">
-        <Stack
-          direction="column"
-          spacing={2}
-          // maxWidth={250}
-          // sx={{ border: "1px solid red" }}
-        >
+      <Grid
+        container
+        spacing={2}
+        direction="row"
+        justifyContent="space-between"
+      >
+        <Grid item container xs={12} md={3} direction="column" spacing={2} mb={8}>
           {CheckedTextField("First name", firstName, setFirstName)}
           {CheckedTextField("Last name", lastName, setLastName)}
           {CheckedTextField("Email", email, setEmail)}
-          <Button variant="outlined" onClick={handleUpdateData}>
-            Update
-          </Button>
-        </Stack>
+          <Grid item>
+            <Button {...buttonProps} onClick={handleUpdateData}>
+              Update
+            </Button>
+          </Grid>
+        </Grid>
 
-        <Stack
+        <Grid item container xs={12} md={3} direction="column" spacing={2}>
+          <Grid item>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Roles:
+                </Typography>
+
+                {userRoles.map((e) => (
+                  <Typography key={e} variant="body1">
+                    {e}
+                  </Typography>
+                ))}
+
+                <Typography variant="body1">
+                  {userRoles.length == 0 ? "none" : ""}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item>{AdminRedirectButton(session, router, buttonProps)}</Grid>
+          <Grid item>
+            <Button {...buttonProps} onClick={() => signOut()}>
+              sign out
+            </Button>
+          </Grid>
+
+          <Grid item mt={8}>
+            <Button {...buttonProps} color="error" onClick={() => signOut()}>
+              Delete account
+            </Button>
+          </Grid>
+        </Grid>
+
+        {/* <Stack
           direction="column"
           spacing={1}
           // sx={{ border: "1px solid red" }}
         >
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Roles:
-              </Typography>
-
-              {userRoles.map((e) => (
-                <Typography key={e} variant="body1">
-                  {e}
-                </Typography>
-              ))}
-
-              <Typography variant="body1">
-                {userRoles.length == 0 ? "none" : ""}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {AdminRedirectButton(session, router)}
-          <Button variant="outlined" onClick={() => signOut()}>
-            sign out
-          </Button>
-          <Stack sx={{ pt: 4 }} spacing={2}>
-            <Button variant="outlined" color="error" onClick={() => signOut()}>
-              Delete account
-            </Button>
-          </Stack>
-        </Stack>
-      </Stack>
-    </Stack>
+        </Stack> */}
+      </Grid>
+    </Box>
   );
 }
 
-const AdminRedirectButton = (session, router) => {
+const AdminRedirectButton = (session, router, buttonProps) => {
   
   const userRoles = session.data.user.roles.map((e) => e.name)
   
   if (!userRoles.includes("admin")) return
   
   return (
-    <Button variant="outlined" onClick={() => router.push("admin")}>
+    <Button {...buttonProps} onClick={() => router.push("admin")}>
       Admin settings
     </Button>
   );
@@ -120,13 +136,16 @@ const AdminRedirectButton = (session, router) => {
 const CheckedTextField = (title, textValue, textCallback) => {
   
   return (
-    <TextField
-      variant="outlined"
-      label={title}
-      value={textValue}
-      onChange={(event) => textCallback(event.target.value)}
-      InputLabelProps={{ shrink: true }}
-    />
+    <Grid item>      
+      <TextField
+        fullWidth
+        variant="outlined"
+        label={title}
+        value={textValue}
+        onChange={(event) => textCallback(event.target.value)}
+        InputLabelProps={{ shrink: true }}
+      />
+    </Grid>
   );
 };
 
