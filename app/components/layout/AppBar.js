@@ -11,6 +11,7 @@ import {
   ListItemButton,
   ListItemText,
   IconButton,
+  Grid,
 } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { Component } from "react";
@@ -21,8 +22,6 @@ import Link from "next/link";
 import LoginButton from "../Login/LoginButton";
 import { useRouter } from "next/navigation";
 
-const drawerWidth = 240;
-
 export class NavBar extends Component {
   render() {
     const { currentPath, navItems } = this.props;
@@ -30,25 +29,43 @@ export class NavBar extends Component {
     // const router = useRouter();
     
     return (
-      <AppBar position="fixed">
-        <Toolbar>
-          <Avatar sx={{ marginRight: { xs: 0, md: 5 }, height: 45, width: 45 }}>
-            <Image src={cybLogo} alt="cyb logo" fill />
-          </Avatar>
+      <AppBar position="absolute">
+        <Toolbar sx={{  }}>
+          <Grid container direction="row" justifyContent="flex-end" alignItems="center">
+            <Grid item>
+              <Avatar sx={{
+                height: 45,
+                width: 45,
+                
+              }}>
+                <Image src={cybLogo} alt="cyb logo" fill />
+              </Avatar>
+            </Grid>
+            
+            
+            <Grid item container md xs justifyContent="flex-end" pr={2}>
+              <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex",  } }}>
+                {navItems.map((item) => NavItemElement(item, currentPath))}
+              </Box>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {navItems.map((item) => NavItemElement(item, currentPath))}
-          </Box>
+              <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none",  } }}>
+                {navItems.map((item) => NavIconElement(item, currentPath))}
+              </Box>
+            </Grid>
+            
+            
+            <Grid item>
+              <Box sx={{
+                
+                // marginLeft: "auto"
+              }}>
+                <SessionProvider>
+                  <LoginButton />
+                </SessionProvider>
+              </Box>
+            </Grid>
+          </Grid>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }, alignContent: "streth" }}>
-            {navItems.map((item) => NavIconElement(item, currentPath))}
-          </Box>
-
-          <Box sx={{ marginLeft: "auto" }}>
-            <SessionProvider>
-              <LoginButton />
-            </SessionProvider>
-          </Box>
         </Toolbar>
       </AppBar>
     );
@@ -131,10 +148,12 @@ function NavIconElement(item, currentPath, router) {
         style={{ textDecoration: "none" }}
       >
         <IconButton size="large">
-          {item.icon}
+          <Avatar sx={{ width: 45, height: 45 }}>
+            {item.icon}
+          </Avatar>
         </IconButton>
       </Link>
-    )
+    );
   }
   
 }
