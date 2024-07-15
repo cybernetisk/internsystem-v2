@@ -19,6 +19,8 @@ const NavItems = [
   { id: "volunteering", path: "volunteering", name: "Volunteering", icon: <EmojiPeople /> },
 ];
 
+const VolunteerLink = "https://nettskjema.no/a/378483#/page/1";
+
 const SocialMedia = [
   {
     name: "Instagram",
@@ -87,7 +89,7 @@ export default function RootLayout({ children }) {
             </Container>
           </Box>
 
-          <LayoutFooter socialMedia={SocialMedia}/>
+          <LayoutFooter socialMedia={SocialMedia} volunteerLink={VolunteerLink}/>
         </ThemeProvider>
       </body>
     </html>
