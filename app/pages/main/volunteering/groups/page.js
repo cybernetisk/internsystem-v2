@@ -1,13 +1,8 @@
 
 "use client"
 
-// import { prismaRequest } from "@/app/middleware/prisma/prismaRequest";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import CustomTable from "@/app/components/table";
-import { Box, Card, CardActionArea, Container, Divider, Grid, List, ListItem, Stack, Typography } from "@mui/material";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Component, useEffect, useState } from "react";
+import { Box, Card, CardActionArea, Container, Divider, Grid, List, ListItem, Stack, Typography } from "@mui/material";
 import { sanityClient } from "@/sanity/client";
 import { imageBuilder } from "@/sanity/client";
 import Image from "mui-image";
