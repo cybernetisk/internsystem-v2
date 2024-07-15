@@ -265,7 +265,7 @@ model varer_varetellingvare {
 }
 
 model ActivateToken {
-  id          String    @id
+  id          String    @id @default(cuid())
   token       String    @unique
   activatedAt DateTime?
   createdAt   DateTime? @default(now())
