@@ -2,7 +2,7 @@
 "use client"
 
 import { useState } from "react";
-import { Box, Button, Card, CardActions, CardContent, Paper, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
 import { cybTheme } from "./../../../components/themeCYB";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -17,9 +17,11 @@ export default function SignInPage() {
   
   const session = useSession()
   const router = useRouter()
-  
-  
-  
+   
+  if (session.status == "authenticated") {
+    router.push("/pages/main/home");
+    return;
+  }
   
   const handleLogin = async () => {
     
@@ -39,55 +41,74 @@ export default function SignInPage() {
       setError(true);
       setResponse(response.error);
     }
-    
-    console.log(response)
-  }
-  
-  if (session.status == "authenticated") {
-    router.push("/pages/main/home")
   }
   
   return (
     <Box>
-      <Stack direction="column" spacing={1} padding={4}>
-        
-        <Typography variant="h6">Log in</Typography>
+      <Grid
+        container
+        spacing={2}
+        direction="column"
+        padding={4}
+        width={{ xs: "100vw", md: "30vw" }}
+      >
+        <Grid item>
+          <Typography variant="h6">Log in</Typography>
+        </Grid>
 
-        <TextField
-          required
-          variant="filled"
-          label="email"
-          value={email}
-          error={error}
-          // helperText={error ? helperText : error}
-          onChange={(event) => setEmail(event.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
-        
-        <Button variant="contained" onClick={() => handleLogin()}>
-          Send magic link
-        </Button>
-        
-        <Stack direction="row" justifyContent="flex-end">
-          {/* {TextButton("Forgot password", "/home")} */}
-          {TextButton("Register", "/pages/auth/register")}
-        </Stack>
-        
-        <Typography variant="caption">
-          {response != "" ? response : <Skeleton animation={false} variant="text" sx={{ bgcolor: "inherit" }}/>}
-        </Typography>
-        
-      </Stack>
+        <Grid item>
+          <TextField
+            required
+            fullWidth
+            variant="filled"
+            label="email"
+            value={email}
+            error={error}
+            onChange={(event) => setEmail(event.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+
+        <Grid item>
+          <Button fullWidth variant="contained" onClick={() => handleLogin()}>
+            Send magic link
+          </Button>
+        </Grid>
+
+        <Grid
+          item
+          container
+          direction="row"
+          justifyContent="flex-end"
+        >
+          <Link
+            href="/pages/auth/register"
+            passHref
+            style={{ textDecoration: "none", cursor: "pointer" }}
+          >
+            <Typography
+              variant="subtitle1"
+              color={{ color: cybTheme.palette.primary.main }}
+            >
+              Register
+            </Typography>
+          </Link>
+        </Grid>
+
+        <Grid item container>
+          <Typography variant="subtitle1" >
+            {response != "" ? (
+              response
+            ) : (
+              <Skeleton
+                animation={false}
+                variant="text"
+                sx={{ bgcolor: "inherit" }}
+              />
+            )}
+          </Typography>
+        </Grid>
+      </Grid>
     </Box>
   );
-}
-
-function TextButton(text, href) {
-  return (    
-    <Link href={href} passHref style={{ textDecoration: "none", cursor: "pointer" }}>
-      <Typography variant="caption" color={{ color: cybTheme.palette.primary.main }}>
-        {text}
-      </Typography>
-    </Link>
-  )
 }
