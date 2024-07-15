@@ -32,7 +32,12 @@ export default defineConfig({
             S.documentTypeListItem("boardPosition"),
             S.documentTypeListItem("page"),
             S.documentTypeListItem("event"),
-            orderableDocumentListDeskItem({ type: "workGroup", title: "Work groups", S, context }),
+            orderableDocumentListDeskItem({
+              type: "workGroup",
+              title: "Work groups",
+              S,
+              context,
+            }),
             // S.documentTypeListItem("interngruppe"),
           ]);
       },
