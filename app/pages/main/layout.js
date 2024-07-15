@@ -14,8 +14,8 @@ import LayoutFooter from "@/app/components/layout/Footer";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },
-  { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
-  { id: "aboutEscape", path: "aboutEscape", name: "About Escape", icon: <Coffee /> },
+  // { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
+  { id: "aboutEscape", path: "aboutEscape", name: "Escape", icon: <Coffee /> },
   { id: "volunteering", path: "volunteering", name: "Volunteering", icon: <EmojiPeople /> },
 ];
 
@@ -75,9 +75,9 @@ export default function RootLayout({ children }) {
               <NavBarOffset />
 
               <Container sx={{ p: 2, minHeight: "100vh" }}>
-                <Box sx={{ backgroundColor: "rgba(0,0,0, 0.2)" }}>
+                {/* <Box sx={{ backgroundColor: "rgba(0,0,0, 0.2)" }}>
                   <Breadcrumbs>{breadcrumbs}</Breadcrumbs>
-                </Box>
+                </Box> */}
 
                 <Container sx={{ my: 3, px: 0 }} disableGutters>
                   <SessionProvider>{children}</SessionProvider>
