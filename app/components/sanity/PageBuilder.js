@@ -1,77 +1,86 @@
 
 import {
-  Box,
-  Container,
+  Grid,
   List,
   ListItem,
-  Stack,
   Typography,
 } from "@mui/material";
 import { imageBuilder } from "@/sanity/client";
 
 
 export default function PageBuilder(data) {
+  
   if (data == undefined) return null;
   
-  return data.map((e) => {
-    let header = null;
-    let images = [];
-    let content = [];
-
-    // check if there is a page header
-    if (e.header != undefined) {
-      header = handleHeader(e);
-    }
-    
-    // check if there are page images
-    if (e.images != undefined) {
-      images = handleImages(e);
-    }
-
-    // Check if there is elements to create
-    if (e.content != undefined) {
-      content = handleContent(e);
-    } else {
-      content = <Typography>Work in progress</Typography>;
-    }
-
-    return {
-      header: header,
-      content: content,
-      images: images
-    };
+  const pageData = data.map((e) => {  
+    let result = {}
+    Object.keys(e).map((key) => {
+      switch (key) {
+        case "header":
+          result = { ...result, [key]: handleHeader(e, "header", "h4") };
+          break;
+        case "title":
+          result = { ...result, [key]: handleHeader(e, "title", "body2") };
+          break;
+        case "images":
+          result = { ...result, [key]: handleImages(e) };
+          break;
+        case "content":
+          result = { ...result, [key]: handleContent(e) };
+          break;
+      }
+    })
+    return result
   });
+  
+  return pageData
 }
 
-function handleHeader(e) {
+function handleHeader(e, prop, variant) {
+  if (e[prop] == null) return <></>;
   return (
     <Typography
-      key={"page_builder_title_" + e.header}
-      variant="h5"
+      key={"page_builder_header_" + e[prop]}
+      variant={variant}
       gutterBottom
       sx={{ fontWeight: "bold" }}
     >
-      {e.header}
+      {e[prop]}
     </Typography>
   );
 }
 
 function handleImages(e) {
-  return e.images.images.map((g) => {
+  if (e.images == null) return <></>;
+  
+  const gridItems = e.images.images.map((g, i) => {
     return (
-      <Container key={"page_builder_sanity_image_container_" + g.alt}>
+      <Grid item key={`page_builder_sanity_image_container_${i}`}>
         <img
-          key={"page_builder_sanity_image_" + g.alt}
+          key={`page_builder_sanity_image_${i}`}
           alt={g.alt}
           src={imageBuilder.image(g).url()}
           width="100%"
         />
-      </Container>
+      </Grid>
     );
   })
+  
+  return (
+    <Grid container spacing={1}>
+      {gridItems}
+    </Grid>
+  )
 }
 
 function handleContent(e) {
+  if (e.content == null) {
+    return (
+      <Typography variant="body2">
+        Work in progress.
+      </Typography>
+    )
+  };
   
   let tempList = [];
   let content = [];
@@ -84,21 +93,43 @@ function handleContent(e) {
       continue;
     }
 
+    let variant = "body2";
+    switch (item.style) {
+      case "h6":
+        variant = "h6";
+        break;
+      case "h5":
+        variant = "h5";
+        break;
+      case "h4":
+        variant = "h4";
+        break;
+      case "h3":
+        variant = "h3";
+        break;
+      case "h2":
+        variant = "h2";
+        break;
+      case "h1":
+        variant = "h1";
+        break;
+    }
+    
     // add populated list when a non-list element is met
     if (tempList.length != 0) {
       let listContent = (
         <List
-          key={"page_builder_list" + content.length}
+          key={`page_builder_list_${item._key}`}
           sx={{ listStyleType: "disc", p: 0, pl: 4, pb: 2 }}
         >
           {tempList.map((g, i) => {
             return (
               <ListItem
-                key={"page_builder_ListItem" + i}
+                key={`page_builder_listItem_${item._key}_${i}`}
                 sx={{ display: "list-item", paddingY: 0 }}
               >
                 <Typography
-                  key={"page_builder_Typography" + i}
+                  key={`page_builder_Typography_${item._key}_${i}`}
                   variant="body2"
                   py={0}
                 >
@@ -132,16 +163,24 @@ function handleContent(e) {
             break;
         }
       }
+      
+      if (g.text == "") {
+        return (
+          <Typography variant="body2" key={`page_builder_linebreak_${item._key}_${i}`}>
+            &nbsp;
+          </Typography>
+        );
+      }
 
       return (
         <Typography
-          key={"page_builder_Typography_child" + i}
-          variant="body2"
+          key={`page_builder_Typography_child_${item._key}_${i}`}
+          variant={variant}
           gutterBottom
           pb={1}
           {...textProps}
         >
-          {g.text}&nbsp;
+          {g.text}
         </Typography>
       );
     });
