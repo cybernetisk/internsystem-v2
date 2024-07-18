@@ -53,33 +53,17 @@ export default class CustomTable extends Component {
     const { sortBy } = this.state;
     
     let tableHeaderData = headers ? headers : [];
-    // let sortBy = headers ? headers[0].id : "";
-    let rawTableData = data;
+
+    if (data.constructor != Array) {
+      console.error("table render error: ", data)
+      return <></>
+    }
     
-    // console.log(data)
-
-    const tableRowData = rawTableData
-      ? rawTableData
-          .sort((a, b) => {
-            let elemA = a[sortBy];
-            let elemB = b[sortBy];
-
-            switch (typeof elemA) {
-              case "number":
-                return elemB - elemA;
-              case "string":
-                if (typeof elemB == "string" && elemB.length != 0) {
-                  return elemA.toLowerCase().localeCompare(elemB.toLowerCase());
-                }
-                return elemA
-              case "object":
-                return elemA
-              default:
-                return elemB - elemA;
-            }
-          })
-          .map((node) => tableBodyRow(node, tableHeaderData, path))
-      : [];
+    const tableBodyData = data
+    ? data
+        .sort((a, b) => sortTableRows(a, b, sortBy))
+        .map((e, i) => createTableRow(e, i, tableHeaderData, path))
+    : [];
 
     return (
       <TableContainerStyle component={Paper}>
@@ -109,19 +93,40 @@ export default class CustomTable extends Component {
             </TableRow>
           </TableHead>
 
-          <TableBody>{tableRowData}</TableBody>
+          <TableBody>{tableBodyData}</TableBody>
         </TableStyle>
       </TableContainerStyle>
     );
   }
 }
 
-function tableBodyRow(rowData, tableHeaders, path) {
+function sortTableRows(a, b, sortBy) {
+  
+  let elemA = a[sortBy];
+  let elemB = b[sortBy];
+
+  switch (typeof elemA) {
+    case "number":
+      return elemB - elemA;
+    case "string":
+      if (typeof elemB == "string" && elemB.length != 0) {
+        return elemB
+          .toLowerCase()
+          .localeCompare(elemA.toLowerCase());
+      }
+      return elemA;
+    case "object":
+      return elemA;
+    default:
+      return elemB - elemA;
+  }
+}
+
+function createTableRow(rowData, rowIndex, tableHeaders, path) {
   
   if (!rowData || !tableHeaders) return <></>;
-  
 
-  const rows = tableHeaders.map((h) => {
+  const cells = tableHeaders.map((h) => {
     
     let data = rowData[h.id];
     let props = {}
@@ -131,7 +136,14 @@ function tableBodyRow(rowData, tableHeaders, path) {
     }
     
     else if (h.direct) {
-      data = <Link href={`${path}/${rowData.id}`}>{rowData[h.id]}</Link>;
+      data = (
+        <Link
+          key={`table_row_link_${h.id}_${rowIndex}`}
+          href={`${path}/${rowData.id}`}
+        >
+          {rowData[h.id]}
+        </Link>
+      );
       props = {
         sx: { textDecoration: "underline" },
       }
@@ -141,7 +153,7 @@ function tableBodyRow(rowData, tableHeaders, path) {
       data = (
         <Button
           variant="text"
-          key={`${rowData.id}_${h.id}_button`}
+          key={`table_row_button_${h.id}_${rowIndex}`}
           onClick={() => h.onClick(rowData[h.target])}
         >
           {h.name}
@@ -150,17 +162,13 @@ function tableBodyRow(rowData, tableHeaders, path) {
     }
     
     return (
-      <TableCell key={`${rowData.id}_${h.id}`} {...props}>
+      <TableCell key={`table_row_cell_${h.id}_${rowIndex}`} {...props}>
         {data}
       </TableCell>
     );
   });
   
-  
-  
   return (
-    <TableRow key={rowData[tableHeaders[0].id]}>
-      {rows}
-    </TableRow>
+    <TableRow key={`table_row_${rowIndex}`}>{cells}</TableRow>
   );
 }
