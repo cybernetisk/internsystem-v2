@@ -30,42 +30,50 @@ export class NavBar extends Component {
     
     return (
       <AppBar position="absolute">
-        <Toolbar sx={{  }}>
-          <Grid container direction="row" justifyContent="flex-end" alignItems="center">
+        <Toolbar sx={{}}>
+          <Grid
+            container
+            direction="row"
+            justifyContent="flex-end"
+            alignItems="center"
+          >
             <Grid item>
-              <Avatar sx={{
-                height: 45,
-                width: 45,
-                
-              }}>
-                <Image src={cybLogo} alt="cyb logo" fill />
-              </Avatar>
+              <Link href={`/pages/main/home`}>
+                <Avatar
+                  sx={{
+                    height: 45,
+                    width: 45,
+                  }}
+                >
+                  <Image src={cybLogo} alt="cyb logo" fill />
+                </Avatar>
+              </Link>
             </Grid>
-            
-            
+
             <Grid item container md xs justifyContent="flex-end" pr={2}>
-              <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex",  } }}>
+              <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
                 {navItems.map((item) => NavItemElement(item, currentPath))}
               </Box>
 
-              <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none",  } }}>
+              <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none" } }}>
                 {navItems.map((item) => NavIconElement(item, currentPath))}
               </Box>
             </Grid>
-            
-            
+
             <Grid item>
-              <Box sx={{
-                
-                // marginLeft: "auto"
-              }}>
+              <Box
+                sx={
+                  {
+                    // marginLeft: "auto"
+                  }
+                }
+              >
                 <SessionProvider>
                   <LoginButton />
                 </SessionProvider>
               </Box>
             </Grid>
           </Grid>
-
         </Toolbar>
       </AppBar>
     );

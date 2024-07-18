@@ -2,7 +2,7 @@
 
 import "./../../globals.css";
 
-import { Coffee, EmojiPeople, Groups, Home, PersonAdd } from "@mui/icons-material";
+import { Coffee, EmojiPeople, Home } from "@mui/icons-material";
 import { Box, CssBaseline, Container, Breadcrumbs } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@emotion/react";
@@ -17,31 +17,6 @@ const NavItems = [
   // { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
   { id: "aboutEscape", path: "aboutEscape", name: "Escape", icon: <Coffee /> },
   { id: "volunteering", path: "volunteering", name: "Volunteering", icon: <EmojiPeople /> },
-];
-
-const VolunteerLink = "https://nettskjema.no/a/378483#/page/1";
-
-const SocialMedia = [
-  {
-    name: "Instagram",
-    value: "@cybernetisk",
-    link: "https://www.instagram.com/cybernetisk/",
-  },
-  {
-    name: "Facebook",
-    value: "Cybernetisk Selskab",
-    link: "https://www.facebook.com/cybernetisk",
-  },
-  {
-    name: "wiki",
-    value: "CYB",
-    link: "https://wiki.cyb.no",
-  },
-  {
-    name: "Github",
-    value: "cybernetisk",
-    link: "https://github.com/cybernetisk",
-  },
 ];
 
 export default function RootLayout({ children }) {
@@ -89,7 +64,7 @@ export default function RootLayout({ children }) {
             </Container>
           </Box>
 
-          <LayoutFooter socialMedia={SocialMedia} volunteerLink={VolunteerLink}/>
+          <LayoutFooter/>
         </ThemeProvider>
       </body>
     </html>

@@ -149,4 +149,4 @@ const CheckedTextField = (title, textValue, textCallback) => {
   );
 };
 
-export default authWrapper(ProfilePage)
+export default authWrapper(ProfilePage, "", "home")

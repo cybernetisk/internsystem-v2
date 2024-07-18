@@ -29,7 +29,7 @@ export default function AboutCYBPage() {
   // return page?.pageBuilder ? PageBuilder(page) : <></>;
   return (
     <Box>
-      <Typography variant="h4">Escape</Typography>
+      {page != null ? page.header : <Skeleton variant="text" />}
       <Divider sx={{ mb: 4 }}></Divider>
 
       <Grid container spacing={2}>

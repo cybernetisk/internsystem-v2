@@ -111,7 +111,9 @@ function VolunteeringPage(params) {
   
   return (
     <Box>
-      <Typography variant="h4">Volunteering</Typography>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+        Volunteering
+      </Typography>
       <Divider sx={{ mb: 4 }}></Divider>
 
       <Grid container>
@@ -181,7 +183,7 @@ function VolunteeringPage(params) {
           <Card sx={{ height: "100vh" }}>
             <CardContent>
               <Typography variant="h6">something is coming here</Typography>
-              <Divider sx={{ mb: 2 }}/>
+              <Divider sx={{ mb: 2 }} />
               <Typography>Have a nice day :)</Typography>
             </CardContent>
           </Card>
