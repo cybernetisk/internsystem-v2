@@ -2,13 +2,15 @@
 import { mailOptions, transporter } from "@/app/pages/auth/email";
 import { NextResponse } from "next/server";
 
+const NEXTAUTH_URL = process.env.NEXTAUTH_URL || "";
+
 export async function POST(req) {
   
   if (req.method == "POST") {
     
     const args = await req.json();
     const { user, activateToken } = args
-    const link = `http://localhost:3000/api/activate/${activateToken.token}`;
+    const link = `${NEXTAUTH_URL}/api/activate/${activateToken.token}`;
     const html = `
     Hello ${user.firstName} ${user.lastName}, You have successfully created a user-account at CYB.no. <br><br>
     
@@ -27,7 +29,7 @@ export async function POST(req) {
       console.error("Error with sending email: ", error);
     }
     
-    return NextResponse.json({ success: success }, { status: 200 });
+    return NextResponse.json({ success: success, link: link }, { status: 200 });
   }
 
   return NextResponse.json(
