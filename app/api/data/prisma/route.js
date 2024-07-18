@@ -3,7 +3,6 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { PrismaClient } from "@prisma/client";
 
 /**
  * @param {*} req
@@ -20,17 +19,13 @@ export async function POST(req) {
         { status: 405 }
       );
     }
-    // console.log("PMH Request", args);
+    
+    if (args.debug) console.log("PMH Request", args);
     
     try {
       switch (args.method) {
         case "find":
           data = await prisma[args.model].findMany(args.request);
-          // if (Object.hasOwn(args.request, "where")) {
-          // }
-          // else {
-          //   data = await prisma[args.model].findMany(args.request);
-          // }
           break;
         case "create":
           data = await prisma[args.model].create(args.request);
@@ -52,8 +47,9 @@ export async function POST(req) {
           extra: prisma[args.model].fields,
         });
       }
-
+      
       return NextResponse.json({ data: data });
+
     } catch (error) {
       console.log(`uh oh, Error with model "${args.model}"`, error);
       

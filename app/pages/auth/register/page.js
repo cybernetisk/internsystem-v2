@@ -11,101 +11,40 @@ import { useState } from "react";
 export default function registerPage() {
   
   const [firstName, setFirstName] = useState("Eric");
-  const [lastName, setLastName] = useState("Svebakk");
-  const [email, setEmail] = useState("ericatsvebakk@gmail.com")
+  const [lastName, setLastName] = useState("CYB");
+  const [email, setEmail] = useState("easvebak@uio.no")
   const [response, setResponse] = useState("")
+  
+  const debug = true;
   
   const handleRegister = async () => {
     
-    const debug = false
+    const responseCUE = await checkUserExists(email, debug)
     
-    try {
-      let existingUser;
-      let newUser;
-      let activateToken;
+    if (!responseCUE.ok) {
+      setResponse(responseCUE.error);
+      return;
+    }
       
-      await prismaRequest({
-        model: "user",
-        method: "find",
-        request: {
-          where: {
-            email: email,
-          },
-        },
-        callback: (data) => existingUser = data.data.length > 0 ? data.data[0] : null
-      });
-      
-      if (debug) console.log("User exists?", !!existingUser, existingUser);
-      
-      // Check if user exists
-      if (!!existingUser) {
-        setResponse("Email already exists in database");
-        return
-      }
-      
-      await prismaRequest({
-        model: "user",
-        method: "create",
-        request: {
-          data: {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-          },
-        },
-        callback: (data) => newUser = data.data != undefined ? data.data : null
-      });
-      
-      if (debug) console.log("User created?", !!newUser, newUser);
-      
-      // Check if user is created
-      if (!newUser) {
-        setResponse("Unable to create user");
-        return;
-      }
-      
-      await prismaRequest({
-        model: "activateToken",
-        method: "create",
-        request: {
-          data: {
-            token: `${randomBytes(32).toString("hex")}`,
-            userId: newUser.id,
-          },
-        },
-        callback: (data) => activateToken = data.data != undefined ? data.data : null
-      })
-      
-      if (debug) console.log("Activate token created?", !!activateToken, activateToken);
+    const responseCU = await createUser(firstName, lastName, email, debug);
 
-      // Check if user is created
-      if (!activateToken) {
-        setResponse("Unable to create activate token");
-        return;
-      }
-
-      fetch("/api/sendVerification/", {
-        method: "post",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user: newUser,
-          activateToken: activateToken,
-        }),
-      })
-      .then((data) => {
-        if (debug) console.log(data);
-        setResponse("User created! Please verify your Email");
-      });
-      
-      
-    } catch (error) {
-      setResponse(`${error}`);
-      console.error(error)
+    if (!responseCU.ok) {
+      setResponse(responseCU.error)
+      return;
     }
     
+    const responseSVM = await sendVerificiationMail(
+      responseCU.data.newUser,
+      responseCU.data.activateToken,
+      debug
+    );
+    
+    if (!responseSVM.ok) {
+      setResponse(responseSVM.error);
+      return;
+    } else {
+      setResponse("User created. Email verification sent!") 
+    }
   }
   
   return (
@@ -185,4 +124,86 @@ const CheckedTextField = (title, textValue, textCallback) => {
     </Grid>
   );
   
+}
+
+// 
+async function checkUserExists(email, debug) {
+  
+  const response = await prismaRequest({
+    model: "user",
+    method: "find",
+    request: {
+      where: {
+        email: email,
+      },
+    },
+    debug: debug
+  });
+  
+  if (!response.ok) {
+    return { ok: false, error: "Unable to connect to database" };
+  } else if (response.data.length > 0) {
+    return { ok: false, error: "Email already exists in database" };
+  }
+  
+  return {
+    ok: true
+  };
+}
+
+// 
+async function createUser(firstName, lastName, email, debug) {
+  
+  const response = await fetch("/api/createUser/", {
+    method: "post",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+    }),
+  })
+  
+  if (debug) console.log("createUser response:", response);
+  
+  if (!response.ok) {
+    return { ok: false, error: response.error };
+  }
+
+  const data = await response.json();
+  
+  if (debug) console.log("createUser:", data);
+  
+  return { ok: true, ...data };
+}
+
+// 
+async function sendVerificiationMail(newUser, activateToken, debug) {
+  
+  const response = await fetch("/api/sendVerification/", {
+    method: "post",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user: newUser,
+      activateToken: activateToken,
+    }),
+  })
+  
+  if (debug) console.log("sendVerificiationMail response:", response);
+  
+  if (!response.ok) {
+    return { ok: false, error: response.error };
+  }
+  
+  const data = await response.json();
+  
+  if (debug) console.log("sendVerificiationMail:", data);
+  
+  return { ok: true, ...data };
 }
