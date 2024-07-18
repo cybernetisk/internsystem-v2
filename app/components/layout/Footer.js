@@ -1,12 +1,43 @@
 
-import { Container, Grid, Stack, Typography } from "@mui/material";
+import { Container, Grid, Stack, SvgIcon, Typography } from "@mui/material";
+import { Facebook, GitHub, Instagram, Public } from "@mui/icons-material";
 import { cybTheme } from "../themeCYB";
 import { Component } from "react";
 import Link from "next/link";
 
+
+const VOLUNTEER_LINK = "https://nettskjema.no/a/378483#/page/1";
+const ESCAPE_ADDRESS = "https://maps.app.goo.gl/CEbazdheBwxbBRmL9";
+
+const SOCIAL_MEDIA = [
+  {
+    name: "Instagram",
+    value: "@cybernetisk",
+    link: "https://www.instagram.com/cybernetisk/",
+    icon: Instagram,
+  },
+  {
+    name: "Facebook",
+    value: "Cybernetisk Selskab",
+    link: "https://www.facebook.com/cybernetisk",
+    icon: Facebook,
+  },
+  {
+    name: "Github",
+    value: "cybernetisk",
+    link: "https://github.com/cybernetisk",
+    icon: GitHub,
+  },
+  {
+    name: "wiki",
+    value: "CYB Wiki",
+    link: "https://wiki.cyb.no",
+    icon: Public,
+  },
+];
+
 export default class LayoutFooter extends Component {
   render() {
-    const { socialMedia, volunteerLink } = this.props;
     
     const gridChildProps = (direction) => {
       return {
@@ -14,7 +45,7 @@ export default class LayoutFooter extends Component {
         padding: 2,
         md: 6,
         xs: 12,
-        spacing: 2,
+        spacing: 0,
         alignItems: "center",
         justifyContent: "center",
       }
@@ -23,11 +54,11 @@ export default class LayoutFooter extends Component {
     return (
       <Container
         disableGutters
-        maxWidth="xl"
+        maxWidth="xxl"
         sx={{
           padding: 4,
           margin: 0,
-          backgroundColor: cybTheme.palette.background.paper,
+          backgroundColor: cybTheme.palette.background.default,
         }}
       >
         <Grid
@@ -35,64 +66,86 @@ export default class LayoutFooter extends Component {
           margin={0}
           padding={0}
           height="100%"
+          // direction={{ xs: "column-reverse", md: "row" }}
           direction="row"
           alignItems="center"
           justifyContent="center"
         >
-          {handleSocialMediaSection(socialMedia, gridChildProps)}
-          {handleAddressSection(volunteerLink, gridChildProps)}
+          {handleSocialMediaSection(gridChildProps)}
+          {handleAddressSection(gridChildProps)}
         </Grid>
       </Container>
     );
   }
 }
 
-function handleSocialMediaSection(socialMedia, gridChildProps) {
+function handleSocialMediaSection(gridChildProps) {
   
   return (
-    <Grid item container {...gridChildProps("row")}>
-      <Grid item md={3} xs={5}>
-        {socialMedia.map((e) => {
-          return (
-            <Typography
-              color={cybTheme.palette.text.primary}
-              key={"footer_link_typography_" + e.name}
+    <Grid
+      item
+      container
+      direction="column"
+      alignContent="center"
+      md
+      xs={12}
+      spacing={2}
+      pb={{ md: 0, xs: 6 }}
+      // sx={{ border: "1px solid red" }}
+    >
+      {SOCIAL_MEDIA.map((e, i) => {
+        return (
+          <Grid item key={`socialmedia_item_grid_item_${i}`}>
+            <Stack
+              direction="row"
+              spacing={1}
+              key={`socialmedia_item_stack_${i}`}
             >
-              {e.name}:
-            </Typography>
-          );
-        })}
-      </Grid>
+              <SvgIcon component={e.icon} key={`socialmedia_item_icon_${i}`} />
 
-      <Grid item md={5} xs={6}>
-        {socialMedia.map((e) => {
-          return (
-            <Link href={e.link} key={"footer_link_" + e.name} target="_blank">
-              <Typography
-                color={cybTheme.palette.text.primary}
-                sx={{
-                  // textDecoration: "underline",
-                  "&:hover": { color: cybTheme.palette.primary.main },
-                }}
-                key={"footer_link_typography_" + e.name}
+              <Link
+                href={e.link}
+                target="_blank"
+                key={`socialmedia_item_link_${i}`}
               >
-                {e.value}
-              </Typography>
-            </Link>
-          );
-        })}
-      </Grid>
+                <Typography
+                  color={cybTheme.palette.text.primary}
+                  sx={{
+                    textDecoration: "underline",
+                    "&:hover": { color: cybTheme.palette.primary.main },
+                  }}
+                  key={`socialmedia_item_typography_${i}`}
+                >
+                  {e.value}
+                </Typography>
+              </Link>
+            </Stack>
+          </Grid>
+        );
+      })}
     </Grid>
   );
 }
 
 
-function handleAddressSection(volunteerLink, gridChildProps) {
+function handleAddressSection(gridChildProps) {
   
   return (
-    <Grid item container {...gridChildProps("column")}>
-      <Grid item>
-        <Link href={volunteerLink} passHref target="_blank">
+    <Grid
+      item
+      container
+      direction="row"
+      alignItems="start"
+      justifyContent="center"
+      md
+      xs={12}
+      rowSpacing={5}
+    >
+      <Grid item container direction="column">
+        <Typography>
+          Interested?
+        </Typography>
+        <Link href={VOLUNTEER_LINK} passHref target="_blank">
           <Typography
             color={cybTheme.palette.text.primary}
             sx={{
@@ -104,24 +157,26 @@ function handleAddressSection(volunteerLink, gridChildProps) {
           </Typography>
         </Link>
       </Grid>
+
       <Grid
         item
         container
-        direction="row"
-        spacing={1}
-        justifyContent="center"
-        justifyItems="start"
+        direction="column"
       >
-        <Grid item>
-          <Typography color={cybTheme.palette.text.primary}>
-            Address:
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Typography color={cybTheme.palette.text.primary}>
+        <Typography color={cybTheme.palette.text.primary}>
+          Address
+        </Typography>
+        <Link href={ESCAPE_ADDRESS} passHref target="_blank">
+          <Typography
+            color={cybTheme.palette.text.primary}
+            sx={{
+              textDecoration: "underline",
+              "&:hover": { color: cybTheme.palette.primary.main },
+            }}
+          >
             Gaustadalléen 23b, 0373 Oslo, Norge
           </Typography>
-        </Grid>
+        </Link>
       </Grid>
     </Grid>
   );
