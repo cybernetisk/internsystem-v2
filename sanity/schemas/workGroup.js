@@ -11,15 +11,20 @@ export default {
       type: "string",
     },
     {
-      title: 'Content', 
-      name: 'content',
-      type: 'array', 
-      of: [{type: 'block'}]
+      name: "header",
+      title: "Header",
+      type: "string",
     },
     {
-      title: 'Images',
-      name: 'images',
-      type: 'gallery',
+      title: "Content",
+      name: "content",
+      type: "array",
+      of: [{ type: "block" }],
+    },
+    {
+      title: "Images",
+      name: "images",
+      type: "gallery",
     },
     // {
     //   name: "email",
