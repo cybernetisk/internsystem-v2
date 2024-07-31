@@ -1,9 +1,19 @@
 
 "use client"
 
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { PageHeader } from "@/app/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
 import prismaRequest from "@/app/middleware/prisma/prismaRequest"
-import { Avatar, Box, Button, Card, CardContent, Container, Divider, Grid, Stack, TextField, Typography } from "@mui/material"
 import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -54,8 +64,7 @@ function ProfilePage() {
   
   return (
     <Box>
-      <Typography variant="h4">Profile</Typography>
-      <Divider sx={{ mb: 4 }}></Divider>
+      <PageHeader text={"Profile"} variant={"h4"}/>
 
       <Grid
         container

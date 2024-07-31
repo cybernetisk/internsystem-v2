@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Box } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   fetchSanityPage,
@@ -10,19 +10,17 @@ import {
   PageHeaderSkeleton,
 } from "@/app/components/sanity/PageBuilder";
 
-
-export default function AboutCYBPage() {
-
+export default function rentingEscapePage() {
   const [page, setPage] = useState(null);
 
   useEffect(() => {
-    fetchSanityPage("About Escape", setPage)
+    fetchSanityPage("Renting Escape", setPage);
   }, []);
-  
+
   return (
     <Box>
       {page != null ? <PageHeader text={page.header}/> : <PageHeaderSkeleton/>}
-      {page ? page.content : <PageBuilderSkeleton/>}
+      {page ? page.content : <PageBuilderSkeleton />}
     </Box>
   );
 }

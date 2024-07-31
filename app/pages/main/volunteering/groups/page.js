@@ -1,49 +1,58 @@
 
 "use client"
 
-import { Box, Card, CardActionArea, Container, Divider, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  Divider,
+  Grid,
+  Typography,
+} from "@mui/material";
 import { Component, useEffect, useState } from "react";
 import { sanityClient } from "@/sanity/client";
 import { cybTheme } from "@/app/components/themeCYB";
-import PageBuilder from "@/app/components/sanity/PageBuilder";
+import { PageBuilder, PageHeader } from "@/app/components/sanity/PageBuilder";
 
-async function sanityFetch(setContent) {
+async function sanityFetch(setPages) {
   const groups = `*[_type == "workGroup"]|order(orderRank) {
     title,
     header,
-    content,
-    images
+    pageContent,
   }`;
 
-  const document = await sanityClient.fetch(groups);
+  const pageContent = await sanityClient.fetch(groups);
+  let pages;
   
-  setContent(PageBuilder(document));
+  if (pageContent.length) {
+    pages = pageContent.map((e) => PageBuilder(e))
+  }
+  
+  setPages(pages);
 }
 
 export default function groupPage() {
   
-  const [groups, setGroups] = useState([])
-  const [content, setContent] = useState([])
-  const [images, setImages] = useState([]);
-  const [header, setHeader] = useState(null);
-  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [pages, setPages] = useState([]);
+  const [selectedPage, setSelectedPage] = useState(null);
+  const [overviewLabel, setOverviewLabel] = useState(null);
+  const [overviewContent, setOverviewContent] = useState([])
   
   useEffect(() => {
-    sanityFetch(setGroups);
+    sanityFetch(setPages);
   }, []);
   
-  const buttons = groups.map((e, i) => {
+  const buttons = pages.map((e, i) => {
     return (
       <CustomGridItem
         key={`group_button_component_${i}`}
         childKey={`group_button_component_${i}`}
-        label={e.title}
-        selectedGroup={selectedGroup}
+        item={e}
+        selectedGroup={selectedPage}
         onClick={() => {
-          setSelectedGroup(e.title);
-          setHeader(e.header);
-          setContent(e.content);
-          setImages(e.images);
+          setSelectedPage(e);
+          setOverviewLabel(e.header);
+          setOverviewContent(e.content);
         }}
       />
     );
@@ -56,26 +65,22 @@ export default function groupPage() {
       </Typography>
       <Divider sx={{ mb: 4 }}></Divider>
 
-      <Grid container>
+      <Grid container direction="row" spacing={2}>
         <Grid
           item
           container
-          md={1.5}
+          md={2.5}
           xs={12}
-          alignContent="stretch"
+          spacing={1}
           alignSelf="flex-start"
           sx={{ flexDirection: { xs: "row", md: "column" } }}
         >
           {buttons}
         </Grid>
 
-        <Grid item md={6.5} xs={12} p={1} px={2}>
-          {header}
-          {content}
-        </Grid>
-
-        <Grid item md={4} xs={12} p={1} px={2}>
-          <Container disableGutters>{images}</Container>
+        <Grid item md xs={12}>
+          <PageHeader text={overviewLabel} divider={false} />
+          {overviewContent}
         </Grid>
       </Grid>
     </Box>
@@ -85,23 +90,29 @@ export default function groupPage() {
 
 class CustomGridItem extends Component {
   render() {
-    const { childKey, label, path, selectedGroup, onClick } = this.props;
+    const { childKey, item, selectedGroup, onClick } = this.props;
 
-    const isSelected = selectedGroup == label ? cybTheme.palette.primary.main : ""
+    const isSelected = selectedGroup == item ? cybTheme.palette.primary.main : ""
     
     return (
-      <Grid key={`${childKey}_grid`} item xs p={1}>
+      <Grid key={`${childKey}_grid`} item md xs={3}>
         <Card key={`${childKey}_card`}>
           <CardActionArea
             key={`${childKey}_cardActionArea`}
             sx={{ padding: 2 }}
             onClick={() => onClick()}
           >
-            {label}
+            <Typography
+              variant="body2"
+              gutterBottom
+              sx={{ fontWeight: "bold" }}
+            >
+              {item.title}
+            </Typography>
             <Divider
               key={`${childKey}_divider`}
               variant="fullWidth"
-              sx={{ backgroundColor: isSelected }}
+              sx={{ backgroundColor: isSelected, mb: 2 }}
             />
           </CardActionArea>
         </Card>

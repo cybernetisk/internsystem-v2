@@ -1,10 +1,23 @@
+
 "use client";
 
+import {
+  Avatar,
+  Box,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material";
+import {
+  fetchSanityPage,
+  PageBuilderSkeleton,
+  PageHeader,
+  PageHeaderSkeleton,
+} from "@/app/components/sanity/PageBuilder";
 import { useEffect, useState } from "react";
-import { Avatar, Button, Card, CardContent, Stack, Typography } from "@mui/material";
-import { sanityClient } from "@/sanity/client";
-import PageBuilder from "@/app/components/sanity/PageBuilder";
-import { useRouter } from "next/navigation";
+import { imageBuilder, sanityClient } from "@/sanity/client";
+import { cybTheme } from "@/app/components/themeCYB";
+import Link from "next/link";
 
 async function sanityFetch(setHS, setKS, setPage) {
   const query1 = (name) => `*[_type == "${name}"]|order(orderRank) {
@@ -16,101 +29,79 @@ async function sanityFetch(setHS, setKS, setPage) {
     "portraitURL": portrait.asset->url,
   }`;
 
-  const query2 = `*[_type == "page" && title == "About CYB"] {
-    pageBuilder[] {
-      _type,
-      heading,
-      _type == "textblock" => {
-        body
-      },
-      _type == "gallery" => {
-        images
-      }
-    }
-  }[0]`;
-
   const hs = await sanityClient.fetch(query1("hovedstyret"));
   const ks = await sanityClient.fetch(query1("kjellerstyret"));
-  const page = await sanityClient.fetch(query2);
-
   setHS(hs);
   setKS(ks);
-  setPage(page);
 }
 
 export default function AboutCYBPage() {
   const [hs, setHS] = useState([]);
   const [ks, setKS] = useState([]);
   const [page, setPage] = useState(null);
-  
-  const router = useRouter();
 
   useEffect(() => {
-    sanityFetch(setHS, setKS, setPage);
+    fetchSanityPage("About CYB", setPage);
+    sanityFetch(setHS, setKS);
   }, []);
 
-  console.log(page);
-
-  const pageContent = page?.pageBuilder ? PageBuilder(page, 2) : <></>;
-
   return (
-    <Stack
-      spacing={4}
-      direction="column"
-      alignContent="center"
-      sx={{ height: "100%" }}
+    <Box
     >
-      {pageContent}
+      {page != null ? <PageHeader text={page.header}/> : <PageHeaderSkeleton/>}
+      {page ? page.content : <PageBuilderSkeleton />}
 
-      <Stack spacing={2} direction="row" sx={{ width: "100%" }}>
-        <Stack spacing={1} direction="column" sx={{ width: "100%" }}>
+      <Divider sx={{ my: 4 }}/>
+
+      <Stack spacing={2} direction="row">
+        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
           <Typography variant="h6">Hovedstyret</Typography>
           {hs ? card(hs) : <></>}
         </Stack>
-        <Stack spacing={1} direction="column" sx={{ width: "100%" }}>
+        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
           <Typography variant="h6">Kjellerstyret</Typography>
           {ks ? card(ks) : <></>}
         </Stack>
       </Stack>
-      {/* <Button onClick={() => router.push("aboutCYB/pastBoardmembers")}>Explore</Button> */}
-    </Stack>
+    </Box>
   );
 }
 
 const card = (list) => {
-  return list.map((p) => {
+  return list.map((p,i) => {
+    
     return (
-      <Card key={"card_" + p.title} variant="outlined" sx={{ width: "100%" }}>
-        <CardContent key={"card_content_" + p.title}>
-          <Stack direction="row" sx={{ width: "100%" }}>
-            <Stack direction="column" sx={{ width: "100%" }}>
-              <Typography
-                variant="subtitle1"
-                key={"card_content_t1_" + p.title}
-              >
-                {p.title}
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                key={"card_content_t2_" + p.title}
-                color="GrayText"
-                gutterBottom
-              >
-                {p.name}
-              </Typography>
-              <Typography
-                variant="body2"
-                key={"card_content_t3_" + p.title}
-                color="GrayText"
-              >
-                {p.description}
-              </Typography>
-            </Stack>
-
-            <Avatar src={null} alt={p.name} />
-          </Stack>
-        </CardContent>
-      </Card>
+      <Stack key={`${i}`} direction="row" spacing={2} alignItems="center">
+        <Avatar
+          src={p.portraitURL ? imageBuilder.image(p.portraitURL).url() : null}
+          alt={p.name}
+          sx={{ height: "12vh", width: "12vh" }}
+        />
+        <Stack direction="column">
+          
+          <Link href={`mailto:${p.email}`}>
+            <Typography
+              variant="subtitle1"
+              key={"card_content_t1_" + p.title}
+              sx={{
+                textDecoration: "underline",
+                "&:hover": { color: cybTheme.palette.primary.main },
+              }}
+            >
+              {p.title}
+            </Typography>
+          </Link>
+          
+          <Typography
+            variant="subtitle2"
+            key={"card_content_t2_" + p.title}
+            color="GrayText"
+            gutterBottom
+          >
+            {p.name ? p.name : ":("}
+          </Typography>
+        </Stack>
+      </Stack>
     );
   });
 };
