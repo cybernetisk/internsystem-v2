@@ -5,6 +5,7 @@ import {
   Avatar,
   Box,
   Divider,
+  Grid,
   Stack,
   Typography,
 } from "@mui/material";
@@ -46,23 +47,26 @@ export default function AboutCYBPage() {
   }, []);
 
   return (
-    <Box
-    >
-      {page != null ? <PageHeader text={page.header}/> : <PageHeaderSkeleton/>}
+    <Box>
+      {page != null ? (
+        <PageHeader text={page.header} />
+      ) : (
+        <PageHeaderSkeleton />
+      )}
       {page ? page.content : <PageBuilderSkeleton />}
 
-      <Divider sx={{ my: 4 }}/>
+      <Divider sx={{ my: 4 }} />
 
-      <Stack spacing={2} direction="row">
-        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
+      <Grid container direction="row" spacing={{ xs: 8, md: 2 }}>
+        <Grid item container direction="column" md={6} sx={12} spacing={2}>
           <Typography variant="h6">Hovedstyret</Typography>
           {hs ? card(hs) : <></>}
-        </Stack>
-        <Stack spacing={2} direction="column" sx={{ width: "100%" }}>
+        </Grid>
+        <Grid item container direction="column" md={6} sx={12} spacing={2}>
           <Typography variant="h6">Kjellerstyret</Typography>
           {ks ? card(ks) : <></>}
-        </Stack>
-      </Stack>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
@@ -71,37 +75,53 @@ const card = (list) => {
   return list.map((p,i) => {
     
     return (
-      <Stack key={`${i}`} direction="row" spacing={2} alignItems="center">
-        <Avatar
-          src={p.portraitURL ? imageBuilder.image(p.portraitURL).url() : null}
-          alt={p.name}
-          sx={{ height: "12vh", width: "12vh" }}
-        />
-        <Stack direction="column">
-          
-          <Link href={`mailto:${p.email}`}>
+      <Grid
+        item
+        container
+        direction="row"
+        key={`${i}`}
+        spacing={2}
+        alignItems="center"
+      >
+        <Grid item>
+          <Avatar
+            src={p.portraitURL ? imageBuilder.image(p.portraitURL).url() : null}
+            alt={p.name}
+            sx={{
+              height: { xs: "8vh", md: "12vh" },
+              width: { xs: "8vh", md: "12vh" },
+              // xs: { height: "12vh", width: "12vh" },
+              // md: { height: "12vh", width: "12vh" },
+            }}
+          />
+        </Grid>
+
+        <Grid item>
+          <Stack direction="column">
+            <Link href={`mailto:${p.email}`}>
+              <Typography
+                variant="subtitle1"
+                key={"card_content_t1_" + p.title}
+                sx={{
+                  textDecoration: "underline",
+                  "&:hover": { color: cybTheme.palette.primary.main },
+                }}
+              >
+                {p.title}
+              </Typography>
+            </Link>
+
             <Typography
-              variant="subtitle1"
-              key={"card_content_t1_" + p.title}
-              sx={{
-                textDecoration: "underline",
-                "&:hover": { color: cybTheme.palette.primary.main },
-              }}
+              variant="subtitle2"
+              key={"card_content_t2_" + p.title}
+              color="GrayText"
+              gutterBottom
             >
-              {p.title}
+              {p.name ? p.name : ":("}
             </Typography>
-          </Link>
-          
-          <Typography
-            variant="subtitle2"
-            key={"card_content_t2_" + p.title}
-            color="GrayText"
-            gutterBottom
-          >
-            {p.name ? p.name : ":("}
-          </Typography>
-        </Stack>
-      </Stack>
+          </Stack>
+        </Grid>
+      </Grid>
     );
   });
 };

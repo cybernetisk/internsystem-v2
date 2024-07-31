@@ -95,7 +95,7 @@ class CustomGridItem extends Component {
     const isSelected = selectedGroup == item ? cybTheme.palette.primary.main : ""
     
     return (
-      <Grid key={`${childKey}_grid`} item md xs={3}>
+      <Grid key={`${childKey}_grid`} item md xs={4}>
         <Card key={`${childKey}_card`}>
           <CardActionArea
             key={`${childKey}_cardActionArea`}
