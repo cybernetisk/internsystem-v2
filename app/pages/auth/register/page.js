@@ -10,9 +10,9 @@ import { useState } from "react";
 
 export default function registerPage() {
   
-  const [firstName, setFirstName] = useState("Eric");
-  const [lastName, setLastName] = useState("CYB");
-  const [email, setEmail] = useState("easvebak@uio.no")
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("")
   const [response, setResponse] = useState("")
   
   const debug = true;

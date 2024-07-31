@@ -118,12 +118,6 @@ function ProfilePage() {
           </Grid>
         </Grid>
 
-        {/* <Stack
-          direction="column"
-          spacing={1}
-          // sx={{ border: "1px solid red" }}
-        >
-        </Stack> */}
       </Grid>
     </Box>
   );

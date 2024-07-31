@@ -11,10 +11,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { PageHeader, PageHeaderSkeleton } from "@/app/components/sanity/PageBuilder";
+import { fetchSanityPage, PageBuilder, PageBuilderSkeleton, PageHeader, PageHeaderSkeleton } from "@/app/components/sanity/PageBuilder";
 import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import Link from "next/link";
+import { sanityClient } from "@/sanity/client";
 
 const BUTTON_CONTENT_1 = [
   { title: "Economy", path: "volunteering/economy" },
@@ -34,13 +35,38 @@ const BUTTON_CONTENT_2 = [
 ];
 
 
+async function sanityFetch(setPages) {
+  const groups = `*[_type == "workGroup"]|order(orderRank) {
+    title,
+    header,
+    pageContent,
+  }`;
+
+  const pageContent = await sanityClient.fetch(groups);
+  let pages;
+
+  if (pageContent.length) {
+    pages = pageContent.map((e) => PageBuilder(e));
+  }
+
+  setPages(pages);
+}
+
+
 function VolunteeringPage(params) {
 
   const [paidMemberships, setPaidMemberships] = useState([]);
   const [voucherLogs, setVoucherLogs] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [semester, setSemester] = useState(null);
-  // const [page, setPage] = useState(null);
+  const [pages, setPages] = useState(null);
+  
+  useEffect(() => {
+    sanityFetch(setPages);
+    // fetchSanityPage("Volunteering", setPage);
+  }, []);
+  
+  console.log(pages);
   
   useEffect(() => {
     
@@ -94,13 +120,24 @@ function VolunteeringPage(params) {
     <Box>
       <PageHeader text="Volunteering" variant="h4" />
 
-      <Grid container direction="row" spacing={2}>
+      <Grid container direction="row" spacing={4}>
         <Grid item md={2.5} xs={12}>
           {createNavigation(semester, paidMemberships, workLogs, voucherLogs)}
         </Grid>
 
         <Grid item md xs={12}>
+          {pages != null ? pages.map((e) => {
+            return (
+              <Box>
+                <PageHeader text={e.header} divider={false} gutter={false} />
+                {e.content}
+                <Divider sx={{ mb: 4 }}/>
+              </Box>
+            );
+          }) : <></>}
           
+          {/* {pages != null ? <PageHeader text={pages.header}/> : <PageHeaderSkeleton/>}
+          {pages ? pages.content : <PageBuilderSkeleton/>} */}
         </Grid>
       </Grid>
       
@@ -130,8 +167,8 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs) {
           <CardContent>
             <PageHeader text="TOOLS" variant="body1" gutter={false} />
             {buttonGroup1}
-            <Divider sx={{ my: 2 }} />
-            {buttonGroup2}
+            {/* <Divider sx={{ my: 2 }} />
+            {buttonGroup2} */}
           </CardContent>
         </Card>
       </Grid>
