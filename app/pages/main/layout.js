@@ -1,28 +1,38 @@
+
 "use client";
 
 import "./../../globals.css";
 
-import { Coffee, EmojiPeople, Home } from "@mui/icons-material";
-import { Box, CssBaseline, Container, Breadcrumbs } from "@mui/material";
+import { Coffee, EmojiPeople, Groups, Home } from "@mui/icons-material";
+import {
+  Box,
+  CssBaseline,
+  Container,
+  Breadcrumbs,
+  ThemeProvider,
+} from "@mui/material";
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "@emotion/react";
 import { usePathname } from "next/navigation";
 import { NavBarOffset, NavBar } from "@/app/components/layout/AppBar";
 import { cybTheme } from "@/app/components/themeCYB";
-import WebsiteBreadcrumbs from "@/app/components/layout/Breadcrumbs";
 import LayoutFooter from "@/app/components/layout/Footer";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },
-  // { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
+  { id: "aboutCYB", path: "aboutCYB", name: "CYB", icon: <Groups /> },
   { id: "aboutEscape", path: "aboutEscape", name: "Escape", icon: <Coffee /> },
-  { id: "volunteering", path: "volunteering", name: "Volunteering", icon: <EmojiPeople /> },
+  {
+    id: "volunteering",
+    path: "volunteering",
+    name: "Volunteering",
+    icon: <EmojiPeople />,
+  },
 ];
 
-export default function RootLayout({ children }) {
-
+export default function AppLayout({ children }) {
+  
   const pathname = usePathname();
-  const breadcrumbs = WebsiteBreadcrumbs(pathname, NavItems);
+  // const breadcrumbs = WebsiteBreadcrumbs(pathname, NavItems);
 
   return (
     <html lang="en">
@@ -60,11 +70,10 @@ export default function RootLayout({ children }) {
                   <SessionProvider>{children}</SessionProvider>
                 </Container>
               </Container>
-              
             </Container>
           </Box>
 
-          <LayoutFooter/>
+          <LayoutFooter />
         </ThemeProvider>
       </body>
     </html>
