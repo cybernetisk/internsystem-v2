@@ -1,9 +1,19 @@
 
 "use client"
 
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { PageHeader } from "@/app/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
 import prismaRequest from "@/app/middleware/prisma/prismaRequest"
-import { Avatar, Box, Button, Card, CardContent, Container, Divider, Grid, Stack, TextField, Typography } from "@mui/material"
 import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -12,7 +22,7 @@ function ProfilePage() {
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
   
   const session = useSession();
   const router = useRouter()
@@ -24,7 +34,7 @@ function ProfilePage() {
     if (session.data != undefined) {
       setFirstName(session.data.user.firstName)
       setLastName(session.data.user.lastName)
-      setEmail(session.data.user.email)
+      // setEmail(session.data.user.email)
     }
   }, [session])
   
@@ -38,7 +48,7 @@ function ProfilePage() {
           email: session.data.user.email
         },
         data: {
-          email: email,
+          // email: email,
           firstName: firstName,
           lastName: lastName,
         }
@@ -54,8 +64,7 @@ function ProfilePage() {
   
   return (
     <Box>
-      <Typography variant="h4">Profile</Typography>
-      <Divider sx={{ mb: 4 }}></Divider>
+      <PageHeader text={"Profile"} variant={"h4"}/>
 
       <Grid
         container
@@ -66,7 +75,7 @@ function ProfilePage() {
         <Grid item container xs={12} md={3} direction="column" spacing={2} mb={8}>
           {CheckedTextField("First name", firstName, setFirstName)}
           {CheckedTextField("Last name", lastName, setLastName)}
-          {CheckedTextField("Email", email, setEmail)}
+          {/* {CheckedTextField("Email", email, setEmail)} */}
           <Grid item>
             <Button {...buttonProps} onClick={handleUpdateData}>
               Update

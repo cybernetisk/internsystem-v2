@@ -5,34 +5,33 @@ import {
   Box,
   Button,
   Card,
-  Container,
+  CardContent,
   Grid,
   Stack,
   Typography,
 } from "@mui/material";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import authWrapper from "@/app/middleware/authWrapper";
-import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import CustomTable from "@/app/components/table";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import LogInput from "./logInput";
+import { PageHeader } from "@/app/components/sanity/PageBuilder";
 
 const WORK_TABLE_HEADERS = [
-  { id: "workedAt", name: "log date" },
-  { id: "duration", name: "duration" },
-  { id: "vouchers", name: "vouchers" },
-  { id: "description", name: "description" },
-  { id: "loggedBy", name: "logged by" },
-  { id: "loggedFor", name: "logged for" },
+  { id: "workedAt", name: "log date", flex: 1.5 },
+  { id: "duration", name: "duration", flex: 1 },
+  { id: "vouchers", name: "vouchers", flex: 1 },
+  { id: "description", name: "description", flex: 3 },
+  { id: "loggedFor", name: "logged for", flex: 2 },
 ];
 
 const VOUCHER_TABLE_HEADERS = [
-  { id: "usedAt", name: "log date" },
-  { id: "amount", name: "vouchers" },
-  { id: "description", name: "description" },
-  { id: "loggedFor", name: "logged for" },
+  { id: "usedAt", name: "log date", flex: 1.5 },
+  { id: "amount", name: "vouchers", flex: 2 },
+  { id: "description", name: "description", flex: 3 },
+  { id: "loggedFor", name: "logged for", flex: 2 },
 ];
 
 function LogsPage() {
@@ -56,6 +55,11 @@ function LogsPage() {
     prismaRequest({
       model: "user",
       method: "find",
+      request: {
+        where: {
+          active: true
+        }
+      },
       callback: (data) => {
         if (data.data.length != 0) {
           setUsers(
@@ -84,6 +88,9 @@ function LogsPage() {
         include: {
           User: true,
         },
+        where: {
+          semesterId: session.data.semester.id,
+        }
       },
       callback: (data) => {
         if (data.length == 0) return;
@@ -97,8 +104,6 @@ function LogsPage() {
           .reduce((total, e) => {
             return (total += e.amount);
           }, 0.0);
-          
-        console.log(data);  
         
         const newLogs = data.data.map((e) => {
           return {
@@ -127,6 +132,9 @@ function LogsPage() {
         include: {
           LoggedByUser: true,
           LoggedForUser: true,
+        },
+        where: {
+          semesterId: session.data.semester.id,
         },
       },
       callback: (data) => {
@@ -165,7 +173,7 @@ function LogsPage() {
   }, [refresh])
   
   const layout = LogInput(
-    session.data.user,
+    session,
     users,
     workGroups,
     vouchersEarned,
@@ -180,41 +188,38 @@ function LogsPage() {
   
   return (
     <Box>
-      <Container disableGutters sx={{ my: 2 }}>
-        <Typography variant="h4">Logs</Typography>
-      </Container>
+      <PageHeader text="Logs"/>
 
-      <Grid container>
-        <Grid item container md={4} xs={12} spacing={0} alignContent="start">
-          <Grid item width="100%" p={1}>
-            <Card
-              sx={{
-                padding: 3,
-                backgroundColor: cybTheme.palette.background.default,
-              }}
-            >
+      <Grid container spacing={2}>
+        
+        <Grid item md={4} xs={12} spacing={2} alignContent="start">
+          <Card>
+            <CardContent>
+              
               <Stack direction="row" spacing={1} pb={4}>
                 <Button
+                  fullWidth
                   variant={mode ? "contained" : "outlined"}
                   onClick={() => setMode(true)}
                 >
                   Register work
                 </Button>
                 <Button
+                  fullWidth
                   variant={!mode ? "contained" : "outlined"}
                   onClick={() => setMode(false)}
                 >
                   Use voucher
                 </Button>
               </Stack>
-
+              
               {layout}
-            </Card>
-          </Grid>
+            </CardContent>
+          </Card>
         </Grid>
 
-        <Grid item md={8} xs={12} p={1}>
-          <Typography variant="h6">
+        <Grid item md={8} xs={12}>
+          <Typography variant="h6" gutterBottom>
             {mode ? "Work logs" : "Voucher logs"}
           </Typography>
           {mode ? (

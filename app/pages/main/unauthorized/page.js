@@ -1,12 +1,14 @@
-import { Box, Divider, Typography } from "@mui/material";
+
+"use client"
+
+import { Box, Typography } from "@mui/material";
+import { PageHeader } from "@/app/components/sanity/PageBuilder";
 
 export default function UnauthorizedPage() {
   
   return (
     <Box>
-      <Typography variant="h4">Unauthorized</Typography>
-      <Divider sx={{ mb: 4 }}></Divider>
-      
+      <PageHeader text={"Unauthorized"} variant={"h4"}/>
       <Typography>Please login to view the requested page.</Typography>
     </Box>
   );

@@ -1,6 +1,8 @@
 
+"use client"
+
 import { Container, Grid, Stack, SvgIcon, Typography } from "@mui/material";
-import { Facebook, GitHub, Instagram, Public } from "@mui/icons-material";
+import { Facebook, Forum, GitHub, Instagram, Public } from "@mui/icons-material";
 import { cybTheme } from "../themeCYB";
 import { Component } from "react";
 import Link from "next/link";
@@ -8,6 +10,7 @@ import Link from "next/link";
 
 const VOLUNTEER_LINK = "https://nettskjema.no/a/378483#/page/1";
 const ESCAPE_ADDRESS = "https://maps.app.goo.gl/CEbazdheBwxbBRmL9";
+const SUGGESTION_LINK = "https://github.com/cybernetisk/internsystem-v2/issues";
 
 const SOCIAL_MEDIA = [
   {
@@ -34,6 +37,12 @@ const SOCIAL_MEDIA = [
     link: "https://wiki.cyb.no",
     icon: Public,
   },
+  {
+    name: "Slack",
+    value: "CYB Slack",
+    link: "https://join.slack.com/t/cybernetisk/shared_invite/zt-2nm279jef-qOAGCMPDiUn5RK19NKA3_g",
+    icon: Forum,
+  },
 ];
 
 export default class LayoutFooter extends Component {
@@ -57,6 +66,7 @@ export default class LayoutFooter extends Component {
         maxWidth="xxl"
         sx={{
           padding: 4,
+          py: 6,
           margin: 0,
           backgroundColor: cybTheme.palette.background.default,
         }}
@@ -115,6 +125,7 @@ function handleSocialMediaSection(gridChildProps) {
                     "&:hover": { color: cybTheme.palette.primary.main },
                   }}
                   key={`socialmedia_item_typography_${i}`}
+                  variant="body2"
                 >
                   {e.value}
                 </Typography>
@@ -139,33 +150,10 @@ function handleAddressSection(gridChildProps) {
       justifyContent="center"
       md
       xs={12}
-      rowSpacing={5}
+      rowSpacing={3}
     >
       <Grid item container direction="column">
-        <Typography>
-          Interested?
-        </Typography>
-        <Link href={VOLUNTEER_LINK} passHref target="_blank">
-          <Typography
-            color={cybTheme.palette.text.primary}
-            sx={{
-              textDecoration: "underline",
-              "&:hover": { color: cybTheme.palette.primary.main },
-            }}
-          >
-            Become a volunteer!
-          </Typography>
-        </Link>
-      </Grid>
-
-      <Grid
-        item
-        container
-        direction="column"
-      >
-        <Typography color={cybTheme.palette.text.primary}>
-          Address
-        </Typography>
+        <Typography color={cybTheme.palette.text.primary}>Address</Typography>
         <Link href={ESCAPE_ADDRESS} passHref target="_blank">
           <Typography
             color={cybTheme.palette.text.primary}
@@ -173,8 +161,56 @@ function handleAddressSection(gridChildProps) {
               textDecoration: "underline",
               "&:hover": { color: cybTheme.palette.primary.main },
             }}
+            variant="body2"
           >
             Gaustadalléen 23b, 0373 Oslo, Norge
+          </Typography>
+        </Link>
+      </Grid>
+
+      <Grid item container direction="column">
+        <Typography>Useful links:</Typography>
+        <Link href={VOLUNTEER_LINK} passHref target="_blank">
+          <Typography
+            color={cybTheme.palette.text.primary}
+            sx={{
+              textDecoration: "underline",
+              "&:hover": { color: cybTheme.palette.primary.main },
+            }}
+            variant="body2"
+            gutterBottom
+          >
+            Become a volunteer
+          </Typography>
+        </Link>
+        <Link
+          href={"/pages/main/aboutEscape/rentingEscape"}
+          passHref
+          // target="_blank"
+        >
+          <Typography
+            color={cybTheme.palette.text.primary}
+            sx={{
+              textDecoration: "underline",
+              "&:hover": { color: cybTheme.palette.primary.main },
+            }}
+            variant="body2"
+            gutterBottom
+          >
+            Rent Escape
+          </Typography>
+        </Link>
+        <Link href={SUGGESTION_LINK} passHref target="_blank">
+          <Typography
+            color={cybTheme.palette.text.primary}
+            sx={{
+              textDecoration: "underline",
+              "&:hover": { color: cybTheme.palette.primary.main },
+            }}
+            variant="body2"
+            gutterBottom
+          >
+            Submit issue
           </Typography>
         </Link>
       </Grid>

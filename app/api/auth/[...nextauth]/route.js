@@ -53,6 +53,14 @@ const handler = NextAuth({
         }
       })
       
+      const semesters = await prisma.semester.findMany({
+        orderBy: {
+          id: "desc"
+        },
+        take: 1,
+      })
+      const currentSemester = await semesters[0];
+      
       if (cybUser) {
         session.user.name = `${cybUser.firstName} ${cybUser.lastName}`
         delete session.user.name;
@@ -61,8 +69,13 @@ const handler = NextAuth({
           ...session.user,
           ...cybUser,
           roles: cybUser.roles.map((e) => e.role),
-          name: `${cybUser.firstName} ${cybUser.lastName}`
+          name: `${cybUser.firstName} ${cybUser.lastName ? cybUser.lastName : ""}`
         }
+      }
+      
+      // console.log(currentSemester);
+      if (currentSemester) {
+        session.semester = currentSemester;
       }
       
       return session

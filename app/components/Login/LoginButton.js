@@ -7,6 +7,7 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  IconButton,
   // Icon,
   Stack,
   SvgIcon,
@@ -42,37 +43,57 @@ export default function LoginButton() {
     bgcolor: cybTheme.palette.primary.main,
   };
   
+  
+  
   return (
-    <Card sx={{ display: "flex", flexDirection: "row",  }}>
-      <CardActionArea onClick={handleClick}>
-        <CardContent>
-          <Stack
-            spacing={2}
-            direction="row"
-            alignContent="center"
-            alignItems="center"
-          >
-            {/* <Typography sx={{ flexGrow: 0 }}>
-              {session.data != undefined ? "Logged in" : "Login"}
-            </Typography> */}
-            
-            <Typography variant="body1" width="3em" sx={{ display: { xs: "none", md: "flex"  } }} >
-              {session.data != undefined ? "Profile" : "Login"}
-            </Typography>
+    <>
+      <Card sx={{ display: { xs: "none", md: "block" } }}>
+        <CardActionArea onClick={handleClick}>
+          <CardContent>
+            <Stack
+              spacing={2}
+              direction="row"
+              alignContent="center"
+              alignItems="center"
+            >
+              <Typography
+                variant="body1"
+                width="3em"
+                sx={{ display: { xs: "none", md: "flex" } }}
+              >
+                {session.data != undefined ? "Profile" : "Login"}
+              </Typography>
 
-            {session.status == "authenticated" ? (
-              <Avatar alt="Image of user" sx={{ ...avatarProps, p:1 }}>
-                <Icon path={mdiPenguin} color={cybTheme.palette.background.main }/>
-                {/* <icon component={mdiPenguin}/> */}
-              </Avatar>
-            ) : (
-              <Avatar sx={{ ...avatarProps }}>
-                <Person sx={{ color: cybTheme.palette.background.main }} />
-              </Avatar>
-            )}
-          </Stack>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+              {session.status == "authenticated" ? (
+                <Avatar alt="Image of user" sx={{ ...avatarProps, p: 1 }}>
+                  <Icon
+                    path={mdiPenguin}
+                    color={cybTheme.palette.background.main}
+                  />
+                </Avatar>
+              ) : (
+                <Avatar sx={{ ...avatarProps }}>
+                  <Person sx={{ color: cybTheme.palette.background.main }} />
+                </Avatar>
+              )}
+            </Stack>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <Box sx={{ display: { xs: "block", md: "none" }, py:1 }}>
+        <IconButton onClick={handleClick}>
+          {session.status == "authenticated" ? (
+            <Avatar alt="Image of user" sx={{ ...avatarProps, p: 1 }}>
+              <Icon path={mdiPenguin} color={cybTheme.palette.background.main} />
+            </Avatar>
+          ) : (
+            <Avatar sx={{ ...avatarProps }}>
+              <Person sx={{ color: cybTheme.palette.background.main }} />
+            </Avatar>
+          )}
+        </IconButton>
+      </Box>
+    </>
   );
 }

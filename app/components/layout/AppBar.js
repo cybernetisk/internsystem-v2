@@ -20,13 +20,10 @@ import cybLogo from "./../../icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import LoginButton from "../Login/LoginButton";
-import { useRouter } from "next/navigation";
 
 export class NavBar extends Component {
   render() {
     const { currentPath, navItems } = this.props;
-
-    // const router = useRouter();
     
     return (
       <AppBar position="absolute">
@@ -61,13 +58,7 @@ export class NavBar extends Component {
             </Grid>
 
             <Grid item>
-              <Box
-                sx={
-                  {
-                    // marginLeft: "auto"
-                  }
-                }
-              >
+              <Box>
                 <SessionProvider>
                   <LoginButton />
                 </SessionProvider>

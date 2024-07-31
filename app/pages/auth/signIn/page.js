@@ -90,7 +90,7 @@ export default function SignInPage() {
               variant="subtitle1"
               color={{ color: cybTheme.palette.primary.main }}
             >
-              Register
+              Register new user
             </Typography>
           </Link>
         </Grid>

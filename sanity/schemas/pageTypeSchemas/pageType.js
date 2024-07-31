@@ -1,8 +1,9 @@
-import { orderRankField } from "@sanity/orderable-document-list";
 
-export default {
-  name: "workGroup",
-  title: "Work group",
+import {defineArrayMember, defineField, defineType} from 'sanity'
+
+export default defineType({
+  name: "page",
+  title: "Page",
   type: "document",
   fields: [
     {
@@ -57,22 +58,15 @@ export default {
       ],
     },
     {
-      title: "Content",
       name: "content",
+      title: "Content",
       type: "array",
       of: [{ type: "block" }],
     },
     {
-      title: "Images",
       name: "images",
+      title: "Images",
       type: "gallery",
     },
-    // {
-    //   name: "email",
-    //   title: "Email",
-    //   placeholder: "tittel@cyb.no",
-    //   type: "string",
-    // },
-    orderRankField({ type: "category" }),
   ],
-};
+});

@@ -7,25 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId], map: "Account_userId_fkey")
-}
-
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -45,22 +26,21 @@ model VerificationToken {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  email         String?         @unique
-  emailVerified DateTime?
-  active        Boolean         @default(false)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  firstName     String?
-  lastName      String?
-  accounts      Account[]
-  ActivateToken ActivateToken[]
-  sessions      Session[]
-  roles         UserRole[]
-  volunteer     Volunteer?
-  VoucherLog    VoucherLog[]
-  loggedByUser  WorkLog[]       @relation("WorkLog_loggedByToUser")
-  LoggedForUser WorkLog[]       @relation("WorkLog_loggedForToUser")
+  id              String            @id @default(cuid())
+  email           String?           @unique
+  emailVerified   DateTime?
+  active          Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  firstName       String?
+  lastName        String?
+  ActivateToken   ActivateToken[]
+  sessions        Session[]
+  roles           UserRole[]
+  UserToWorkGroup UserToWorkGroup[]
+  VoucherLog      VoucherLog[]
+  loggedByUser    WorkLog[]         @relation("WorkLog_loggedByToUser")
+  LoggedForUser   WorkLog[]         @relation("WorkLog_loggedForToUser")
 }
 
 model Role {
@@ -82,35 +62,12 @@ model UserRole {
   @@index([roleId], map: "UserRole_roleId_fkey")
 }
 
-model Volunteer {
-  id                   String                 @id @default(uuid())
-  userId               String                 @unique
-  groupId              String                 @unique(map: "groupId_UNIQUE")
-  leaderStatus         Boolean?               @default(false)
-  User                 User                   @relation(fields: [userId], references: [id])
-  VolunteerToWorkGroup VolunteerToWorkGroup[]
-
-  @@index([groupId], map: "groupID_idx")
-  @@index([userId], map: "uid_idx")
-}
-
 model WorkGroup {
-  id                   String                 @id @unique(map: "gid_UNIQUE") @default(uuid())
-  name                 String                 @db.VarChar(45)
-  leaderTitle          String                 @db.VarChar(45)
-  description          String
-  VolunteerToWorkGroup VolunteerToWorkGroup[]
-}
-
-model VolunteerToWorkGroup {
-  volunteerId String
-  workGroupId String
-  Volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade, map: "_VolunteerToWorkGroup_A_fkey")
-  WorkGroup   WorkGroup @relation(fields: [workGroupId], references: [id], onDelete: Cascade, map: "_VolunteerToWorkGroup_B_fkey")
-
-  @@unique([volunteerId, workGroupId], map: "_VolunteerToWorkGroup_AB_unique")
-  @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
-  @@map("_VolunteerToWorkGroup")
+  id              String            @id @unique(map: "gid_UNIQUE") @default(uuid())
+  name            String            @db.VarChar(45)
+  leaderTitle     String            @db.VarChar(45)
+  description     String
+  UserToWorkGroup UserToWorkGroup[]
 }
 
 model varer_konto {
@@ -282,10 +239,13 @@ model VoucherLog {
   usedAt      DateTime @default(now()) @db.Timestamp(0)
   amount      Int
   description String   @db.VarChar(120)
+  semesterId  Int
+  Semester    Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
   User        User     @relation(fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor0")
 
   @@index([id], map: "logID_idx")
   @@index([loggedFor], map: "loggedFor_idx")
+  @@index([semesterId], map: "VoucherLog_Semester_idx")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -297,12 +257,15 @@ model WorkLog {
   createdAt     DateTime? @default(now()) @db.Timestamp(0)
   duration      Int?
   description   String?   @db.VarChar(120)
+  semesterId    Int
+  Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
   LoggedByUser  User      @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedBy")
   LoggedForUser User      @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor")
 
   @@index([id], map: "logID_idx")
   @@index([loggedBy], map: "loggedBy_idx")
   @@index([loggedFor], map: "loggedFor_idx")
+  @@index([semesterId], map: "WorkLog_Semester_idx")
 }
 
 model UserMembership {
@@ -319,6 +282,9 @@ model UserMembership {
   date_lifetime     DateTime? @db.DateTime(0)
   comments          String?   @db.Text
   last_edited_by_id Int?
+  Semester          Semester  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserMembership_semester")
+
+  @@index([semester_id], map: "UserMembership_semester_idx")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -342,8 +308,23 @@ model memberLog {
   year Int?
 }
 
-model semester {
-  id       Int     @id
-  semester String? @db.VarChar(45)
-  year     Int?
+model Semester {
+  id             Int              @id
+  semester       String?          @db.VarChar(45)
+  year           Int?
+  UserMembership UserMembership[]
+  VoucherLog     VoucherLog[]
+  WorkLog        WorkLog[]
+}
+
+model UserToWorkGroup {
+  userId      String
+  workGroupId String
+  groupLeader Boolean?  @default(false)
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UserToWorkGroup_A_fkey")
+  WorkGroup   WorkGroup @relation(fields: [workGroupId], references: [id], onDelete: Cascade, map: "UserToWorkGroup_B_fkey")
+
+  @@id([workGroupId, userId])
+  @@index([userId], map: "UserToWorkGroup_A_fkey_idx")
+  @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
 }

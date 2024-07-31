@@ -1,9 +1,12 @@
 
 "use client"
 
-import { Box, CssBaseline, Paper, Stack, ThemeProvider } from "@mui/material";
+import { Avatar, Box, CssBaseline, Paper, Stack, ThemeProvider } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { cybTheme } from "@/app/components/themeCYB";
+import Link from "next/link";
+import cybLogo from "./../../icon.png";
+import Image from "next/image";
 
 export default function AuthLayout({ children }) {
 
@@ -13,6 +16,18 @@ export default function AuthLayout({ children }) {
     <html lang="en">
       <body>
         <ThemeProvider theme={cybTheme}>
+          <Box sx={{ p:2, px:3 }}>
+            <Link href={`/pages/main/home`}>
+              <Avatar
+                sx={{
+                  height: 45,
+                  width: 45,
+                }}
+              >
+                <Image src={cybLogo} alt="cyb logo" fill />
+              </Avatar>
+            </Link>
+          </Box>
           <Box
             sx={{
               position: "relative",
@@ -25,7 +40,7 @@ export default function AuthLayout({ children }) {
             }}
           >
             <CssBaseline />
-              
+
             <Box>
               <Stack
                 height="100%"
@@ -33,16 +48,13 @@ export default function AuthLayout({ children }) {
                 alignContent="center"
                 justifyContent="center"
                 alignItems="center"
-                sx={{ minHeight: "100vh" }} 
+                sx={{ minHeight: "100vh" }}
               >
                 <Paper>
-                  <SessionProvider> 
-                    {children}
-                  </SessionProvider>
+                  <SessionProvider>{children}</SessionProvider>
                 </Paper>
               </Stack>
             </Box>
-              
           </Box>
         </ThemeProvider>
       </body>

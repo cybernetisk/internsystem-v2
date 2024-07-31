@@ -2,7 +2,7 @@ import { orderRankField } from "@sanity/orderable-document-list";
 
 export default {
   name: "boardPosition",
-  title: "CYB board position",
+  title: "Board positions",
   type: "document",
   fields: [
     {
