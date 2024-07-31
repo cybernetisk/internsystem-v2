@@ -45,17 +45,6 @@ function VolunteeringPage(params) {
   useEffect(() => {
     
     prismaRequest({
-      model: "user",
-      method: "find",
-      request: {
-        include: {
-          sessions: true
-        },
-      },
-      callback: (data) => setUsersOnline(data.data.filter((e) => e.sessions.length != 0)),
-    });
-    
-    prismaRequest({
       model: "semester",
       method: "find",
       request: {

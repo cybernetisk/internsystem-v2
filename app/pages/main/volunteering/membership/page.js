@@ -126,7 +126,7 @@ export default function MembershipPage() {
                   <Button
                     fullWidth
                     variant="outlined"
-                    // onClick={() => handleFilterTable(search)}
+                    onClick={() => handleFilterTable(search)}
                   >
                     Search
                   </Button>
