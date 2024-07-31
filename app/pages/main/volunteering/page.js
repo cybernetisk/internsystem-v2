@@ -60,6 +60,7 @@ function VolunteeringPage(params) {
   const [workLogs, setWorkLogs] = useState([]);
   const [semester, setSemester] = useState(null);
   const [pages, setPages] = useState(null);
+  const [numVolunteers, setNumVolunteers] = useState(null);
   
   useEffect(() => {
     sanityFetch(setPages);
@@ -96,6 +97,21 @@ function VolunteeringPage(params) {
       callback: (data) => setVoucherLogs(data.data),
     });
     
+    prismaRequest({
+      model: "userToWorkGroup",
+      method: "find",
+      // request: {
+      //   include: {
+          
+      //   }
+      // },
+      callback: (data) => {
+        if (data.length == 0) return;
+        console.log(data);
+        setNumVolunteers(data.data);
+      }
+    })
+    
   }, [])
   
   // Semester-based data
@@ -122,14 +138,14 @@ function VolunteeringPage(params) {
 
       <Grid container direction="row" spacing={4}>
         <Grid item md={2.5} xs={12}>
-          {createNavigation(semester, paidMemberships, workLogs, voucherLogs)}
+          {createNavigation(semester, paidMemberships, workLogs, voucherLogs, numVolunteers)}
         </Grid>
 
         <Grid item md xs={12}>
           {pages != null ? pages.map((e) => {
             return (
               <Box>
-                <PageHeader text={e.header} divider={false} gutter={false} />
+                <PageHeader text={e.header} variant="h5" divider={false} gutter={false} />
                 {e.content}
                 <Divider sx={{ mb: 4 }}/>
               </Box>
@@ -145,7 +161,7 @@ function VolunteeringPage(params) {
   );
 }
 
-function createNavigation(semester, paidMemberships, workLogs, voucherLogs) {
+function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numVolunteers) {
   
   const buttonGroup1 = createButtons(BUTTON_CONTENT_1);
   const buttonGroup2 = createButtons(BUTTON_CONTENT_2);
@@ -155,13 +171,10 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs) {
   const totalWorkHours = workLogs.length != 0 ? workLogs.reduce((tot, cur) => tot += cur.duration,0) : 0;
   const TWHString = totalWorkHours.toLocaleString();
   const totalVouchersUsed = voucherLogs.length != 0 ? voucherLogs.reduce((tot, cur) => tot += cur.amount,0) : 0;
+  const totalNumVolunteers = numVolunteers ? numVolunteers.length : 0;
   
   return (
-    <Grid
-      container
-      direction="column"
-      spacing={2}
-    >
+    <Grid container direction="column" spacing={2}>
       <Grid item md={2} xs>
         <Card>
           <CardContent>
@@ -192,6 +205,10 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs) {
               <Box>
                 <Typography variant="body1">Memberships paid</Typography>
                 <Typography variant="body1">{membershipsPaid}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="body1">Number volunteers</Typography>
+                <Typography variant="body1">{totalNumVolunteers}</Typography>
               </Box>
               <Box>
                 <Typography variant="body1">Total volunteer hours</Typography>
