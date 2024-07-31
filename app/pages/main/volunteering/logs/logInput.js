@@ -15,7 +15,7 @@ import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB"; 
 
 export default function LogInput(
-  user,
+  session,
   users,
   workGroups,
   vouchersEarned,
@@ -41,7 +41,7 @@ export default function LogInput(
   const [numVouchersError, setNumVouchersError] = useState(false);
   const [descriptionVoucherError, setDescriptionVoucherError] = useState(false);
   
-  const handleWorkClick = () => {
+  const handleWorkClick = async () => {
     
     const isInvalid = validateLogRequest(
       registeredFor,
@@ -60,16 +60,17 @@ export default function LogInput(
       return;
     }
     
-    prismaRequest({
+    const response = await prismaRequest({
       model: "workLog",
       method: "create",
       request: {
         data: {
-          loggedBy: user.id,
+          loggedBy: session.data.user.id,
           loggedFor: registeredFor.id,
           workedAt: selectedDateTime.toISOString(),
           duration: hours,
           description: description,
+          semesterId: session.data.semester.id
         },
       },
       callback: (data) => {
@@ -80,6 +81,20 @@ export default function LogInput(
         setRefresh(data);
       }
     });
+    
+    if (!response.ok) return;
+    
+    prismaRequest({
+      model: "userToWorkGroup",
+      method: "create",
+      request: {
+        data: {
+          userId: registeredFor.id,
+          workGroupId: selectedGroup.id
+        }
+      }
+    })
+    
   };
 
   const handleVoucherClick = () => {
@@ -102,54 +117,55 @@ export default function LogInput(
       method: "create",
       request: {
         data: {
-          loggedFor: user.id,
+          loggedFor: session.data.user.id,
           amount: numVouchers,
           description: descriptionVoucher,
+          semesterId: session.data.semester.id,
         },
       },
       callback: (data) => {
         setNumVouchers(0);
         setDescriptionVoucher("");
         setRefresh(data);
-      }
+      },
     });
   };
 
   return mode
     ? WorkInput({
-      users,
-      workGroups,
-      registeredBy: user,
-      
-      registeredFor,
-      selectedGroup,
-      selectedDateTime,
-      hours,
-      description,
+        users,
+        workGroups,
+        registeredBy: session.data.user,
 
-      setRegisteredFor,
-      setSelectedGroup,
-      setSelectedDateTime,
-      setHours,
-      setDescription,
-      handleWorkClick,
-      registeredForError,
-      selectedGroupError,
-      selectedDateTimeError,
-      hoursError,
-      descriptionError
-    })
+        registeredFor,
+        selectedGroup,
+        selectedDateTime,
+        hours,
+        description,
+
+        setRegisteredFor,
+        setSelectedGroup,
+        setSelectedDateTime,
+        setHours,
+        setDescription,
+        handleWorkClick,
+        registeredForError,
+        selectedGroupError,
+        selectedDateTimeError,
+        hoursError,
+        descriptionError,
+      })
     : VoucherInput({
-      vouchersEarned,
-      vouchersUsed,
-      numVouchers,
-      descriptionVoucher,
-      setNumVouchers,
-      setDescriptionVoucher,
-      handleVoucherClick,
-      numVouchersError,
-      descriptionVoucherError
-    });
+        vouchersEarned,
+        vouchersUsed,
+        numVouchers,
+        descriptionVoucher,
+        setNumVouchers,
+        setDescriptionVoucher,
+        handleVoucherClick,
+        numVouchersError,
+        descriptionVoucherError,
+      });
 }
 
 function validateLogRequest(
@@ -209,23 +225,24 @@ function WorkInput(props) {
   return (
     <Stack spacing={2}>
       <CustomAutoComplete
-        label={"registered by"}
-        dataLabel={"name"}
+        label="registered by"
+        dataLabel="name"
         data={props.users}
-        defaultValue={props.registeredBy.name}
+        defaultValue={props.registeredBy}
         error={false}
       />
       <CustomAutoComplete
-        label={"registered for"}
-        dataLabel={"name"}
+        label="registered for"
+        dataLabel="name"
+        subDataLabel="email"
         data={props.users}
         value={props.registeredFor}
         callback={props.setRegisteredFor}
         error={props.registeredForError}
       />
       <CustomAutoComplete
-        label={"work group"}
-        dataLabel={"name"}
+        label="work group"
+        dataLabel="name"
         data={props.workGroups}
         value={props.selectedGroup}
         callback={props.setSelectedGroup}
@@ -241,7 +258,7 @@ function WorkInput(props) {
         />
       </LocalizationProvider>
       <CustomNumberInput
-        label={"# of hours"}
+        label="# of hours"
         value={props.hours}
         setValue={props.setHours}
         check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
@@ -305,7 +322,7 @@ function VoucherInput(props) {
         label={"# of vouchers"}
         value={props.numVouchers}
         setValue={props.setNumVouchers}
-        check={(data) => data.match(/[^0-9]/) || parseFloat(data) > diff}
+        check={(data) => data.match(/[^0-9]/)}
         error={props.numVouchersError}
       />
       <TextField
