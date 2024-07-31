@@ -169,7 +169,7 @@ function handleAddressSection(gridChildProps) {
       </Grid>
 
       <Grid item container direction="column">
-        <Typography>Useful links:</Typography>
+        <Typography>Useful links</Typography>
         <Link href={VOLUNTEER_LINK} passHref target="_blank">
           <Typography
             color={cybTheme.palette.text.primary}

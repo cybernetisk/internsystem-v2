@@ -19,8 +19,8 @@ import LayoutFooter from "@/app/components/layout/Footer";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },
-  { id: "aboutCYB", path: "aboutCYB", name: "CYB", icon: <Groups /> },
-  { id: "aboutEscape", path: "aboutEscape", name: "Escape", icon: <Coffee /> },
+  { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
+  // { id: "aboutEscape", path: "aboutEscape", name: "Escape", icon: <Coffee /> },
   {
     id: "volunteering",
     path: "volunteering",
