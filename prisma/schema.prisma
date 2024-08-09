@@ -269,13 +269,13 @@ model WorkLog {
 }
 
 model UserMembership {
-  id                Int       @id
-  lifetime          Boolean
-  honorary          Boolean
-  date_joined       DateTime  @db.DateTime(0)
+  id                Int       @id @default(autoincrement())
+  lifetime          Boolean   @default(false)
+  honorary          Boolean   @default(false)
+  date_joined       DateTime  @default(now()) @db.DateTime(0)
   name              String    @db.VarChar(50)
   email             String    @db.VarChar(254)
-  seller_id         Int
+  seller_id         String
   semester_id       Int
   user_id           String?   @db.VarChar(50)
   uio_username      String?   @db.VarChar(15)
