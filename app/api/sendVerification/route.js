@@ -12,7 +12,7 @@ export async function POST(req) {
     const { user, activateToken } = args
     const link = `${NEXTAUTH_URL}/api/activate/${activateToken.token}`;
     const html = `
-    Hello ${user.firstName} ${user.lastName}, You have successfully created a user-account at CYB.no. <br><br>
+    Hello ${user.firstName} ${user.lastName}, You have successfully created a user-account at ${NEXTAUTH_URL}. <br><br>
     
     Please verify your email by clicking the following link: ${link} <br><br>
     If you have not created a user, ignore this message. <br><br>
@@ -20,6 +20,8 @@ export async function POST(req) {
     `;
     
     let success = false
+    
+    console.log(html)
     
     try {
       await transporter.sendMail(mailOptions(user.email, html));
