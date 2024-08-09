@@ -62,6 +62,7 @@ function LogsPage() {
       },
       callback: (data) => {
         if (data.data.length != 0) {
+          // console.log(data);
           setUsers(
             data.data.map((e) => {
               return { ...e, name: `${e.firstName} ${e.lastName}`}
@@ -95,14 +96,17 @@ function LogsPage() {
       },
       callback: (data) => {
         if (data.length == 0) return;
+        console.log(data.data);
 
         const newLogs = data.data.map((e) => {
           const p1 = e.LoggedByUser;
           const p2 = e.LoggedForUser;
+          const p1name = p1 ? `${p1.firstName} ${p1.lastName}` : null
+          const p2name = p2 ? `${p2.firstName} ${p2.lastName}` : null;
           return {
             ...e,
-            loggedBy: `${p1.firstName} ${p1.lastName}`,
-            loggedFor: `${p2.firstName} ${p2.lastName}`,
+            loggedBy: p1name,
+            loggedFor: p2name,
             vouchers: e.duration * 0.5,
             workedAt_num: parseISO(e.workedAt).getTime(),
             workedAt: format(
@@ -115,8 +119,7 @@ function LogsPage() {
         const newVouchers = data.data
           .filter((e) => {
             const person = e.LoggedForUser;
-            const personId = person.id;
-            return personId == session.data.user.id;
+            return person && person.id == session.data.user.id;
           })
           .reduce((total, e) => {
             return (total += e.duration * 0.5);
