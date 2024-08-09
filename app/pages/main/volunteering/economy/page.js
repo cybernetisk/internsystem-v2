@@ -85,8 +85,8 @@ function EconomyPage() {
           variant="body1"
           gutterBottom
           sx={{
-            color: (e.id == selectedTable) ? cybTheme.palette.primary.main : "",
-            "&:hover": { color: cybTheme.palette.primary.main },
+            // color: (e.id == selectedTable) ? cybTheme.palette.primary.main : "",
+            // "&:hover": { color: cybTheme.palette.primary.main },
           }}
         >
           {e.title}

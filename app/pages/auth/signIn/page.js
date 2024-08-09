@@ -87,8 +87,8 @@ export default function SignInPage() {
             style={{ textDecoration: "none", cursor: "pointer" }}
           >
             <Typography
-              variant="subtitle1"
-              color={{ color: cybTheme.palette.primary.main }}
+              variant="caption"
+              color={cybTheme.palette.primary.main}
             >
               Register new user
             </Typography>

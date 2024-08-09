@@ -4,6 +4,8 @@
 import { Component } from "react";
 import {
   Button,
+  Card,
+  Container,
   Paper,
   Table,
   TableBody,
@@ -50,8 +52,6 @@ export default class CustomTable extends Component {
   constructor(props) {
     super();
     
-    console.log(props.headers);
-    
     const noHeaders = props.headers == undefined || props.headers.length == 0;
     const noSortBy = props.sortBy == undefined || props.headers.length == 0;
     const sortBy = noHeaders
@@ -62,14 +62,13 @@ export default class CustomTable extends Component {
       
     this.state = {
       sortBy: sortBy,
-      sortDirection: "ASC",
+      sortDirection: "DESC",
       rowsPerPage: 10,
       page: 0,
     }
   }
 
   updateSortBy = (sortBy, altSortBy="") => {
-    console.log("here: ", this.state.sortBy, sortBy, altSortBy);
     if (this.state.sortBy == sortBy || this.state.sortBy == altSortBy) {
       this.setState({
         sortDirection: this.state.sortDirection == "ASC" ? "DESC" : "ASC"
@@ -77,7 +76,6 @@ export default class CustomTable extends Component {
     }
     else {
       const stuff = altSortBy == "" ? sortBy : altSortBy;
-      console.log("here: ", stuff)
       this.setState({
         sortBy: stuff,
         sortDirection: "ASC"
@@ -88,45 +86,38 @@ export default class CustomTable extends Component {
   render() {
     const { sortBy, sortDirection, rowsPerPage, page } = this.state;
     const { headers, data, path } = this.props;
-
-    // if (!headers.length || !headers.length) {
-    //   return <></>
-    // }
     
     if (data.constructor != Array) {
       console.error("table render error: ", data);
       return <></>;
     }
     
-    // console.log(sortBy);
+    const noHeaders = headers == undefined || headers.length == 0;
+    const noSortBy = sortBy == undefined || headers.length == 0;
+    const sortElementsBy = noHeaders
+      ? null
+      : noSortBy
+      ? headers[0].id
+      : headers[0].sortBy;
     
     const tableBodyElements = data
-      .sort((a, b) => sortTableRows(a, b, sortBy, sortDirection))
+      .sort((a, b) => sortTableRows(a, b, sortElementsBy, sortDirection))
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((e, i) => createTableRow(e, i, headers, path));
 
     const HeaderFlexTotal = headers
       ? headers.reduce((total, cur) => (total += cur.flex ? cur.flex : 0), 0)
       : 0;
-    
-    // console.log("HFT", HeaderFlexTotal)
-      
-    // if (headers) {
-    //   headers.map((e) => {
-    //     console.log(HeaderFlexTotal / e.flex, );
-    //   })
-    // }
       
     const tableHeaderElements = headers
       ? headers.map((h) => (
           <TableCell
             key={h.id}
-            variant="head"
+            // variant="head"
             sx={{
               width: `${100 / (HeaderFlexTotal / h.flex)}%`,
-              backgroundColor: cybTheme.palette.background.paper,
-              border: `1px solid ${cybTheme.palette.primary.main}`,
-              borderRadius: "5px",
+              border: 1,
+              borderColor: cybTheme.palette.primary.main,
               textDecoration:
                 h.id == sortBy || h.sortBy == sortBy ? "underline" : "none",
               ":hover": {
@@ -143,9 +134,15 @@ export default class CustomTable extends Component {
       
     
     return (
-      <TableContainerStyle component={Paper}>
+      <Container
+        component={Paper}
+        elevation={3}
+        disableGutters
+        square
+        sx={{ overflowX: { xs: "scroll", sm: "hidden" } }}
+      >
         <TableStyle stickyHeader size="small">
-          <TableHead sx={{}}>
+          <TableHead>
             <TableRow>{tableHeaderElements}</TableRow>
           </TableHead>
 
@@ -159,11 +156,10 @@ export default class CustomTable extends Component {
                   rowsPerPage={rowsPerPage}
                   onPageChange={(event, value) => {
                     this.setState({
-                      page: value
-                    })
+                      page: value,
+                    });
                   }}
                   onRowsPerPageChange={(event) => {
-                    // console.log(event, event.target.value);
                     this.setState({
                       rowsPerPage: event.target.value,
                     });
@@ -177,7 +173,7 @@ export default class CustomTable extends Component {
             </TableRow>
           </TableFooter>
         </TableStyle>
-      </TableContainerStyle>
+      </Container>
     );
   }
 }
@@ -195,8 +191,6 @@ function sortTableRows(a, b, sortBy, sortDirection) {
     elemA = b[sortBy];
     elemB = a[sortBy];
   }
-
-  // console.log(typeof elemA, sortBy)
   
   switch (typeof elemA) {
     case "number":

@@ -58,11 +58,11 @@ export default function AboutCYBPage() {
       <Divider sx={{ my: 4 }} />
 
       <Grid container direction="row" spacing={{ xs: 8, md: 2 }}>
-        <Grid item container direction="column" md={6} sx={12} spacing={2}>
+        <Grid item container direction="column" md={6} xs={12} spacing={2}>
           <Typography variant="h6">Hovedstyret</Typography>
           {hs ? card(hs) : <></>}
         </Grid>
-        <Grid item container direction="column" md={6} sx={12} spacing={2}>
+        <Grid item container direction="column" md={6} xs={12} spacing={2}>
           <Typography variant="h6">Kjellerstyret</Typography>
           {ks ? card(ks) : <></>}
         </Grid>
@@ -90,8 +90,6 @@ const card = (list) => {
             sx={{
               height: { xs: "8vh", md: "12vh" },
               width: { xs: "8vh", md: "12vh" },
-              // xs: { height: "12vh", width: "12vh" },
-              // md: { height: "12vh", width: "12vh" },
             }}
           />
         </Grid>

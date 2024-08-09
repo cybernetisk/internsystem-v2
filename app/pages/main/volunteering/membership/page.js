@@ -2,10 +2,13 @@
 "use client"
 
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
+import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import CustomTable from "@/app/components/table";
+import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Card, CardContent, Divider, Grid, Stack, Table, TextField, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const MEMBERSHIP_TABLE_HEADERS = [
@@ -16,63 +19,47 @@ const MEMBERSHIP_TABLE_HEADERS = [
   { id: "comment", name: "Comment", flex: 2 },
 ];
 
-export default function MembershipPage() {
+function MembershipPage() {
   
-  const [semester, setSemester] = useState(null);
+  const session = useSession();
+
   const [membershipData, setMembershipData] = useState([]);
   const [tableData, setTableData] = useState([]);
   
   const [search, setSearch] = useState("");
   const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberComment, setNewMemberComment] = useState("");
+  const [refresh, setRefresh] = useState(false);
+  
   
   useEffect(() => {
     prismaRequest({
-      model: "semester",
+      model: "userMembership",
       method: "find",
       request: {
-        orderBy: {
-          id: "desc",
+        where: {
+          semester_id: session.data.semester.id,
         },
       },
       callback: (data) => {
         if (data.length == 0) return;
-        setSemester(data.data[1]);
-      },
+        
+        const NewData = data.data.map((e) => {
+          return {
+            ...e,
+            date_joined_num: parseISO(e.date_joined).getTime(),
+            date_joined: format(
+              parseISO(e.date_joined),
+              "dd MMM yyyy 'kl.'HH:mm"
+            ).toLowerCase(),
+          };
+        });
+        
+        setMembershipData(NewData);
+        setTableData(NewData);
+      }
     });
-    
-  }, [])
-  
-  useEffect(() => {
-    if (semester != null) {
-      prismaRequest({
-        model: "userMembership",
-        method: "find",
-        request: {
-          where: {
-            semester_id: semester.id,
-          },
-        },
-        callback: (data) => {
-          if (data.length == 0) return;
-          console.log(data, semester.id);
-          
-          const NewData = data.data.map((e) => {
-            return {
-              ...e,
-              date_joined_num: parseISO(e.date_joined).getTime(),
-              date_joined: format(
-                parseISO(e.date_joined),
-                "dd MMM yyyy 'kl.'HH:mm"
-              ).toLowerCase(),
-            };
-          });
-          
-          setMembershipData(NewData);
-          setTableData(NewData);
-        }
-      });
-    }
-  }, [semester])
+  }, [refresh])
   
   const handleFilterTable = (text) => {
     setSearch(text);
@@ -88,25 +75,40 @@ export default function MembershipPage() {
     }
   }
   
-  // console.log(newMemberName)
+  const addNewMember = async () => {
+    
+    const response = await prismaRequest({
+      model: "userMembership",
+      method: "create",
+      request: {
+        data: {
+          name: newMemberName,
+          email: "",
+          comments: newMemberComment,
+          seller_id: session.data.user.id,
+          semester_id: session.data.semester.id
+        }
+      },
+      callback: (data) => {
+        setRefresh(!refresh);
+      }
+    })
+    
+  }
    
   return (
     <Box>
-      {/* {page != null ? page.header : <Skeleton variant="text" />} */}
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
-        Membership overview
-      </Typography>
-      <Divider sx={{ mb: 4 }}></Divider>
+      <PageHeader text="Membership overview" variant="h4" />
 
       <Typography variant="h6" gutterBottom pb={2}>
-        Semester {semester ? `${semester.semester} ${semester.year}` : ""}
+        Semester {session.data.semester.semester} {session.data.semester.year}{" "}
         {membershipData.length != 0 ? ` - (${membershipData.length})` : ""}
       </Typography>
 
       <Grid container direction="row" spacing={2} rowGap={2} rowSpacing={2}>
         <Grid item container direction="column" md={3} spacing={2}>
           <Grid item>
-            <Card>
+            <Card elevation={3}>
               <CardContent>
                 <Stack direction="column" spacing={2}>
                   <TextField
@@ -135,36 +137,51 @@ export default function MembershipPage() {
             </Card>
           </Grid>
 
-          {/* <Grid item>
-            <Card>
+          <Grid item>
+            <Card elevation={3}>
               <CardContent>
                 <Stack direction="column" spacing={2}>
-                  <CustomAutoComplete
-                    label="new members name"
-                    dataLabel="name"
-                    data={membershipData}
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label="new member"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
                     value={newMemberName}
-                    callback={setNewMemberName}
-                    allowAdding={true}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                  />
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label="comment"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    value={newMemberComment}
+                    onChange={(e) => setNewMemberComment(e.target.value)}
                   />
                   <Button
                     fullWidth
                     variant="outlined"
-                    onClick={() => handleFilterTable(search)}
+                    onClick={() => addNewMember()}
                   >
                     Add New Member
                   </Button>
                 </Stack>
               </CardContent>
             </Card>
-          </Grid> */}
+          </Grid>
         </Grid>
 
         <Grid item md={9}>
-          <CustomTable headers={MEMBERSHIP_TABLE_HEADERS} data={tableData} />
+          <CustomTable
+            headers={MEMBERSHIP_TABLE_HEADERS}
+            data={tableData}
+            sortBy={"date_joined"}
+          />
         </Grid>
       </Grid>
     </Box>
   );
 }
 
+export default authWrapper(MembershipPage);

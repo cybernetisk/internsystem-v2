@@ -33,7 +33,7 @@ export default function WebsiteBreadcrumbs(path, navItems) {
           key={"typography" + path}
           alignSelf="center"
           sx={{
-            "&:hover": { color: cybTheme.palette.primary.main },
+            // "&:hover": { color: cybTheme.palette.primary.main },
             textTransform: "lowercase",
           }}
         >

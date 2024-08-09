@@ -81,8 +81,8 @@ export default function registerPage() {
             style={{ textDecoration: "none", cursor: "pointer" }}
           >
             <Typography
-              variant="subtitle1"
-              color={{ color: cybTheme.palette.primary.main }}
+              variant="caption"
+              color={cybTheme.palette.primary.main}
             >
               Log in
             </Typography>

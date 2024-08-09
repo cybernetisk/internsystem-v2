@@ -85,7 +85,7 @@ function ProfilePage() {
 
         <Grid item container xs={12} md={3} direction="column" spacing={2}>
           <Grid item>
-            <Card>
+            <Card elevation={3}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Roles:
@@ -111,11 +111,11 @@ function ProfilePage() {
             </Button>
           </Grid>
 
-          <Grid item mt={8}>
+          {/* <Grid item mt={8}>
             <Button {...buttonProps} color="error" onClick={() => signOut()}>
               Delete account
             </Button>
-          </Grid>
+          </Grid> */}
         </Grid>
 
       </Grid>

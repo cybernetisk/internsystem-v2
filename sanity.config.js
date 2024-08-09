@@ -27,8 +27,7 @@ export default defineConfig({
           .title("Content")
           .items([
             // Minimum required configuration
-            S.documentTypeListItem("boardPosition"),
-            S.documentTypeListItem("event"),
+            // S.documentTypeListItem("event"),
             S.documentTypeListItem("page"),
             orderableDocumentListDeskItem({
               type: "workGroup",
@@ -36,8 +35,9 @@ export default defineConfig({
               S,
               context,
             }),
-            orderableDocumentListDeskItem({ type: "hovedstyret", title: "Hovedstyret", S, context }),
-            orderableDocumentListDeskItem({ type: "kjellerstyret", title: "Kjellerstyret", S, context }),
+            S.documentTypeListItem("boardPosition"),
+            orderableDocumentListDeskItem({ type: "hovedstyret", title: "Members of HS", S, context }),
+            orderableDocumentListDeskItem({ type: "kjellerstyret", title: "Members of KS", S, context }),
             // S.documentTypeListItem("interngruppe"),
           ]);
       },
