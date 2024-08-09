@@ -57,16 +57,16 @@ export default defineType({
         },
       ],
     },
-    {
-      name: "content",
-      title: "Content",
-      type: "array",
-      of: [{ type: "block" }],
-    },
-    {
-      name: "images",
-      title: "Images",
-      type: "gallery",
-    },
+    // {
+    //   name: "content",
+    //   title: "Content",
+    //   type: "array",
+    //   of: [{ type: "block" }],
+    // },
+    // {
+    //   name: "images",
+    //   title: "Images",
+    //   type: "gallery",
+    // },
   ],
 });

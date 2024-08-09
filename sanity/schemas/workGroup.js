@@ -56,17 +56,17 @@ export default {
         },
       ],
     },
-    {
-      title: "Content",
-      name: "content",
-      type: "array",
-      of: [{ type: "block" }],
-    },
-    {
-      title: "Images",
-      name: "images",
-      type: "gallery",
-    },
+    // {
+    //   title: "Content",
+    //   name: "content",
+    //   type: "array",
+    //   of: [{ type: "block" }],
+    // },
+    // {
+    //   title: "Images",
+    //   name: "images",
+    //   type: "gallery",
+    // },
     // {
     //   name: "email",
     //   title: "Email",
