@@ -14,7 +14,7 @@ export const cybTheme = createTheme({
       main: "#ffe358",
     },
     background: {
-      paper: "#181817",
+      // paper: "#181817",
     },
   },
 });

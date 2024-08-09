@@ -92,7 +92,7 @@ class CustomGridItem extends Component {
   render() {
     const { childKey, item, selectedGroup, onClick } = this.props;
 
-    const isSelected = selectedGroup == item ? cybTheme.palette.primary.main : ""
+    // const isSelected = selectedGroup == item ? cybTheme.palette.primary.main : ""
     
     return (
       <Grid key={`${childKey}_grid`} item md xs={4}>
@@ -112,7 +112,7 @@ class CustomGridItem extends Component {
             <Divider
               key={`${childKey}_divider`}
               variant="fullWidth"
-              sx={{ backgroundColor: isSelected, mb: 2 }}
+              // sx={{ backgroundColor: isSelected, mb: 2 }}
             />
           </CardActionArea>
         </Card>
