@@ -8,6 +8,9 @@ import {
   CardActionArea,
   CardContent,
   IconButton,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   // Icon,
   Stack,
   SvgIcon,
@@ -20,9 +23,14 @@ import { useRouter } from "next/navigation";
 
 import { mdiPenguin } from '@mdi/js';
 import Icon from "@mdi/react";
+import Link from "next/link";
 // import { useEffect, useState } from "react";
 
-export default function LoginButton() {
+export default function LoginButton(props) {
+  
+  const { currentPath, iconProps } = props;
+  
+  // console.log(currentPath)
   
   // const [firstName, setFirstName] = useState("");
   
@@ -30,6 +38,7 @@ export default function LoginButton() {
   const session = useSession();
   
   const handleClick = (event) => {
+    console.log("CLICK")
     if (session.status == "authenticated") {
       router.push("/pages/main/profile");
     } else {
@@ -38,8 +47,8 @@ export default function LoginButton() {
   };
 
   const avatarProps = {
-    height: 45,
-    width: 45,
+    ...iconProps,
+    p: 0.8,
     bgcolor: cybTheme.palette.primary.main,
   };
   
@@ -47,6 +56,44 @@ export default function LoginButton() {
   
   return (
     <>
+      {/* Mobile layout */}
+      <Box sx={{ display: { xs: "block", md: "none" } }}>
+        <ListItem key={`link_item_login`} disablePadding>
+          <ListItemButton key={`link_item_button_login`} onClick={handleClick} sx={{ p: 1 }}>
+            <Stack direction="column" alignItems="center" width="100%">
+              
+              <Avatar sx={avatarProps}>
+                {session.status == "authenticated" ? (
+                  <Icon
+                    alt="Image of user"
+                    path={mdiPenguin}
+                    color={cybTheme.palette.background.main}
+                  />
+                ) : (
+                  <Person color={cybTheme.palette.background.main} />
+                )}
+              </Avatar>
+
+              <ListItemText
+                key={`link_item_text_login`}
+                sx={{
+                  color:
+                    currentPath == `/pages/main/profile`
+                      ? cybTheme.palette.primary.main
+                      : cybTheme.palette.text.primary,
+                }}
+                primary={
+                  <Typography variant="caption">
+                    {session.data != undefined ? "Profile" : "Login"}
+                  </Typography>
+                }
+              />
+            </Stack>
+          </ListItemButton>
+        </ListItem>
+      </Box>
+
+      {/* Computer layout */}
       <Card sx={{ display: { xs: "none", md: "block" } }}>
         <CardActionArea onClick={handleClick}>
           <CardContent>
@@ -59,13 +106,14 @@ export default function LoginButton() {
               <Typography
                 variant="body1"
                 width="3em"
+                // color={cybTheme.palette.text.secondary}
                 sx={{ display: { xs: "none", md: "flex" } }}
               >
                 {session.data != undefined ? "Profile" : "Login"}
               </Typography>
 
               {session.status == "authenticated" ? (
-                <Avatar alt="Image of user" sx={{ ...avatarProps, p: 1 }}>
+                <Avatar alt="Image of user" sx={{ ...avatarProps }}>
                   <Icon
                     path={mdiPenguin}
                     color={cybTheme.palette.background.main}
@@ -73,27 +121,18 @@ export default function LoginButton() {
                 </Avatar>
               ) : (
                 <Avatar sx={{ ...avatarProps }}>
-                  <Person sx={{ color: cybTheme.palette.background.main }} />
+                  <Person
+                    color={cybTheme.palette.background.main}
+                    // color= sx={{
+                    //   color: cybTheme.palette.background.main
+                    //   }}
+                  />
                 </Avatar>
               )}
             </Stack>
           </CardContent>
         </CardActionArea>
       </Card>
-
-      <Box sx={{ display: { xs: "block", md: "none" }, py:1 }}>
-        <IconButton onClick={handleClick}>
-          {session.status == "authenticated" ? (
-            <Avatar alt="Image of user" sx={{ ...avatarProps, p: 1 }}>
-              <Icon path={mdiPenguin} color={cybTheme.palette.background.main} />
-            </Avatar>
-          ) : (
-            <Avatar sx={{ ...avatarProps }}>
-              <Person sx={{ color: cybTheme.palette.background.main }} />
-            </Avatar>
-          )}
-        </IconButton>
-      </Box>
     </>
   );
 }
