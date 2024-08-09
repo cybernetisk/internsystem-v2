@@ -10,30 +10,23 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import {
+  PageBuilder,
+  PageHeader,
+  PageHeaderSkeleton,
+} from "@/app/components/sanity/PageBuilder";
 import { useEffect, useState } from "react";
-import { fetchSanityPage, PageBuilder, PageBuilderSkeleton, PageHeader, PageHeaderSkeleton } from "@/app/components/sanity/PageBuilder";
 import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import Link from "next/link";
 import { sanityClient } from "@/sanity/client";
 
 const BUTTON_CONTENT_1 = [
-  { title: "Economy", path: "volunteering/economy" },
+  // { title: "Economy", path: "volunteering/economy" },
   { title: "Logs", path: "volunteering/logs" },
   { title: "Membership", path: "volunteering/membership" },
-  { title: "Website content", path: "unauthorized" },
+  { title: "Website content", path: "https://tepohi.no/studio", external: true },
 ];
-
-const BUTTON_CONTENT_2 = [
-  {
-    title: "Become volunteer",
-    path: "https://nettskjema.no/a/378483#/page/1",
-    external: true,
-  },
-  // { title: "Traditions", path: "volunteering/traditions", wip: true },
-  { title: "Volunteer groups", path: "volunteering/groups" },
-];
-
 
 async function sanityFetch(setPages) {
   const groups = `*[_type == "workGroup"]|order(orderRank) {
@@ -64,10 +57,8 @@ function VolunteeringPage(params) {
   
   useEffect(() => {
     sanityFetch(setPages);
-    // fetchSanityPage("Volunteering", setPage);
   }, []);
   
-  console.log(pages);
   
   useEffect(() => {
     
@@ -100,14 +91,8 @@ function VolunteeringPage(params) {
     prismaRequest({
       model: "userToWorkGroup",
       method: "find",
-      // request: {
-      //   include: {
-          
-      //   }
-      // },
       callback: (data) => {
         if (data.length == 0) return;
-        console.log(data);
         setNumVolunteers(data.data);
       }
     })
@@ -117,7 +102,6 @@ function VolunteeringPage(params) {
   // Semester-based data
   useEffect(() => {
     if (semester == null) return;
-    console.log(semester)
     
     prismaRequest({
       model: "userMembership",
@@ -142,18 +126,21 @@ function VolunteeringPage(params) {
         </Grid>
 
         <Grid item md xs={12}>
-          {pages != null ? pages.map((e) => {
+          {pages != null ? pages.map((e, i) => {
             return (
-              <Box>
-                <PageHeader text={e.header} variant="h5" divider={false} gutter={false} />
+              <Box key={`page${i}_box`}>
+                <PageHeader
+                  key={`page${i}_pageheader`}
+                  text={e.header}
+                  variant="h5"
+                  divider={false}
+                  gutter={false}
+                />
                 {e.content}
-                <Divider sx={{ mb: 4 }}/>
+                <Divider key={`page${i}_pageheader_divider`} sx={{ mb: 4 }} />
               </Box>
             );
           }) : <></>}
-          
-          {/* {pages != null ? <PageHeader text={pages.header}/> : <PageHeaderSkeleton/>}
-          {pages ? pages.content : <PageBuilderSkeleton/>} */}
         </Grid>
       </Grid>
       
@@ -164,7 +151,6 @@ function VolunteeringPage(params) {
 function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numVolunteers) {
   
   const buttonGroup1 = createButtons(BUTTON_CONTENT_1);
-  const buttonGroup2 = createButtons(BUTTON_CONTENT_2);
   
   const currentSemester = semester != undefined ? semester.semester + " " + semester.year : null
   const membershipsPaid = paidMemberships.length.toLocaleString();
@@ -176,18 +162,16 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numV
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item md={2} xs>
-        <Card>
+        <Card elevation={3}>
           <CardContent>
             <PageHeader text="TOOLS" variant="body1" gutter={false} />
             {buttonGroup1}
-            {/* <Divider sx={{ my: 2 }} />
-            {buttonGroup2} */}
           </CardContent>
         </Card>
       </Grid>
 
       <Grid item xs alignContent="start">
-        <Card>
+        <Card elevation={3}>
           <CardContent>
             {currentSemester ? (
               <>
