@@ -1,7 +1,7 @@
 
 "use client"
 
-import { Container, Grid, Stack, SvgIcon, Typography } from "@mui/material";
+import { Card, Container, Grid, Paper, Stack, SvgIcon, Typography } from "@mui/material";
 import { Facebook, Forum, GitHub, Instagram, Public } from "@mui/icons-material";
 import { cybTheme } from "../themeCYB";
 import { Component } from "react";
@@ -45,6 +45,21 @@ const SOCIAL_MEDIA = [
   },
 ];
 
+const USEFUL_LINKS = [
+  {
+    name: "Become a volunteer",
+    link: "https://nettskjema.no/a/378483#/page/1",
+  },
+  {
+    name: "Rent Escape",
+    link: "/pages/main/aboutEscape/rentingEscape",
+  },
+  {
+    name: "Submit issue",
+    link: "https://github.com/cybernetisk/internsystem-v2/issues",
+  },
+]
+
 export default class LayoutFooter extends Component {
   render() {
     
@@ -62,28 +77,29 @@ export default class LayoutFooter extends Component {
     
     return (
       <Container
+        component={Paper}
+        elevation={3}
+        square
         disableGutters
         maxWidth="xxl"
         sx={{
           padding: 4,
           py: 6,
           margin: 0,
-          backgroundColor: cybTheme.palette.background.default,
         }}
       >
-        <Grid
-          container
-          margin={0}
-          padding={0}
-          height="100%"
-          // direction={{ xs: "column-reverse", md: "row" }}
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-        >
-          {handleSocialMediaSection(gridChildProps)}
-          {handleAddressSection(gridChildProps)}
-        </Grid>
+          <Grid
+            container
+            margin={0}
+            padding={0}
+            height="100%"
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+          >
+            {handleSocialMediaSection(gridChildProps)}
+            {handleAddressSection(gridChildProps)}
+          </Grid>
       </Container>
     );
   }
@@ -101,7 +117,6 @@ function handleSocialMediaSection(gridChildProps) {
       xs={12}
       spacing={2}
       pb={{ md: 0, xs: 6 }}
-      // sx={{ border: "1px solid red" }}
     >
       {SOCIAL_MEDIA.map((e, i) => {
         return (
@@ -119,7 +134,6 @@ function handleSocialMediaSection(gridChildProps) {
                 key={`socialmedia_item_link_${i}`}
               >
                 <Typography
-                  color={cybTheme.palette.text.primary}
                   sx={{
                     textDecoration: "underline",
                     "&:hover": { color: cybTheme.palette.primary.main },
@@ -153,10 +167,10 @@ function handleAddressSection(gridChildProps) {
       rowSpacing={3}
     >
       <Grid item container direction="column">
-        <Typography color={cybTheme.palette.text.primary}>Address</Typography>
+        <Typography 
+        >Address</Typography>
         <Link href={ESCAPE_ADDRESS} passHref target="_blank">
           <Typography
-            color={cybTheme.palette.text.primary}
             sx={{
               textDecoration: "underline",
               "&:hover": { color: cybTheme.palette.primary.main },
@@ -170,49 +184,28 @@ function handleAddressSection(gridChildProps) {
 
       <Grid item container direction="column">
         <Typography>Useful links</Typography>
-        <Link href={VOLUNTEER_LINK} passHref target="_blank">
-          <Typography
-            color={cybTheme.palette.text.primary}
-            sx={{
-              textDecoration: "underline",
-              "&:hover": { color: cybTheme.palette.primary.main },
-            }}
-            variant="body2"
-            gutterBottom
-          >
-            Become a volunteer
-          </Typography>
-        </Link>
-        <Link
-          href={"/pages/main/aboutEscape/rentingEscape"}
-          passHref
-          // target="_blank"
-        >
-          <Typography
-            color={cybTheme.palette.text.primary}
-            sx={{
-              textDecoration: "underline",
-              "&:hover": { color: cybTheme.palette.primary.main },
-            }}
-            variant="body2"
-            gutterBottom
-          >
-            Rent Escape
-          </Typography>
-        </Link>
-        <Link href={SUGGESTION_LINK} passHref target="_blank">
-          <Typography
-            color={cybTheme.palette.text.primary}
-            sx={{
-              textDecoration: "underline",
-              "&:hover": { color: cybTheme.palette.primary.main },
-            }}
-            variant="body2"
-            gutterBottom
-          >
-            Submit issue
-          </Typography>
-        </Link>
+        {USEFUL_LINKS.map((e, i) => {
+          return (
+            <Link
+              href={e.link}
+              passHref
+              target="_blank"
+              key={`useful_links_${i}_link`}
+            >
+              <Typography
+                key={`useful_links_${i}_typography`}
+                sx={{
+                  textDecoration: "underline",
+                  "&:hover": { color: cybTheme.palette.primary.main },
+                }}
+                variant="body2"
+                gutterBottom
+              >
+                {e.name}
+              </Typography>
+            </Link>
+          );
+        })}
       </Grid>
     </Grid>
   );

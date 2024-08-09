@@ -2,7 +2,7 @@
 "use client"
 
 import {
-  AppBar as MuiAppBar,
+  AppBar,
   styled,
   Toolbar,
   Avatar,
@@ -10,8 +10,9 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  IconButton,
   Grid,
+  Typography,
+  Stack,
 } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { Component } from "react";
@@ -25,14 +26,41 @@ export class NavBar extends Component {
   render() {
     const { currentPath, navItems } = this.props;
     
+    const iconProps = {
+      mt: 0.5
+    };
+    
     return (
-      <AppBar position="absolute">
-        <Toolbar sx={{}}>
+      <AppBar sx={{ position: { xs: "relative", md: "relative" } }}>
+        <Toolbar>
+          {/* Mobile layout */}
+          <Grid
+            container
+            direction="row"
+            alignContent="flex-end"
+            justifyContent="space-between"
+            sx={{ display: { xs: "flex", md: "none" } }}
+          >
+            {navItems.map((item, i) => (
+              <Grid item xs key={`nav${i}`}>
+                {NavElementSmallScreen(item, i, iconProps, currentPath)}
+              </Grid>
+            ))}
+
+            <Grid item xs>
+              <SessionProvider>
+                <LoginButton currentPath={currentPath} iconProps={iconProps} />
+              </SessionProvider>
+            </Grid>
+          </Grid>
+
+          {/* Computer layout */}
           <Grid
             container
             direction="row"
             justifyContent="flex-end"
             alignItems="center"
+            sx={{ display: { xs: "none", md: "flex" } }}
           >
             <Grid item>
               <Link href={`/pages/main/home`}>
@@ -49,20 +77,16 @@ export class NavBar extends Component {
 
             <Grid item container md xs justifyContent="flex-end" pr={2}>
               <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
-                {navItems.map((item) => NavItemElement(item, currentPath))}
-              </Box>
-
-              <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none" } }}>
-                {navItems.map((item) => NavIconElement(item, currentPath))}
+                {navItems.map((item, i) =>
+                  NavElementLargeScreen(item, i, currentPath)
+                )}
               </Box>
             </Grid>
 
             <Grid item>
-              <Box>
-                <SessionProvider>
-                  <LoginButton />
-                </SessionProvider>
-              </Box>
+              <SessionProvider>
+                <LoginButton />
+              </SessionProvider>
             </Grid>
           </Grid>
         </Toolbar>
@@ -71,48 +95,19 @@ export class NavBar extends Component {
   }
 }
 
-export const NavBarOffset = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  backgroundColor: cybTheme.palette.background.default,
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}));
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-function NavItemElement(item, currentPath) {
+function NavElementLargeScreen(item, index, currentPath) {
 
   if (item) {
     return (
       <Link
-        key={`link_${item.id}`}
+        key={`link_nav${index}`}
         href={`/pages/main/${item.path}`}
-        // passHref
         style={{ textDecoration: "none" }}
       >
-        <ListItem key={`link_item_${item.id}`} disablePadding>
-          <ListItemButton key={`link_item_button_${item.id}`}>
+        <ListItem key={`link_nav${index}_item`} disablePadding>
+          <ListItemButton key={`link_nav${index}_itembutton`}>
             <ListItemText
-              key={`link_item_text_${item.id}`}
+              key={`link_nav${index}_itemtext`}
               sx={{
                 color:
                   currentPath == `/pages/main/${item.path}`
@@ -128,31 +123,70 @@ function NavItemElement(item, currentPath) {
   }
 
   return (
-    <ListItem>
-      <ListItemText primary={"undefined"} />
+    <ListItem key={`link_nav${index}_item`}>
+      <ListItemText key={`link_nav${index}_itemtext`} primary={"undefined"} />
     </ListItem>
   );
 }
 
-function NavIconElement(item, currentPath, router) {
-  
-  // const router = useRouter()
+function NavElementSmallScreen(item, index, iconProps, currentPath) {
   
   if (item) {
     return (
       <Link
-        key={`link_${item.id}`}
+        key={`link_snav${index}`}
         href={`/pages/main/${item.path}`}
-        // passHref
         style={{ textDecoration: "none" }}
+        sx={{ width: "100%" }}
       >
-        <IconButton size="large">
-          <Avatar sx={{ width: 30, height: 30 }}>
-            {item.icon}
-          </Avatar>
-        </IconButton>
+        <ListItem key={`link_snav${index}_item`} disablePadding>
+          <ListItemButton key={`link_snav${index}_item_button`} sx={{ p: 1 }}>
+            <Stack
+              key={`link_snav${index}_stack`}
+              direction="column"
+              alignItems="center"
+              width="100%"
+            >
+              <Avatar
+                key={`link_snav${index}_avatar`}
+                sx={iconProps}
+              >
+                {item.icon}
+              </Avatar>
+              <ListItemText
+                key={`link_snav${index}_itemtext`}
+                sx={{
+                  color:
+                    currentPath == `/pages/main/${item.path}`
+                      ? cybTheme.palette.primary.main
+                      : cybTheme.palette.text.primary,
+                }}
+                primary={
+                  <Typography key={`link_snav${index}_typography`} variant="caption">
+                    {item.name}
+                  </Typography>
+                }
+              />
+            </Stack>
+          </ListItemButton>
+        </ListItem>
       </Link>
     );
   }
-  
+
+  return (
+    <ListItem key={`link_snav_${index}`}>
+      <ListItemText key={`link_snav${index}_itemtext`} primary={"undefined"} />
+    </ListItem>
+  );
 }
+
+export const NavBarOffset = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  // backgroundColor: cybTheme.palette.background.default,
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+}));
