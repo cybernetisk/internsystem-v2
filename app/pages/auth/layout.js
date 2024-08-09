@@ -32,7 +32,6 @@ export default function AuthLayout({ children }) {
             sx={{
               position: "relative",
               width: "100%",
-              backgroundColor: cybTheme.palette.background.default,
               background: 'url("/olejohan.svg") ',
               backgroundSize: "100% auto",
               backgroundRepeat: "no-repeat",
