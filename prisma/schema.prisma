@@ -228,20 +228,20 @@ model ActivateToken {
   createdAt   DateTime? @default(now())
   updatedAt   DateTime?
   userId      String
-  User        User      @relation(fields: [userId], references: [id])
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "ActivateToken_userId_fkey")
 }
 
 model VoucherLog {
   id          String   @id @default(cuid())
-  loggedFor   String
+  loggedFor   String?
   usedAt      DateTime @default(now()) @db.Timestamp(0)
   amount      Int
   description String   @db.VarChar(120)
   semesterId  Int
   Semester    Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
-  User        User     @relation(fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor0")
+  User        User?    @relation(fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor0")
 
   @@index([id], map: "logID_idx")
   @@index([loggedFor], map: "loggedFor_idx")
@@ -251,16 +251,16 @@ model VoucherLog {
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model WorkLog {
   id            String    @id @default(cuid())
-  loggedBy      String
-  loggedFor     String
+  loggedBy      String?
+  loggedFor     String?
   workedAt      DateTime? @db.Timestamp(0)
   createdAt     DateTime? @default(now()) @db.Timestamp(0)
   duration      Int?
   description   String?   @db.VarChar(120)
   semesterId    Int
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
-  LoggedByUser  User      @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedBy")
-  LoggedForUser User      @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loggedFor")
+  LoggedByUser  User?     @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onUpdate: NoAction, map: "loggedBy")
+  LoggedForUser User?     @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor")
 
   @@index([id], map: "logID_idx")
   @@index([loggedBy], map: "loggedBy_idx")
