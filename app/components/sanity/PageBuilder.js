@@ -21,11 +21,7 @@ async function fetchSanityPage(pageTitle, setPage) {
   
   const pageContent = await sanityClient.fetch(query);
   
-  console.log(pageContent);
-  
   const page = pageBuilder(pageContent);
-  
-  // console.log(page)
   
   setPage(page);
 }
@@ -38,11 +34,9 @@ function pageBuilder(data) {
   const noTitle = data.title == undefined;
   const noPageContent = data.pageContent == undefined;
   
-  console.log(data);
-  
   const page = {    
-    header: noHeader ? null : data.header, //<PageHeader text={data.header} variant={"h4"}/>,
-    title: noTitle ? null : data.title, //<PageHeader text={data.title} variant={"body2"}/>,
+    header: noHeader ? null : data.header, 
+    title: noTitle ? null : data.title, 
     content: noPageContent ? null : data.pageContent.map((e, i) => handleContent(e, i)),
   }
   
@@ -57,21 +51,36 @@ function handleContent(e, index) {
   if (e.text) {
     textContent = handleText(e, index);
   } else {
-    textContent = <Typography variant="body2">Work in progress</Typography>;
+    textContent = (
+      <Typography
+        key={`page_builder_text_placeholder${index}`}
+        variant="body2"
+      >
+        Work in progress
+      </Typography>
+    );
   }
   
   if (e.images) {
     imageContent = handleImages(e, index);
   } else {
-    imageContent = <React.Fragment key={`page_builder_sanity_fragment${index}`}/>
+    imageContent = (
+      <React.Fragment key={`page_builder_image_placeholder${index}`} />
+    );
   }
   
   return (
-    <Grid container direction="row" spacing={2} py={2}>
-      <Grid item md={7} xs={12}>
+    <Grid
+      container
+      direction="row"
+      spacing={2}
+      py={2}
+      key={`pagebuilder_grid${index}_container`}
+    >
+      <Grid item md={7} xs={12} key={`pagebuilder_grid${index}_item_text`}>
         {textContent}
       </Grid>
-      <Grid item md={5} xs={12}>
+      <Grid item md={5} xs={12} key={`pagebuilder_grid${index}_item_image`}>
         {imageContent}
       </Grid>
     </Grid>
@@ -141,7 +150,6 @@ function handleText(e, index) {
     
     // add populated list when a non-list element is met
     if (tempList.length != 0) {
-      // console.log(index, tempList)
       content = [...content, [handleListContent(tempList, index)]];
       tempList = [];
     }
@@ -163,7 +171,6 @@ function handleText(e, index) {
             textProps = { ...textProps, textDecoration: "lineThrough" };
             break;
           default:
-            console.log(item, i, item.markDefs[i]);
             for (const markDef of item.markDefs) {
               if (markDef._key == mark && markDef._type == "link") {
                 
@@ -171,8 +178,6 @@ function handleText(e, index) {
                 isLink = markDef.href;
               }
             }
-            // if (item.markDefs[i]._key == mark && item.markDefs[i]._type == "link") {
-            // }
             break;
         }
       }
@@ -200,7 +205,6 @@ function handleText(e, index) {
 }
 
 function handleListContent(list, index) {
-  console.log(index, list);
   return (
     <List
       key={`page_builder_list_${index}`}
@@ -233,7 +237,7 @@ class PageText extends Component {
     if (text == "") {
       return (
         <Typography
-          key={`${compKey}_more1`}
+          key={`${compKey}_typography`}
           variant={variant}
           width={"100%"}
           gutterBottom
@@ -246,9 +250,9 @@ class PageText extends Component {
 
     if (href) {
       return (
-        <Link href={href} passHref key={`${compKey}_more2`}>
+        <Link href={href} passHref key={`${compKey}_link`}>
           <Typography
-            key={`${compKey}_more3`}
+            key={`${compKey}_link_typography`}
             variant={variant}
             gutterBottom
             pb={1}
@@ -319,9 +323,7 @@ class PageHeaderSkeleton extends Component {
         <Typography variant={typoVariant} gutterBottom>
           <Skeleton />
         </Typography>
-        {/* <Divider sx={{ mb: 4 }}></Divider> */}
         {headerDivider ? <Divider sx={ headerGutter ? { mb: 4 } : { mb: 2 } }></Divider> : <></>}
-        {/* {headerGutter ? <Divider sx={ headerGutter ? { mb: 4 } : { mb: 2 } }></Divider> : <></>} */}
       </>
     );
   }
@@ -336,8 +338,8 @@ class PageBuilderSkeleton extends Component {
     for (let i = 0; i < numText; i++) {
       skeletonText.push(
         <Typography
-          variant="body2"
           key={`pagebuilder_typography${i}`}
+          variant="body2"
         >
           <Skeleton key={`pagebuilder_typography${i}_skeleton`} />
         </Typography>
