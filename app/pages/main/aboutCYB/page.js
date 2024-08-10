@@ -14,10 +14,10 @@ import {
   PageBuilderSkeleton,
   PageHeader,
   PageHeaderSkeleton,
-} from "@/app/components/sanity/PageBuilder";
+} from "@/components/sanity/PageBuilder";
 import { useEffect, useState } from "react";
 import { imageBuilder, sanityClient } from "@/sanity/client";
-import { cybTheme } from "@/app/components/themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import Link from "next/link";
 
 async function sanityFetch(setHS, setKS, setPage) {

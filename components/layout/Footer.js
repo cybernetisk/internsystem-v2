@@ -3,7 +3,7 @@
 
 import { Card, Container, Grid, Paper, Stack, SvgIcon, Typography } from "@mui/material";
 import { Facebook, Forum, GitHub, Instagram, Public } from "@mui/icons-material";
-import { cybTheme } from "../themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import { Component } from "react";
 import Link from "next/link";
 

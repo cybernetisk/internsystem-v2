@@ -13,11 +13,11 @@ import {
 import { useEffect, useState } from "react";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/components/table";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import LogInput from "./logInput";
-import { PageHeader } from "@/app/components/sanity/PageBuilder";
+import { PageHeader } from "@/components/sanity/PageBuilder";
 
 const WORK_TABLE_HEADERS = [
   { id: "workedAt", name: "log date", sortBy: "workedAt_num", flex: 2 },

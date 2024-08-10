@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import { Person } from "@mui/icons-material";
-import { cybTheme } from "../themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import { useRouter } from "next/navigation";
 
 import { mdiPenguin } from '@mdi/js';

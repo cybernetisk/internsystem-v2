@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Autocomplete, Button, Card, Grid, Paper, Stack, TextField, Typography } from "@mui/material";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/components/table";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import handleWorkGroups from "./handleWorkGroups";
 import useRole from "@/app/middleware/useRole";

@@ -1,9 +1,9 @@
 
 "use client"
 
-import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import { PageHeader } from "@/app/components/sanity/PageBuilder";
-import CustomTable from "@/app/components/table";
+import CustomAutoComplete from "@/components/input/CustomAutocomplete";
+import { PageHeader } from "@/components/sanity/PageBuilder";
+import CustomTable from "@/components/table";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Card, CardContent, Divider, Grid, Stack, Table, TextField, Typography } from "@mui/material";

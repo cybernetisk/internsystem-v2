@@ -8,7 +8,7 @@ import {
   PageBuilderSkeleton,
   PageHeader,
   PageHeaderSkeleton,
-} from "@/app/components/sanity/PageBuilder";
+} from "@/components/sanity/PageBuilder";
 
 export default function rentingEscapePage() {
   const [page, setPage] = useState(null);

@@ -1,8 +1,7 @@
 
 import { Typography } from "@mui/material";
 import Link from "next/link";
-import { cybTheme } from "../themeCYB";
-
+import { cybTheme } from "@/components/themeCYB";
 /**
  * Generates breadcrumbs from path-url
  * @param {*} path string containing path

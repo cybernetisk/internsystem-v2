@@ -12,9 +12,9 @@ import {
 import { useState } from "react";
 import authWrapper from "@/app/middleware/authWrapper";
 import Link from "next/link";
-import { cybTheme } from "@/app/components/themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/components/table";
 import { format, parseISO } from "date-fns";
 
 const FINANCE_TABLES = [

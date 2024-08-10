@@ -3,9 +3,9 @@
 
 import { Avatar, Box, CssBaseline, Paper, Stack, ThemeProvider } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
-import { cybTheme } from "@/app/components/themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import Link from "next/link";
-import cybLogo from "./../../icon.png";
+import cybLogo from "@/app/icon.png";
 import Image from "next/image";
 
 export default function AuthLayout({ children }) {

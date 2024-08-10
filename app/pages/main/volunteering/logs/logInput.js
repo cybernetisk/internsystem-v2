@@ -9,8 +9,8 @@ import {
 import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import CustomNumberInput from "@/app/components/input/CustomNumberInput";
+import CustomAutoComplete from "@/components/input/CustomAutocomplete";
+import CustomNumberInput from "@/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB"; 
 

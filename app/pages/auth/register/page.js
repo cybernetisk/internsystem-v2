@@ -1,7 +1,7 @@
 
 "use client"
 
-import { cybTheme } from "@/app/components/themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
 import { randomBytes } from "crypto";

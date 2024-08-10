@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import { Component, useEffect, useState } from "react";
 import { sanityClient } from "@/sanity/client";
-import { cybTheme } from "@/app/components/themeCYB";
-import { PageBuilder, PageHeader } from "@/app/components/sanity/PageBuilder";
+import { cybTheme } from "@/components/themeCYB";
+import { PageBuilder, PageHeader } from "@/components/sanity/PageBuilder";
 
 async function sanityFetch(setPages) {
   const groups = `*[_type == "workGroup"]|order(orderRank) {

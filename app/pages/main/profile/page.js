@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { PageHeader } from "@/app/components/sanity/PageBuilder"
+import { PageHeader } from "@/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
 import prismaRequest from "@/app/middleware/prisma/prismaRequest"
 import { signOut, useSession } from "next-auth/react"

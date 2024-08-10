@@ -16,11 +16,11 @@ import {
 } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { Component } from "react";
-import { cybTheme } from "./../themeCYB";
-import cybLogo from "./../../icon.png";
+import { cybTheme } from "@/components/themeCYB";
+import cybLogo from "@/app/icon.png";
 import Image from "next/image";
 import Link from "next/link";
-import LoginButton from "../Login/LoginButton";
+import LoginButton from "@/components/Login/LoginButton";
 
 export class NavBar extends Component {
   render() {

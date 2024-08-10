@@ -2,7 +2,7 @@
 "use client"
 
 import { Box, Typography } from "@mui/material";
-import { PageHeader } from "@/app/components/sanity/PageBuilder";
+import { PageHeader } from "@/components/sanity/PageBuilder";
 
 export default function UnauthorizedPage() {
   

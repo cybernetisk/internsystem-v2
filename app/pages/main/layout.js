@@ -1,7 +1,7 @@
 
 "use client";
 
-import "./../../globals.css";
+import "@/app/globals.css";
 
 import { EmojiPeople, Groups, Home } from "@mui/icons-material";
 import {
@@ -13,9 +13,9 @@ import {
 } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { NavBar } from "@/app/components/layout/AppBar";
-import { cybTheme } from "@/app/components/themeCYB";
-import LayoutFooter from "@/app/components/layout/Footer";
+import { NavBar } from "@/components/layout/AppBar";
+import { cybTheme } from "@/components/themeCYB";
+import LayoutFooter from "@/components/layout/Footer";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },

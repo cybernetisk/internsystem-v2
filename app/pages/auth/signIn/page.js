@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
-import { cybTheme } from "./../../../components/themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

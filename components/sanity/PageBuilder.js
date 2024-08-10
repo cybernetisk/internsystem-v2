@@ -10,7 +10,7 @@ import {
 import React, { Component } from "react";
 import { sanityClient, imageBuilder } from "@/sanity/client";
 import Link from "next/link";
-import { cybTheme } from "../themeCYB";
+import { cybTheme } from "@/components/themeCYB";
 
 async function fetchSanityPage(pageTitle, setPage) {
   
