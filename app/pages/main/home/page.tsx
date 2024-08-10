@@ -9,6 +9,7 @@ import {
   PageHeader,
   PageHeaderSkeleton,
 } from "@/components/sanity/PageBuilder";
+import Calendar from "@/components/calendar/CustomCalendar";
 
 interface Page {
   header: string;
@@ -26,6 +27,7 @@ export default function HomePage() {
     <Box>
       {page ? <PageHeader text={page.header}/> : <PageHeaderSkeleton/>}
       {page ? page.content : <PageBuilderSkeleton/>}
+      <Calendar />
     </Box>
   );
 }
