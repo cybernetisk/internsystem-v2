@@ -23,9 +23,9 @@ import { sanityClient } from "@/sanity/client";
 
 const BUTTON_CONTENT_1 = [
   // { title: "Economy", path: "volunteering/economy" },
-  { title: "Logs", path: "volunteering/logs" },
-  { title: "Membership", path: "volunteering/membership" },
-  { title: "Website content", path: "https://tepohi.no/studio", external: true },
+  { title: "Logs", path: "/pages/main/volunteering/logs" },
+  { title: "Membership", path: "/pages/main/volunteering/membership" },
+  { title: "Website content", path: "/studio" },
 ];
 
 async function sanityFetch(setPages) {
@@ -220,7 +220,7 @@ function createButtons(content) {
       <Grid item width="100%" key={`grid_${e.title}`}>
         <Link
           key={"link_" + e.title}
-          href={e.external ? e.path : "/pages/main/" + e.path}
+          href={e.path}
         >
           <Typography
             key={"link_typography" + e.title}
