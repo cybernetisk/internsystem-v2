@@ -1,5 +1,5 @@
-
 "use client";
+import React from "react";
 
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -8,11 +8,15 @@ import {
   PageBuilderSkeleton,
   PageHeader,
   PageHeaderSkeleton,
-} from "@/app/components/sanity/PageBuilder";
+} from "@/components/sanity/PageBuilder";
+
+interface Page {
+  header: string;
+  content: React.ReactNode;
+}
 
 export default function HomePage() {
-
-  const [page, setPage] = useState(null);
+  const [page, setPage] = useState<Page | null>(null);
   
   useEffect(() => {
     fetchSanityPage("Home", setPage);
@@ -20,7 +24,7 @@ export default function HomePage() {
   
   return (
     <Box>
-      {page != null ? <PageHeader text={page.header}/> : <PageHeaderSkeleton/>}
+      {page ? <PageHeader text={page.header}/> : <PageHeaderSkeleton/>}
       {page ? page.content : <PageBuilderSkeleton/>}
     </Box>
   );

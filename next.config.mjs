@@ -1,27 +1,41 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/pages/main/home",
-        permanent: true,
-        basePath: false,
-      },
-      {
-        source: "/pages",
-        destination: "/pages/main/home",
-        permanent: true,
-        basePath: false,
-      },
-      {
-        source: "/pages/main",
-        destination: "/pages/main/home",
-        permanent: true,
-        basePath: false,
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: "/pages",
+  //       destination: "/",
+  //       permanent: true,
+  //       basePath: false,
+  //     },
+  //     {
+  //       source: "/pages/main",
+  //       destination: "/",
+  //       permanent: true,
+  //       basePath: false,
+  //     },
+  //     {
+  //       source: "/pages/main/home",
+  //       destination: "/",
+  //       permanent: true,
+  //       basePath: false,
+  //     },
+
+  //   ];
+  // },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/pages/main/home",
+  //       destination: "/"
+  //     },
+
+  //     {
+  //       source: '/okonomi',
+  //       destination: 'https://cybernetisk.github.io/okotools/'
+  //     },
+  //   ];
+  // },
   images: {
     remotePatterns: [
       {
