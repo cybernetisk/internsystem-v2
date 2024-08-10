@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "jsx": "react",
+    "baseUrl": ".",  // Ensure baseUrl is set for path aliases
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"]  // Ensure paths align with tsconfig.json
     }
   }
 }
