@@ -111,10 +111,10 @@ function AdminPage(params) {
     <Box>
       <PageHeader text="Admin panel" variant="h4" />
 
-      <Grid container direction="row" columnGap={2} height="50vh">
+      <Grid container direction="row" columnGap={2} rowGap={2}>
         {/* select user and settings */}
-        <Grid item xs={3}>
-          <Card elevation={3} sx={{ height: "100%" }}>
+        <Grid item md={3} xs={12}>
+          <Card elevation={3}>
             <CardContent>
               <Stack direction="column" spacing={2}>
                 <CustomAutoComplete
@@ -174,11 +174,11 @@ function AdminPage(params) {
         </Grid>
 
         {/* selected settings */}
-        <Grid item xs>
-          <Card elevation={3} sx={{ height: "100%" }}>
-            <CardContent>
-              {showRoleSettings ? (
-                roleSettings(
+        <Grid item md xs={12}>
+          {showRoleSettings ? (
+            <Card elevation={3}>
+              <CardContent>
+                {roleSettings(
                   selectedUser,
                   availableRoles,
                   assignedRoles,
@@ -186,13 +186,20 @@ function AdminPage(params) {
                   setAssignedRoles,
                   roleChangeResponse,
                   setRoleChangeResponse
-                )
-              ) : (
-                <></>
-              )}
-              {showLogSettings ? logSettings(logs) : <></>}
-            </CardContent>
-          </Card>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <></>
+          )}
+
+          {showLogSettings ? (
+            <Card elevation={3}>
+              <CardContent>{logSettings(logs)}</CardContent>
+            </Card>
+          ) : (
+            <></>
+          )}
         </Grid>
       </Grid>
     </Box>
@@ -238,9 +245,9 @@ function roleSettings(
     <Stack direction="column" spacing={2}>
       <Typography variant="body1">Roles</Typography>
 
-      <Grid container columnGap={1}>
+      <Grid container columnGap={1} height="25vh">
         <Grid item xs>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography>Available roles</Typography>
               <Divider sx={{ mb: 2 }} />
@@ -274,7 +281,7 @@ function roleSettings(
         </Grid>
 
         <Grid item xs>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography>Assigned roles</Typography>
               <Divider sx={{ mb: 2 }} />
