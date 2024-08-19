@@ -26,6 +26,7 @@ function MembershipPage() {
   const [membershipData, setMembershipData] = useState([]);
   const [tableData, setTableData] = useState([]);
   
+  const [numSpecialMembers, setNumSpecialMembers] = useState(0);
   const [search, setSearch] = useState("");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberComment, setNewMemberComment] = useState("");
@@ -38,15 +39,27 @@ function MembershipPage() {
       method: "find",
       request: {
         where: {
-          semester_id: session.data.semester.id,
+          OR: [
+            {
+              semester_id: session.data.semester.id,
+            },
+            {
+              honorary: true,
+            },
+            {
+              lifetime: true,
+            }
+          ],
         },
       },
       callback: (data) => {
         if (data.length == 0) return;
-        
-        const NewData = data.data.map((e) => {
+
+        const newMembershipData = data.data.map((e) => {
           return {
             ...e,
+            honorary: e.honorary ? "x" : "",
+            lifetime: e.lifetime ? "x" : "",
             date_joined_num: parseISO(e.date_joined).getTime(),
             date_joined: format(
               parseISO(e.date_joined),
@@ -55,9 +68,14 @@ function MembershipPage() {
           };
         });
         
-        setMembershipData(NewData);
-        setTableData(NewData);
-      }
+        const newNumSpecialMembers = data.data.filter((e) => {
+          return e.honorary || e.lifetime
+        }).length;
+
+        setMembershipData(newMembershipData);
+        setTableData(newMembershipData);
+        setNumSpecialMembers(newNumSpecialMembers);
+      },
     });
   }, [refresh])
   
@@ -98,12 +116,10 @@ function MembershipPage() {
    
   return (
     <Box>
-      <PageHeader text="Membership overview" variant="h4" />
-
-      <Typography variant="h6" gutterBottom pb={2}>
-        Semester {session.data.semester.semester} {session.data.semester.year}{" "}
-        {membershipData.length != 0 ? ` - (${membershipData.length})` : ""}
-      </Typography>
+      <PageHeader
+        text={`Membership overview ${session.data.semester.semester} ${session.data.semester.year}`}
+        variant="h4"
+      />
 
       <Grid container direction="row" spacing={2} rowGap={2} rowSpacing={2}>
         <Grid item container direction="column" md={3} spacing={2}>
@@ -169,6 +185,15 @@ function MembershipPage() {
                 </Stack>
               </CardContent>
             </Card>
+          </Grid>
+
+          <Grid item>
+            <Typography variant="body1">
+              lifetime: {numSpecialMembers}
+            </Typography>
+            <Typography variant="body1">
+              new: {membershipData.length - numSpecialMembers}
+            </Typography>
           </Grid>
         </Grid>
 
