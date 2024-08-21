@@ -23,6 +23,7 @@ import { sanityClient } from "@/sanity/client";
 
 const BUTTON_CONTENT_1 = [
   // { title: "Economy", path: "volunteering/economy" },
+  { title: "Café", path: "/pages/main/volunteering/cafe" },
   { title: "Logs", path: "/pages/main/volunteering/logs" },
   { title: "Membership", path: "/pages/main/volunteering/membership" },
   { title: "Website content", path: "/studio" },
