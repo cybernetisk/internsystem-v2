@@ -134,6 +134,8 @@ export default class CustomCalendar extends Component {
                       <CardActionArea
                         disabled={elem.header}
                         onClick={() => {                          
+                          this.handleModeChange("week")
+                          this.setState({ ...generateMonthData(elem.value) })
                         }}
                       >
                         <Box sx={{ p: 1 }} height={elem.header ? "" : "14vh"}>
@@ -176,7 +178,8 @@ export default class CustomCalendar extends Component {
 
   createWeekView = () => {
     const { focusedDay, monthInWeeks, today } = this.state;
-    const { events } = this.props;
+    const { events, setShiftManager, setShiftWorker1, setShiftWorker2 } =
+      this.props;
 
     const focusedWeek = monthInWeeks.filter((week) =>
       week.reduce(
@@ -250,6 +253,10 @@ export default class CustomCalendar extends Component {
               <CardActionArea
                 disabled={elem.header}
                 onClick={() => {
+                  console.log(event[0])
+                  setShiftManager(event[0].shift_manager);
+                  setShiftWorker1(event[0].worker_1);
+                  setShiftWorker2(event[0].worker_2);
                 }}
               >
                 <Stack
