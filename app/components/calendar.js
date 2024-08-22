@@ -34,48 +34,8 @@ import {
   subWeeks,
 } from "date-fns";
 import { Component } from "react";
-import { nb } from "date-fns/locale";
+import { enGB, nb } from "date-fns/locale";
 import { cybTheme } from "./themeCYB";
-
-const DayLabels = [
-  { 
-    header: true, 
-    label: "Monday",
-    abbr: "Mon",
-  },
-  { 
-    header: true, 
-    label: "Tuesday",
-    abbr: "Tue",
-  },
-  { 
-    header: true, 
-    label: "Wednesday",
-    abbr: "Wed",
-  },
-  { 
-    header: true, 
-    label: "Thursday",
-    abbr: "Thu",
-  },
-  { 
-    header: true, 
-    label: "Friday",
-    abbr: "Fri",
-  },
-  { 
-    header: true, 
-    label: "Saturday",
-    abbr: "Sat",
-    weekend: true,
-  },
-  { 
-    header: true, 
-    label: "Sunday",
-    abbr: "Sun",
-    weekend: true,
-  },
-]
 
 export default class CustomCalendar extends Component {
   constructor(props) {
@@ -121,16 +81,28 @@ export default class CustomCalendar extends Component {
     const { focusedDay, today, monthInWeeks } = this.state;
     const { events } = this.props;
 
-    const weekDays = DayLabels.filter((day) => !day.weekend);
+    const focusedWeek = monthInWeeks.filter((week) =>
+      week.reduce(
+        (sum, next) => sum || isSameDay(focusedDay, next.value),
+        false
+      )
+    )[0];
+
+    const focusedWeekdays = focusedWeek.filter((row) => !row.isWeekend);
 
     const header = (
       <Grid container item direction="row">
-        {weekDays.map((elem) => {
+        {focusedWeekdays.map((elem) => {
           return (
-            <Grid item xs={12 / weekDays.length}>
+            <Grid item xs={12 / focusedWeekdays.length}>
               <Card square>
-                <Box sx={{ p: 1 }} height={elem.header ? "" : "14vh"}>
-                  <Typography variant="body1" color="GrayText">
+                <Box sx={{ p: 1 }}>
+                  <Typography variant="body1" color="GrayText" display={{ xs: "block", md: "none" }}>
+                    {format(elem.value, "EE")}
+                    {elem.label}
+                  </Typography>
+                  <Typography variant="body1" color="GrayText" display={{ xs: "none", md: "block" }}>
+                    {format(elem.value, "EEEE")}
                     {elem.label}
                   </Typography>
                 </Box>
@@ -161,12 +133,13 @@ export default class CustomCalendar extends Component {
                     <Card square>
                       <CardActionArea
                         disabled={elem.header}
-                        onClick={() =>
-                          this.setState({ focusedDay: elem.value })
-                        }
+                        onClick={() => {                          
+                        }}
                       >
                         <Box sx={{ p: 1 }} height={elem.header ? "" : "14vh"}>
                           <Typography
+                            variant="body2"
+                            fontWeight={isToday(elem.value) ? "bold" : ""}
                             color={
                               isToday(elem.value)
                                 ? cybTheme.palette.primary.main
@@ -175,7 +148,6 @@ export default class CustomCalendar extends Component {
                                 : ""
                             }
                           >
-                            {/* {elem.label} */}
                             {format(elem.value, "dd", { locale: nb })}
                           </Typography>
                           <Stack>
@@ -224,6 +196,18 @@ export default class CustomCalendar extends Component {
                 <Box sx={{ p: 1 }}>
                   <Typography
                     variant="body1"
+                    display={{ xs: "block", md: "none" }}
+                    color={
+                      isToday(elem.value)
+                        ? cybTheme.palette.primary.main
+                        : "GrayText"
+                    }
+                  >
+                    {format(elem.value, "EE do")}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    display={{ xs: "none", md: "block" }}
                     color={
                       isToday(elem.value)
                         ? cybTheme.palette.primary.main
@@ -241,38 +225,43 @@ export default class CustomCalendar extends Component {
     );
 
     let body = [];
-    for (let i = 8; i < 18; i += 2) {
+    for (let i = 10; i < 16; i += 2) {
       const hours = focusedWeekdays.map((elem) => {
         const tempDayHourStart = addHours(elem.value, i);
         const tempDayHourEnd = addHours(elem.value, i + 2);
 
-        const relatedEvents = events
+        const event = events
           .filter((event) => isSameHour(event.start, tempDayHourStart))
+          
+        const shiftEvent = event
           .map((event) => (
             <Stack>
-              <Typography variant="caption">{event.shift_manager}</Typography>
-              <Typography variant="caption">{event.worker_1}</Typography>
-              <Typography variant="caption">{event.worker_2}</Typography>
+              <Typography variant="caption" color="GrayText">{event.shift_manager.firstName}</Typography>
+              <Typography variant="caption" color="GrayText">{event.worker_1.firstName}</Typography>
+              <Typography variant="caption" color="GrayText">{event.worker_2.firstName}</Typography>
             </Stack>
-          ));
+          ))[0];
+          
+        // isWithinInterval()
 
         return (
           <Grid item xs={12 / 5}>
-            <Card
-              square
-              sx={{
-                backgroundColor: relatedEvents.length > 0 ? "green" : "",
-              }}
-            >
+            <Card square>
               <CardActionArea
                 disabled={elem.header}
-                onClick={() => this.setState({ focusedDay: elem.value })}
+                onClick={() => {
+                }}
               >
-                <Box sx={{ p: 1 }} height={elem.header ? "" : "14vh"}>
+                <Stack
+                  direction="column"
+                  sx={{ p: 1 }}
+                  height={elem.header ? "" : "16vh"}
+                  justifyContent="space-between"
+                >
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     color={
-                      isToday(elem.value) || relatedEvents.length > 0
+                      isToday(elem.value) // || relatedEvents.length > 0
                         ? ""
                         : "GrayText"
                     }
@@ -281,8 +270,8 @@ export default class CustomCalendar extends Component {
                     {format(tempDayHourEnd, "HH:mm")}
                   </Typography>
 
-                  <Stack>{relatedEvents}</Stack>
-                </Box>
+                  <Stack>{shiftEvent}</Stack>
+                </Stack>
               </CardActionArea>
             </Card>
           </Grid>
@@ -302,11 +291,7 @@ export default class CustomCalendar extends Component {
   };
 
   render() {
-    const {
-      today,
-      focusedDay,
-      mode,
-    } = this.state;
+    const { today, focusedDay, mode } = this.state;
 
     if (today == null) {
       return <></>;
@@ -316,63 +301,101 @@ export default class CustomCalendar extends Component {
     const weekView = this.createWeekView();
 
     return (
-      <Box>
-        <Card elevation={3}>
-          <CardContent>
-            <Stack direction="column" spacing={2}>
-              {/* Calendar Controls */}
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                alignItems={{ xs: "start", sm: "center" }}
-                justifyContent="space-between"
-                spacing={1}
+      <Card elevation={3}>
+        <CardContent>
+          <Stack direction="column" spacing={2}>
+            {/* Calendar Controls */}
+            <Grid
+              container
+              direction={{ xs: "column", md: "row" }}
+              justifyContent="space-between"
+              rowGap={1}
+            >
+              <Grid
+                item
+                container
+                direction="row"
+                alignItems="center"
+                xs={5}
               >
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Grid item xs>
                   <Button
                     variant="outlined"
                     size="small"
+                    fullWidth
                     onClick={() => this.handleViewChange(mode, -1)}
                   >
                     Previous
                   </Button>
+                </Grid>
+
+                <Grid item xs justifyItems="center">
+                  <Typography variant="body1" textAlign="center">
+                    {format(focusedDay, "MMM yyyy", { locale: enGB })}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs>
                   <Button
                     variant="outlined"
                     size="small"
+                    fullWidth
                     onClick={() => this.handleViewChange(mode, 1)}
                   >
                     Next
                   </Button>
-                  <Typography variant="body1">
-                    {format(focusedDay, "MMMM yyyy", { locale: nb })}
-                  </Typography>
-                </Stack>
+                </Grid>
+              </Grid>
 
-                <Stack direction="row" spacing={1}>
+              <Grid
+                item
+                container
+                direction="row"
+                justifyContent={{ xs: "space-between", md: "end" }}
+                xs
+              >
+                <Grid item xs md={3}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    onClick={() => {
+                      this.setState({ ...generateMonthData(today) });
+                    }}
+                  >
+                    Today
+                  </Button>
+                </Grid>
+                <Grid item xs md={3}>
                   <Button
                     variant={mode == "month" ? "contained" : "outlined"}
                     size="small"
+                    fullWidth
                     onClick={() => this.handleModeChange("month")}
                   >
                     Month
                   </Button>
+                </Grid>
+                <Grid item xs md={3}>
                   <Button
                     variant={mode == "week" ? "contained" : "outlined"}
                     size="small"
+                    fullWidth
                     onClick={() => this.handleModeChange("week")}
                   >
                     Week
                   </Button>
-                </Stack>
-              </Stack>
-
-              {/* Calendar view */}
-              <Grid container direction="column" rowGap={1}>
-                {mode == "month" ? monthView : weekView}
+                </Grid>
               </Grid>
-            </Stack>
-          </CardContent>
-        </Card>
-      </Box>
+            </Grid>
+
+            {/* Calendar view */}
+            <Grid container direction="column" rowGap={1}>
+              {mode == "month" ? monthView : weekView}
+            </Grid>
+          </Stack>
+        </CardContent>
+      </Card>
     );
   }
 }
