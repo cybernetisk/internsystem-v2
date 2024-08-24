@@ -1,4 +1,4 @@
-name: Deploy to Production Server
+name: Deploy to dev.cyb.no
 
 on:
   push:
