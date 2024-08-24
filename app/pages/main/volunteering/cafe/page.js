@@ -1,22 +1,24 @@
 
 "use client"
 
-import { Box, Button, Card, CardContent, Grid, Skeleton, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+} from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-import CustomCalendar from "@/app/components/calendar";
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import { PageBuilderSkeleton, PageHeader } from "@/app/components/sanity/PageBuilder";
+import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { useEffect, useState } from "react";
 import locale from "date-fns/locale/en-GB";
+import CafeShiftScheduler from "@/app/components/calendar/CafeShiftScheduler";
 
-// const SHIFTS = [
-//   { name: "opening shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
-//   { name: "middle shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
-//   { name: "closing shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
-// ]
 
 function CafePage() {
   
@@ -59,7 +61,8 @@ function CafePage() {
         const newShifts = data.data.map((e) => {
           return {
             ...e,
-            startAtDateTime: new Date(Date.parse(e.startAt)),
+            isReal: true,
+            startAt: new Date(Date.parse(e.startAt)),
             shiftManager: e.UserForShiftManager,
             shiftWorker1: e.UserForShiftWorker1,
             shiftWorker2: e.UserForShiftWorker2,
@@ -110,16 +113,14 @@ function CafePage() {
         spacing={2}
       >
         <Grid item xs>
-          {shifts.length > 0 ? 
-          <CustomCalendar
-          shifts={shifts}
-          setSelectedShift={setSelectedShift}
-          setSelectedDay={setSelectedDay}
-          setShiftManager={setShiftManager}
-          setShiftWorker1={setShiftWorker1}
-          setShiftWorker2={setShiftWorker2}
-          />
-        : <PageBuilderSkeleton/>}
+          {CafeShiftScheduler({
+            shifts,
+            setSelectedShift,
+            setSelectedDay,
+            setShiftManager,
+            setShiftWorker1,
+            setShiftWorker2,
+          })}
         </Grid>
 
         <Grid item xs={4} height="100%">
@@ -166,30 +167,12 @@ function CafePage() {
                       value={selectedDay}
                       ampm={false}
                       disableOpenPicker
-                      // disabled
-                      // onChange={(e) => setSelectedDay(e)}
                     />
                   </LocalizationProvider>
-                  <Button variant="outlined" onClick={manageShift}>Save</Button>
+                  <Button variant="outlined" onClick={manageShift}>
+                    Save
+                  </Button>
                 </Stack>
-                {/* <Stack spacing={2}> */}
-                  {/* <CustomAutoComplete
-                    label="Select day"
-                    dataLabel="date_label"
-                    data={shifts}
-                    value={selectedDay}
-                    callback={setSelectedDay}
-                    error={false}
-                  /> */}
-                  {/* <CustomAutoComplete
-                    label="Select shift"
-                    dataLabel="title"
-                    data={SHIFTS}
-                    value={selectedShift}
-                    callback={setSelectedShift}
-                    error={false}
-                  /> */}
-                {/* </Stack> */}
               </Stack>
             </CardContent>
           </Card>
