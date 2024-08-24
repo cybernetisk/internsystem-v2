@@ -26,21 +26,24 @@ model VerificationToken {
 }
 
 model User {
-  id              String            @id @default(cuid())
-  email           String?           @unique
-  emailVerified   DateTime?
-  active          Boolean           @default(false)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  firstName       String?
-  lastName        String?
-  ActivateToken   ActivateToken[]
-  sessions        Session[]
-  roles           UserRole[]
-  UserToWorkGroup UserToWorkGroup[]
-  VoucherLog      VoucherLog[]
-  loggedByUser    WorkLog[]         @relation("WorkLog_loggedByToUser")
-  LoggedForUser   WorkLog[]         @relation("WorkLog_loggedForToUser")
+  id                                     String            @id @default(cuid())
+  email                                  String?           @unique
+  emailVerified                          DateTime?
+  active                                 Boolean           @default(false)
+  createdAt                              DateTime          @default(now())
+  updatedAt                              DateTime          @updatedAt
+  firstName                              String?
+  lastName                               String?
+  ActivateToken                          ActivateToken[]
+  sessions                               Session[]
+  ShiftCafe_ShiftCafe_shiftManagerToUser ShiftCafe[]       @relation("ShiftCafe_shiftManagerToUser")
+  ShiftCafe_ShiftCafe_shiftWorker1ToUser ShiftCafe[]       @relation("ShiftCafe_shiftWorker1ToUser")
+  ShiftCafe_ShiftCafe_shiftWorker2ToUser ShiftCafe[]       @relation("ShiftCafe_shiftWorker2ToUser")
+  roles                                  UserRole[]
+  UserToWorkGroup                        UserToWorkGroup[]
+  VoucherLog                             VoucherLog[]
+  loggedByUser                           WorkLog[]         @relation("WorkLog_loggedByToUser")
+  LoggedForUser                          WorkLog[]         @relation("WorkLog_loggedForToUser")
 }
 
 model Role {
@@ -287,21 +290,6 @@ model UserMembership {
   @@index([semester_id], map: "UserMembership_semester_idx")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model core_user {
-  id           Int       @id
-  password     String?   @db.VarChar(128)
-  last_login   DateTime? @db.DateTime(0)
-  is_superuser Boolean?
-  username     String?   @db.VarChar(30)
-  realname     String?   @db.VarChar(60)
-  email        String?   @db.VarChar(254)
-  is_staff     Boolean?
-  is_active    Boolean?
-  date_joined  DateTime? @db.DateTime(0)
-  phone_number String?   @db.VarChar(128)
-}
-
 model memberLog {
   id   String  @id
   name String? @db.VarChar(45)
@@ -327,4 +315,77 @@ model UserToWorkGroup {
   @@id([workGroupId, userId])
   @@index([userId], map: "UserToWorkGroup_A_fkey_idx")
   @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
+}
+
+model Event {
+  id          String   @id @db.VarChar(45)
+  title       String   @db.VarChar(45)
+  startDate   DateTime @db.DateTime(0)
+  endDate     DateTime @db.DateTime(0)
+  description String   @db.VarChar(120)
+  location    String?  @db.VarChar(45)
+}
+
+model ShiftCafe {
+  id                  String   @id @default(cuid())
+  title               String   @db.VarChar(45)
+  startAt             DateTime @db.DateTime(0)
+  createdAt           DateTime @default(now()) @db.DateTime(0)
+  shiftPosition       Int
+  shiftManager        String?
+  shiftWorker1        String?
+  shiftWorker2        String?
+  UserForShiftManager User?    @relation("ShiftCafe_shiftManagerToUser", fields: [shiftManager], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ShiftCafe_shiftManager_User")
+  UserForShiftWorker1 User?    @relation("ShiftCafe_shiftWorker1ToUser", fields: [shiftWorker1], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ShiftCafe_shiftWorker1_User")
+  UserForShiftWorker2 User?    @relation("ShiftCafe_shiftWorker2ToUser", fields: [shiftWorker2], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ShiftCafe_shiftWorker2_User")
+
+  @@index([shiftWorker1], map: "ShiftCafe_shiftWorker2_User_idx")
+  @@index([shiftWorker2], map: "ShiftCafe_shiftWorker2_User_idx1")
+  @@index([shiftManager], map: "ShiftCafe_shiftWorker_User_idx")
+}
+
+model MenuProduct {
+  id             Int     @id
+  name           String  @db.VarChar(45)
+  volume         Float   @db.Float
+  price          Int
+  priceVolunteer Int
+  glutenfree     Int     @db.TinyInt
+  active         Int?    @default(1) @db.TinyInt
+  category       String? @db.VarChar(45)
+}
+
+model old_users {
+  id           Int       @id
+  password     String?   @db.VarChar(128)
+  last_login   DateTime? @db.DateTime(0)
+  is_superuser Boolean?
+  username     String?   @db.VarChar(30)
+  realname     String?   @db.VarChar(60)
+  email        String?   @db.VarChar(254)
+  is_staff     Boolean?
+  is_active    Boolean?
+  date_joined  DateTime? @db.DateTime(0)
+  phone_number String?   @db.VarChar(128)
+}
+
+model old_voucher_logs {
+  id              String    @id @db.VarChar(120)
+  date_issued     DateTime? @db.DateTime(0)
+  date_worked     DateTime? @db.DateTime(0)
+  work_group      String?   @db.VarChar(45)
+  hours           Float?    @db.Float
+  vouchers        Float?    @db.Float
+  comment         String?   @db.VarChar(120)
+  issuing_user_id Int?
+  wallet_id       Int?
+}
+
+model old_voucher_usage {
+  id              String    @id @db.VarChar(45)
+  date_spent      DateTime? @db.DateTime(0)
+  comment         String?   @db.VarChar(200)
+  vouchers        String?   @db.VarChar(45)
+  wallet_id       String?   @db.VarChar(45)
+  issuing_user_id String?   @db.VarChar(45)
 }

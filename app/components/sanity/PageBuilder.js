@@ -340,6 +340,7 @@ class PageBuilderSkeleton extends Component {
         <Typography
           key={`pagebuilder_typography${i}`}
           variant="body2"
+          width="100%"
         >
           <Skeleton key={`pagebuilder_typography${i}_skeleton`} />
         </Typography>
@@ -348,13 +349,13 @@ class PageBuilderSkeleton extends Component {
     
     return (
       <Grid container direction="row" spacing={2}>
-        <Grid item md={7}>
+        <Grid item md={7} xs={12}>
           <Typography variant="h5" gutterBottom>
             <Skeleton/>
           </Typography>
           {skeletonText}
         </Grid>
-        <Grid item md={5}>
+        <Grid item md={5} xs={12}>
           <Skeleton variant="rectangular" height="50vh" />
         </Grid>
       </Grid>
