@@ -41,54 +41,116 @@ export default class CustomCalendar extends Component {
   constructor(props) {
     super(props);
 
-    const today = new Date();
-
     this.state = {
-      today: today,
-      focusedDay: today,
       mode: "month",
-      ...generateMonthData(today),
+      focusedDay: new Date(),
     };
   }
 
-  handleViewChange = (mode, direction) => {
+  updateStateFocusedDay = (mode, direction) => {
     const { focusedDay } = this.state;
 
-    console.log(mode, direction);
+    const modeOperations = {
+      month: direction === 1 ? addMonths : subMonths,
+      week: direction === 1 ? addWeeks : subWeeks,
+    };
 
-    if (mode == "month") {
-      if (direction == 1) {
-        this.setState({ ...generateMonthData(addMonths(focusedDay, 1)) });
-      } else if (direction == -1) {
-        this.setState({ ...generateMonthData(subMonths(focusedDay, 1)) });
-      }
-    } else if (mode == "week") {
-      if (direction == 1) {
-        this.setState({ ...generateMonthData(addWeeks(focusedDay, 1)) });
-      } else if (direction == -1) {
-        this.setState({ ...generateMonthData(subWeeks(focusedDay, 1)) });
-      }
+    if (modeOperations[mode]) {
+      this.setState({
+        focusedDay: modeOperations[mode](focusedDay, 1),
+      });
     }
   };
 
-  handleModeChange = (mode) => {
-    this.setState({
-      mode: mode,
-    });
+  updateStateMode = (mode) => {
+    if (this.state.mode !== mode) {
+      this.setState({ mode });
+    }
+  };
+  
+  getFocusedWeekdays = (data, focusedDay) => {
+    const focusedWeek = data.filter((week) =>
+      week.some((day) => isSameDay(focusedDay, day.value))
+    )[0];
+    
+    return focusedWeek.filter((day) => !day.isWeekend);
   };
 
-  createMonthView = () => {
-    const { focusedDay, today, monthInWeeks } = this.state;
-    const { events } = this.props;
+  generateMonthData = () => {
+    const { focusedDay } = this.state;
+    const { shifts } = this.props;
 
-    const focusedWeek = monthInWeeks.filter((week) =>
-      week.reduce(
-        (sum, next) => sum || isSameDay(focusedDay, next.value),
-        false
-      )
-    )[0];
+    const monthStart = startOfMonth(focusedDay);
+    const monthEnd = endOfMonth(focusedDay);
 
-    const focusedWeekdays = focusedWeek.filter((row) => !row.isWeekend);
+    // calculate the number of days to display from the previous month
+    const monthStartOffset = isSameMonth(monthStart, previousMonday(monthStart))
+      ? 0
+      : differenceInCalendarDays(monthStart, previousMonday(monthStart));
+
+    // calculate the number of days to display from the next month
+    const monthEndOffset = isSunday(monthEnd)
+      ? 0
+      : differenceInCalendarDays(nextSunday(monthEnd), monthEnd);
+
+    let currentDay = subDays(monthStart, monthStartOffset);
+    let lastDayInCalendar = addDays(monthEnd, monthEndOffset);
+    let monthInWeeks = [];
+
+    // Generate relevant weeks
+    while (currentDay <= lastDayInCalendar) {
+      let week = [];
+
+      for (let i = 0; i < 7; i++) {
+        let dayShifts = shifts.filter((e) => isSameDay(currentDay, e.startAt));
+        let filledPositions = dayShifts.map((e) => e.shiftPosition);
+
+        // Ensure that each shift position (0, 1, 2) is filled, adding placeholders if necessary
+        for (let position = 0; position < 3; position++) {
+          if (!filledPositions.includes(position)) {
+            dayShifts.push({ shiftPosition: position, title: "-" });
+          }
+        }
+
+        // Sort the shifts by shiftPosition to ensure the earliest slots come first
+        dayShifts.sort((a, b) => a.shiftPosition - b.shiftPosition);
+
+        week.push({
+          value: currentDay,
+          isWeekend: isWeekend(currentDay),
+          weekIndex: getWeek(currentDay),
+          shifts: dayShifts,
+        });
+
+        currentDay = addDays(currentDay, 1);
+      }
+
+      monthInWeeks.push(week);
+    }
+
+    return monthInWeeks;
+  };
+  
+  generateWeekData = () => {
+    
+  };
+
+  generateView = () => {
+    const { mode } = this.state;
+
+    const data = this.generateMonthData();
+
+    if (mode == "month") {
+      return this.generateMonthView(data);
+    } else {
+      return this.generateWeekView(data);
+    }
+  };
+
+  generateMonthView = (data) => {
+    const { focusedDay } = this.state;
+
+    const focusedWeekdays = this.getFocusedWeekdays(data, focusedDay);
 
     const header = (
       <Grid container item direction="row">
@@ -97,12 +159,12 @@ export default class CustomCalendar extends Component {
             <Grid item xs={12 / focusedWeekdays.length}>
               <Card square>
                 <Box sx={{ p: 1 }}>
-                  <Typography variant="body1" color="GrayText" display={{ xs: "block", md: "none" }}>
+                  <Typography
+                    variant="body1"
+                    color="GrayText"
+                    display={{ xs: "block", md: "block" }}
+                  >
                     {format(elem.value, "EE")}
-                    {elem.label}
-                  </Typography>
-                  <Typography variant="body1" color="GrayText" display={{ xs: "none", md: "block" }}>
-                    {format(elem.value, "EEEE")}
                     {elem.label}
                   </Typography>
                 </Box>
@@ -113,7 +175,7 @@ export default class CustomCalendar extends Component {
       </Grid>
     );
 
-    const body = monthInWeeks
+    const body = data
       .filter((row) =>
         row.reduce(
           (sum, nextElem) =>
@@ -122,10 +184,10 @@ export default class CustomCalendar extends Component {
           false
         )
       )
-      .map((row) => {
+      .map((week) => {
         return (
           <Grid container item direction="row">
-            {row
+            {week
               .filter((elem) => !elem.isWeekend)
               .map((elem) => {
                 return (
@@ -133,9 +195,8 @@ export default class CustomCalendar extends Component {
                     <Card square>
                       <CardActionArea
                         disabled={elem.header}
-                        onClick={() => {                          
-                          this.handleModeChange("week")
-                          this.setState({ ...generateMonthData(elem.value) })
+                        onClick={() => {
+                          this.updateStateMode("week");
                         }}
                       >
                         <Box sx={{ p: 1 }} height={elem.header ? "" : "14vh"}>
@@ -153,15 +214,20 @@ export default class CustomCalendar extends Component {
                             {format(elem.value, "dd", { locale: nb })}
                           </Typography>
                           <Stack>
-                            {events
-                              .filter((event) =>
-                                isSameDay(event.start, elem.value)
-                              )
-                              .map((event) => (
-                                <Typography variant="caption">
-                                  {event.title}
-                                </Typography>
-                              ))}
+                            {elem.shifts.map((shift) => (
+                              <Typography
+                                variant="caption"
+                                color={
+                                  isToday(elem.value)
+                                    ? cybTheme.palette.primary.main
+                                    : !isSameMonth(elem.value, focusedDay)
+                                    ? "GrayText"
+                                    : ""
+                                }
+                              >
+                                {shift.title}
+                              </Typography>
+                            ))}
                           </Stack>
                         </Box>
                       </CardActionArea>
@@ -176,19 +242,18 @@ export default class CustomCalendar extends Component {
     return [header, ...body];
   };
 
-  createWeekView = () => {
-    const { focusedDay, monthInWeeks, today } = this.state;
-    const { events, setShiftManager, setShiftWorker1, setShiftWorker2 } =
-      this.props;
+  generateWeekView = (data) => {
+    const { focusedDay } = this.state;
+    const {
+      shifts,
+      setSelectedDay,
+      setSelectedShift,
+      setShiftManager,
+      setShiftWorker1,
+      setShiftWorker2,
+    } = this.props;
 
-    const focusedWeek = monthInWeeks.filter((week) =>
-      week.reduce(
-        (sum, next) => sum || isSameDay(focusedDay, next.value),
-        false
-      )
-    )[0];
-
-    const focusedWeekdays = focusedWeek.filter((row) => !row.isWeekend);
+    const focusedWeekdays = this.getFocusedWeekdays(data, focusedDay);
 
     const header = (
       <Grid container item direction="row">
@@ -199,7 +264,7 @@ export default class CustomCalendar extends Component {
                 <Box sx={{ p: 1 }}>
                   <Typography
                     variant="body1"
-                    display={{ xs: "block", md: "none" }}
+                    display={{ xs: "block", md: "block" }}
                     color={
                       isToday(elem.value)
                         ? cybTheme.palette.primary.main
@@ -207,17 +272,6 @@ export default class CustomCalendar extends Component {
                     }
                   >
                     {format(elem.value, "EE do")}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    display={{ xs: "none", md: "block" }}
-                    color={
-                      isToday(elem.value)
-                        ? cybTheme.palette.primary.main
-                        : "GrayText"
-                    }
-                  >
-                    {format(elem.value, "EEEE do")}
                   </Typography>
                 </Box>
               </Card>
@@ -233,19 +287,23 @@ export default class CustomCalendar extends Component {
         const tempDayHourStart = addHours(elem.value, i);
         const tempDayHourEnd = addHours(elem.value, i + 2);
 
-        const event = events
-          .filter((event) => isSameHour(event.start, tempDayHourStart))
-          
-        const shiftEvent = event
-          .map((event) => (
-            <Stack>
-              <Typography variant="caption" color="GrayText">{event.shift_manager.firstName}</Typography>
-              <Typography variant="caption" color="GrayText">{event.worker_1.firstName}</Typography>
-              <Typography variant="caption" color="GrayText">{event.worker_2.firstName}</Typography>
-            </Stack>
-          ))[0];
-          
-        // isWithinInterval()
+        const event = shifts.filter((event) =>
+          isSameHour(event.startAt, tempDayHourStart)
+        );
+
+        const shiftEvent = event.map((event) => (
+          <Stack>
+            <Typography variant="caption">
+              {event.shiftManager ? event.shiftManager.firstName : "-"}
+            </Typography>
+            <Typography variant="caption">
+              {event.shiftWorker1 ? event.shiftWorker1.firstName : "-"}
+            </Typography>
+            <Typography variant="caption">
+              {event.shiftWorker2 ? event.shiftWorker2.firstName : "-"}
+            </Typography>
+          </Stack>
+        ))[0];
 
         return (
           <Grid item xs={12 / 5}>
@@ -253,10 +311,16 @@ export default class CustomCalendar extends Component {
               <CardActionArea
                 disabled={elem.header}
                 onClick={() => {
-                  console.log(event[0])
-                  setShiftManager(event[0].shift_manager);
-                  setShiftWorker1(event[0].worker_1);
-                  setShiftWorker2(event[0].worker_2);
+                  setSelectedDay(tempDayHourStart);
+
+                  if (event.length == 0) {
+                    setSelectedShift(null);
+                  } else {
+                    setSelectedShift(event[0]);
+                    setShiftManager(event[0].shiftManager);
+                    setShiftWorker1(event[0].shiftWorker1);
+                    setShiftWorker2(event[0].shiftWorker2);
+                  }
                 }}
               >
                 <Stack
@@ -265,14 +329,7 @@ export default class CustomCalendar extends Component {
                   height={elem.header ? "" : "16vh"}
                   justifyContent="space-between"
                 >
-                  <Typography
-                    variant="body2"
-                    color={
-                      isToday(elem.value) // || relatedEvents.length > 0
-                        ? ""
-                        : "GrayText"
-                    }
-                  >
+                  <Typography variant="body2" color="GrayText">
                     {format(tempDayHourStart, "HH:mm")} -{" "}
                     {format(tempDayHourEnd, "HH:mm")}
                   </Typography>
@@ -298,14 +355,9 @@ export default class CustomCalendar extends Component {
   };
 
   render() {
-    const { today, focusedDay, mode } = this.state;
+    const { today, focusedDay, mode, currentShifts } = this.state;
 
-    if (today == null) {
-      return <></>;
-    }
-
-    const monthView = this.createMonthView();
-    const weekView = this.createWeekView();
+    const view = this.generateView();
 
     return (
       <Card elevation={3}>
@@ -318,19 +370,13 @@ export default class CustomCalendar extends Component {
               justifyContent="space-between"
               rowGap={1}
             >
-              <Grid
-                item
-                container
-                direction="row"
-                alignItems="center"
-                xs={5}
-              >
+              <Grid item container direction="row" alignItems="center" xs={5}>
                 <Grid item xs>
                   <Button
                     variant="outlined"
                     size="small"
                     fullWidth
-                    onClick={() => this.handleViewChange(mode, -1)}
+                    onClick={() => this.updateStateFocusedDay(mode, -1)}
                   >
                     Previous
                   </Button>
@@ -347,7 +393,7 @@ export default class CustomCalendar extends Component {
                     variant="outlined"
                     size="small"
                     fullWidth
-                    onClick={() => this.handleViewChange(mode, 1)}
+                    onClick={() => this.updateStateFocusedDay(mode, 1)}
                   >
                     Next
                   </Button>
@@ -363,11 +409,11 @@ export default class CustomCalendar extends Component {
               >
                 <Grid item xs md={3}>
                   <Button
-                    variant="outlined"
+                    variant="text"
                     size="small"
                     fullWidth
                     onClick={() => {
-                      this.setState({ ...generateMonthData(today) });
+                      this.setState({ focusedDay: today });
                     }}
                   >
                     Today
@@ -378,7 +424,7 @@ export default class CustomCalendar extends Component {
                     variant={mode == "month" ? "contained" : "outlined"}
                     size="small"
                     fullWidth
-                    onClick={() => this.handleModeChange("month")}
+                    onClick={() => this.updateStateMode("month")}
                   >
                     Month
                   </Button>
@@ -388,7 +434,7 @@ export default class CustomCalendar extends Component {
                     variant={mode == "week" ? "contained" : "outlined"}
                     size="small"
                     fullWidth
-                    onClick={() => this.handleModeChange("week")}
+                    onClick={() => this.updateStateMode("week")}
                   >
                     Week
                   </Button>
@@ -398,63 +444,11 @@ export default class CustomCalendar extends Component {
 
             {/* Calendar view */}
             <Grid container direction="column" rowGap={1}>
-              {mode == "month" ? monthView : weekView}
+              {view}
             </Grid>
           </Stack>
         </CardContent>
       </Card>
     );
   }
-}
-
-function generateMonthData(day) {
-  
-  const monthStart = startOfMonth(day);
-  const monthEnd = endOfMonth(day);
-
-  let monthStartOffset = 0;
-  let monthEndOffset = 0;
-
-  // calculate the number of days to display from the previous month
-  if (!isSameMonth(monthStart, previousMonday(monthStart))) {
-    monthStartOffset = differenceInCalendarDays(
-      monthStart,
-      previousMonday(monthStart)
-    );
-  }
-  
-  // calculate the number of days to display from the next month
-  if (!isSunday(monthEnd)) {
-    monthEndOffset = differenceInCalendarDays(
-      nextSunday(monthEnd),
-      monthEnd,
-    );
-  }
-  
-  let indexDay = subDays(monthStart, monthStartOffset);
-  let indexDayEnd = addDays(monthEnd, monthEndOffset);
-  let monthInWeeks = []
-
-  // Generate relevant weeks
-  while (indexDay <= indexDayEnd) {
-    
-    let tempWeek = [];
-    
-    for (let i = 0; i < 7; i++) {
-      tempWeek.push({
-        value: indexDay,
-        isWeekend: isWeekend(indexDay),
-        weekIndex: getWeek(indexDay),
-      });
-      
-      indexDay = addDays(indexDay, 1);
-    } 
-    
-    monthInWeeks.push(tempWeek)
-  }
-
-  return {
-    focusedDay: day,
-    monthInWeeks: monthInWeeks,
-  };
 }

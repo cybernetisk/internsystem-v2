@@ -2,6 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { PageBuilderSkeleton } from "../components/sanity/PageBuilder";
 
 export default function authWrapper(WrappedComponent, requiredRole="", redirect="/pages/main/unauthorized") {
   return function AuthenticatedComponent(props) {
@@ -15,7 +16,7 @@ export default function authWrapper(WrappedComponent, requiredRole="", redirect=
     });
     
     if (status == "loading") {
-      return <div>Loading...</div>
+      return <PageBuilderSkeleton/>
     }
     else if (status == "authenticated" && requiredRole != "") {
       

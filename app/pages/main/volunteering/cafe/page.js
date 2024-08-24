@@ -1,33 +1,37 @@
 
 "use client"
 
+import { Box, Button, Card, CardContent, Grid, Skeleton, Stack } from "@mui/material";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import CustomCalendar from "@/app/components/calendar";
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import { PageHeader } from "@/app/components/sanity/PageBuilder";
+import { PageBuilderSkeleton, PageHeader } from "@/app/components/sanity/PageBuilder";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import { Box, Button, Card, CardContent, Grid, Stack } from "@mui/material";
-import { format } from "date-fns";
 import { useEffect, useState } from "react";
+import locale from "date-fns/locale/en-GB";
 
-const SHIFTS = [
-  { name: "opening shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
-  { name: "middle shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
-  { name: "closing shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
-]
+// const SHIFTS = [
+//   { name: "opening shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
+//   { name: "middle shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
+//   { name: "closing shift", startTime: "", endTime: "", managerStartTime: "", managerEndTime: "" },
+// ]
 
-function VolunteeringPage() {
+function CafePage() {
   
   const [users, setUsers] = useState([]);
+  const [shifts, setShifts] = useState([]);
+  
   const [shiftManager, setShiftManager] = useState(null);
   const [shiftWorker1, setShiftWorker1] = useState(null);
   const [shiftWorker2, setShiftWorker2] = useState(null);
   
-  const [shift, setShift] = useState(null);
-  const [day, setDay] = useState(null);
+  const [selectedShift, setSelectedShift] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(new Date());
+  const [refresh, setRefresh] = useState(false);
   
   useEffect(() => {
-    
     prismaRequest({
       model: "user",
       method: "find",
@@ -36,51 +40,65 @@ function VolunteeringPage() {
         setUsers(data.data);
       }
     })
-    
   }, [])
   
-  const events = [
-    {
-      event_id: 0,
-      title: "early shift",
-      date_label: format(new Date(new Date(new Date().setMinutes(0)).setHours(10)), "dd/MM"),
-      start: new Date(new Date(new Date().setMinutes(0)).setHours(10)),
-      end: new Date(new Date(new Date().setMinutes(59)).setHours(11)),
-      shift_manager: { firstName: "Alice" },
-      worker_1: { firstName: "Alice's friend" },
-      worker_2: { firstName: "Alice's other friend" },
-    },
-    {
-      event_id: 1,
-      title: "middle shift",
-      date_label: format(new Date(new Date(new Date().setMinutes(15)).setHours(12)), "dd/MM"),
-      start: new Date(new Date(new Date().setMinutes(15)).setHours(12)),
-      end: new Date(new Date(new Date().setMinutes(59)).setHours(13)),
-      shift_manager: { firstName: "Bob" },
-      worker_1: { firstName: "Bob's friend" },
-      worker_2: { firstName: "Bob's other friend" },
-    },
-    {
-      event_id: 3,
-      title: "closing shift",
-      date_label: format(new Date(new Date(new Date().setMinutes(15)).setHours(14)), "dd/MM"),
-      start: new Date(new Date(new Date().setMinutes(15)).setHours(14)),
-      end: new Date(new Date(new Date().setMinutes(59)).setHours(14)),
-      shift_manager: { firstName: "Charlie" },
-      worker_1: { firstName: "Charlie's friend" },
-      worker_2: { firstName: "Charlie's other friend" },
-    },
-    {
-      event_id: 4,
-      title: "middle shift",
-      date_label: format(new Date(Date.parse("19 Aug 2024 12:15")), "dd/MM"),
-      start: new Date(Date.parse("19 Aug 2024 12:15")),
-      end: new Date(new Date(new Date().setMinutes(59)).setHours(13)),
-      shift_manager: { firstName: "Charlie" },
-      worker_1: { firstName: "Alice" },
-      worker_2: { firstName: "Bob" },
-    },
-  ];
+  useEffect(() => {
+    prismaRequest({
+      model: "shiftCafe",
+      method: "find",
+      request: {
+        include: {
+          UserForShiftManager: true,
+          UserForShiftWorker1: true,
+          UserForShiftWorker2: true,
+        }
+      },
+      callback: (data) => {
+        if (data.data.length == 0) return;
+        
+        const newShifts = data.data.map((e) => {
+          return {
+            ...e,
+            startAtDateTime: new Date(Date.parse(e.startAt)),
+            shiftManager: e.UserForShiftManager,
+            shiftWorker1: e.UserForShiftWorker1,
+            shiftWorker2: e.UserForShiftWorker2,
+          }
+        })
+        
+        // console.log(newShifts);
+        setShifts(newShifts);
+      }
+    })
+  }, [refresh]);
+  
+  const manageShift = async () => {
+    
+    console.log(shiftManager, shiftWorker1, shiftWorker2)
+    
+    const response = await fetch("/api/data/updateORCreateShift", {
+      method: "post",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        selectedShiftId: selectedShift?.id,
+        selectedDay: selectedDay,
+        shiftManagerId: shiftManager ? shiftManager.id : null,
+        shiftWorker1Id: shiftWorker1 ? shiftWorker1.id : null,
+        shiftWorker2Id: shiftWorker2 ? shiftWorker2.id : null,
+      }),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      setRefresh(!refresh);
+    }
+    
+    
+  }
   
   return (
     <Box>
@@ -92,12 +110,16 @@ function VolunteeringPage() {
         spacing={2}
       >
         <Grid item xs>
+          {shifts.length > 0 ? 
           <CustomCalendar
-            events={events}
-            setShiftManager={setShiftManager}
-            setShiftWorker1={setShiftWorker1}
-            setShiftWorker2={setShiftWorker2}
+          shifts={shifts}
+          setSelectedShift={setSelectedShift}
+          setSelectedDay={setSelectedDay}
+          setShiftManager={setShiftManager}
+          setShiftWorker1={setShiftWorker1}
+          setShiftWorker2={setShiftWorker2}
           />
+        : <PageBuilderSkeleton/>}
         </Grid>
 
         <Grid item xs={4} height="100%">
@@ -134,26 +156,40 @@ function VolunteeringPage() {
                     callback={setShiftWorker2}
                     error={false}
                   />
+                  <LocalizationProvider
+                    dateAdapter={AdapterDateFns}
+                    adapterLocale={locale}
+                  >
+                    <DateTimePicker
+                      label="Start time"
+                      defaultValue={selectedDay}
+                      value={selectedDay}
+                      ampm={false}
+                      disableOpenPicker
+                      // disabled
+                      // onChange={(e) => setSelectedDay(e)}
+                    />
+                  </LocalizationProvider>
+                  <Button variant="outlined" onClick={manageShift}>Save</Button>
                 </Stack>
-                <Stack spacing={2}>
-                  <CustomAutoComplete
+                {/* <Stack spacing={2}> */}
+                  {/* <CustomAutoComplete
                     label="Select day"
                     dataLabel="date_label"
-                    data={events}
-                    value={day}
-                    callback={setDay}
+                    data={shifts}
+                    value={selectedDay}
+                    callback={setSelectedDay}
                     error={false}
-                    />
-                  <CustomAutoComplete
+                  /> */}
+                  {/* <CustomAutoComplete
                     label="Select shift"
-                    dataLabel="name"
+                    dataLabel="title"
                     data={SHIFTS}
-                    value={shift}
-                    callback={setShift}
+                    value={selectedShift}
+                    callback={setSelectedShift}
                     error={false}
-                  />
-                </Stack>
-                <Button variant="outlined">Save</Button>
+                  /> */}
+                {/* </Stack> */}
               </Stack>
             </CardContent>
           </Card>
@@ -163,4 +199,4 @@ function VolunteeringPage() {
   );
 }
 
-export default authWrapper(VolunteeringPage)
+export default authWrapper(CafePage)
