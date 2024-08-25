@@ -26,6 +26,8 @@ export async function POST(req) {
     let shiftPosition;
     const selectedStartTime = getHours(selectedDay);
     
+    const hasWorkers = shiftManagerId || shiftWorker1Id || shiftWorker2Id;
+    
     switch (selectedStartTime) {
       case 10:
         title = "Opening Shift";
@@ -44,7 +46,7 @@ export async function POST(req) {
     try {
       let data;
       
-      if (selectedShiftId) {
+      if (selectedShiftId && hasWorkers) {
         data = await prisma.shiftCafe.update({
           where: {
             id: selectedShiftId
@@ -58,7 +60,7 @@ export async function POST(req) {
             shiftWorker2: shiftWorker2Id,
           }
         });
-      } else {
+      } else if (hasWorkers) {
         data = await prisma.shiftCafe.create({
           data: {
             title: title,
@@ -69,6 +71,12 @@ export async function POST(req) {
             shiftWorker2: shiftWorker2Id,
           },
         });
+      } else {
+        data = await prisma.shiftCafe.delete({
+          where: {
+            id: selectedShiftId
+          }
+        })
       }
 
       return NextResponse.json({ data: data });

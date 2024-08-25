@@ -1,9 +1,6 @@
 
 import {
   addDays,
-  addHours,
-  addMonths,
-  addWeeks,
   differenceInCalendarDays,
   endOfMonth,
   endOfWeek,
@@ -18,8 +15,6 @@ import {
   startOfMonth,
   startOfWeek,
   subDays,
-  subMonths,
-  subWeeks,
 } from "date-fns";
 
 
@@ -102,16 +97,7 @@ export function generateCalendarData(
   let currentDay: Date = subDays(start, startOffset);
   let lastDayInCalendar: Date = addDays(end, endOffset);
 
-  let calendarDays =
-    // : Array<
-    //   Array<{
-    //     value: Date;
-    //     isWeekend: boolean;
-    //     weekIndex: number;
-    //     shifts: Array<{ shiftPosition: number; title: string; startAt: Date }>;
-    //   }>
-    // >
-    [];
+  let calendarDays = [];
 
   // Generate relevant weeks
   while (currentDay <= lastDayInCalendar) {
@@ -127,10 +113,6 @@ export function generateCalendarData(
           dayShifts.push({
             isReal: false,
             shiftPosition: position,
-            // shiftManager: { firstName: "-" },
-            // shiftWorker1: { firstName: "-" },
-            // shiftWorker2: { firstName: "-" },
-            // title: "-",
             startAt: new Date(new Date(currentDay).setHours(10 + position * 2)),
           });
         }
@@ -153,4 +135,16 @@ export function generateCalendarData(
   }
 
   return calendarDays;
+}
+
+export function getInitials(name: string) {
+    let nameParts = name.trim().split(' ');
+    let firstName = nameParts[0];
+    
+    let initials = nameParts.slice(1).map(part => {
+        // Handle names with dashes
+        return part.split('-').map(subPart => subPart[0].toUpperCase()).join('');
+    }).join('');
+    
+    return `${firstName} ${initials}`;
 }
