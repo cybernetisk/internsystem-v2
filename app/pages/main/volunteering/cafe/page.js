@@ -8,6 +8,7 @@ import {
   CardContent,
   Grid,
   Stack,
+  Typography,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -18,6 +19,7 @@ import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { useEffect, useState } from "react";
 import locale from "date-fns/locale/en-GB";
 import CafeShiftScheduler from "@/app/components/calendar/CafeShiftScheduler";
+import { Circle } from "@mui/icons-material";
 
 
 function CafePage() {
@@ -105,7 +107,7 @@ function CafePage() {
   
   return (
     <Box>
-      <PageHeader text="Café" variant="h4" />
+      <PageHeader text="Café shifts" variant="h4" />
 
       <Grid
         container
@@ -124,58 +126,77 @@ function CafePage() {
         </Grid>
 
         <Grid item xs={4} height="100%">
-          <Card elevation={3}>
-            <CardContent>
-              <PageHeader variant="h6" text="Manage shift" />
+          <Stack direction="column" spacing={1}>
+            <Card elevation={3}>
+              <CardContent>
+                <PageHeader variant="h6" text="Manage shift" />
 
-              <Stack direction="column" spacing={6}>
-                <Stack spacing={2}>
-                  <CustomAutoComplete
-                    label="Shift manager"
-                    dataLabel="firstName"
-                    subDataLabel="email"
-                    data={users}
-                    value={shiftManager}
-                    callback={setShiftManager}
-                    error={false}
-                  />
-                  <CustomAutoComplete
-                    label="volunteer"
-                    dataLabel="firstName"
-                    subDataLabel="email"
-                    data={users}
-                    value={shiftWorker1}
-                    callback={setShiftWorker1}
-                    error={false}
-                  />
-                  <CustomAutoComplete
-                    label="volunteer"
-                    dataLabel="firstName"
-                    subDataLabel="email"
-                    data={users}
-                    value={shiftWorker2}
-                    callback={setShiftWorker2}
-                    error={false}
-                  />
-                  <LocalizationProvider
-                    dateAdapter={AdapterDateFns}
-                    adapterLocale={locale}
-                  >
-                    <DateTimePicker
-                      label="Start time"
-                      defaultValue={selectedDay}
-                      value={selectedDay}
-                      ampm={false}
-                      disableOpenPicker
+                <Stack direction="column" spacing={6}>
+                  <Stack spacing={2}>
+                    <CustomAutoComplete
+                      label="Shift manager"
+                      dataLabel="firstName"
+                      subDataLabel="email"
+                      data={users}
+                      value={shiftManager}
+                      callback={setShiftManager}
+                      error={false}
                     />
-                  </LocalizationProvider>
-                  <Button variant="outlined" onClick={manageShift}>
-                    Save
-                  </Button>
+                    <CustomAutoComplete
+                      label="volunteer"
+                      dataLabel="firstName"
+                      subDataLabel="email"
+                      data={users}
+                      value={shiftWorker1}
+                      callback={setShiftWorker1}
+                      error={false}
+                    />
+                    <CustomAutoComplete
+                      label="volunteer"
+                      dataLabel="firstName"
+                      subDataLabel="email"
+                      data={users}
+                      value={shiftWorker2}
+                      callback={setShiftWorker2}
+                      error={false}
+                    />
+                    <LocalizationProvider
+                      dateAdapter={AdapterDateFns}
+                      adapterLocale={locale}
+                    >
+                      <DateTimePicker
+                        label="Start time"
+                        defaultValue={selectedDay}
+                        value={selectedDay}
+                        ampm={false}
+                        disableOpenPicker
+                      />
+                    </LocalizationProvider>
+                    <Button variant="outlined" onClick={manageShift}>
+                      Save
+                    </Button>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            <Card elevation={3}>
+              <CardContent>
+                <Stack direction="row" alignItems="center">
+                  <Circle sx={{ height: 15 }} color="success" />
+                  <Typography>= Shift is filled</Typography>
+                </Stack>
+                <Stack direction="row" alignItems="center">
+                  <Circle sx={{ height: 15 }} color="warning" />
+                  <Typography>= Shift has people</Typography>
+                </Stack>
+                <Stack direction="row" alignItems="center">
+                  <Circle sx={{ height: 15 }} color="error" />
+                  <Typography>= Shift is empty</Typography>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Stack>
         </Grid>
       </Grid>
     </Box>
