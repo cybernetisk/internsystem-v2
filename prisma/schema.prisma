@@ -258,7 +258,7 @@ model WorkLog {
   loggedFor     String?
   workedAt      DateTime? @db.Timestamp(0)
   createdAt     DateTime? @default(now()) @db.Timestamp(0)
-  duration      Int?
+  duration      Float?    @db.Float
   description   String?   @db.VarChar(120)
   semesterId    Int
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
