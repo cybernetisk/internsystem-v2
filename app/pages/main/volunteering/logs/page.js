@@ -20,18 +20,18 @@ import LogInput from "./logInput";
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
 
 const WORK_TABLE_HEADERS = [
-  { id: "workedAt", name: "log date", sortBy: "workedAt_num", flex: 2 },
+  { id: "workedAt", name: "work date", sortBy: "workedAt_num", flex: 2 },
   { id: "duration", name: "duration", flex: 1 },
-  { id: "vouchers", name: "vouchers", flex: 1 },
   { id: "description", name: "description", flex: 3 },
-  { id: "loggedFor", name: "logged for", flex: 2 },
+  { id: "loggedBy", name: "log by", flex: 2 },
+  { id: "loggedFor", name: "log for", flex: 2 },
 ];
 
 const VOUCHER_TABLE_HEADERS = [
-  { id: "usedAt", name: "log date", sortBy: "usedAt_num", flex: 2 },
+  { id: "usedAt", name: "usage date", sortBy: "usedAt_num", flex: 2 },
   { id: "amount", name: "vouchers", flex: 2 },
-  { id: "description", name: "description", flex: 3 },
-  { id: "loggedFor", name: "logged for", flex: 2 },
+  { id: "description", name: "description", flex: 4 },
+  { id: "loggedFor", name: "log for", flex: 2 },
 ];
 
 function LogsPage() {
@@ -111,7 +111,7 @@ function LogsPage() {
             workedAt_num: parseISO(e.workedAt).getTime(),
             workedAt: format(
               parseISO(e.workedAt),
-              "dd MMM 'kl.'HH:mm"
+              "dd.MM HH:mm"
             ).toLowerCase(),
           };
         });
@@ -193,13 +193,40 @@ function LogsPage() {
   
   return (
     <Box>
+      {/* <PageHeader text={mode ? "Work logs" : "Voucher logs"} /> */}
       <PageHeader text="Logs" />
 
       <Grid container spacing={2}>
         <Grid item md={4} xs={12} alignContent="start">
           <Card elevation={3}>
             <CardContent>
-              <Stack direction="row" spacing={1} pb={4}>
+              <Stack
+                direction="row"
+                spacing={1}
+                pb={4}
+                sx={{ display: { xs: "flex", lg: "none" } }}
+              >
+                <Button
+                  fullWidth
+                  variant={mode ? "contained" : "outlined"}
+                  onClick={() => setMode(true)}
+                >
+                  Register
+                </Button>
+                <Button
+                  fullWidth
+                  variant={!mode ? "contained" : "outlined"}
+                  onClick={() => setMode(false)}
+                >
+                  Use
+                </Button>
+              </Stack>
+              <Stack
+                direction="row"
+                spacing={1}
+                pb={4}
+                sx={{ display: { xs: "none", lg: "flex" } }}
+              >
                 <Button
                   fullWidth
                   variant={mode ? "contained" : "outlined"}
@@ -222,9 +249,9 @@ function LogsPage() {
         </Grid>
 
         <Grid item md={8} xs={12}>
-          <Typography variant="h6" gutterBottom>
+          {/* <Typography variant="h6" gutterBottom>
             {mode ? "Work logs" : "Voucher logs"}
-          </Typography>
+          </Typography> */}
           {mode ? (
             <CustomTable
               headers={WORK_TABLE_HEADERS}
