@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 
 import {
   Box,
@@ -8,12 +7,11 @@ import {
   CardContent,
   Grid,
   Stack,
-  Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/app/components/CustomTable";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import LogInput from "./logInput";
@@ -35,53 +33,47 @@ const VOUCHER_TABLE_HEADERS = [
 ];
 
 function LogsPage() {
-  
   const [users, setUsers] = useState([]);
   const [workGroups, setWorkGroups] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [voucherLogs, setVoucherLogs] = useState([]);
-  
+
   const [mode, setMode] = useState(true);
-  const [vouchersEarned, setVouchersEarned] = useState(0)
+  const [vouchersEarned, setVouchersEarned] = useState(0);
   const [vouchersUsed, setVouchersUsed] = useState(0);
-  
-  
+
   const [refresh, setRefresh] = useState(false);
-  
+
   const session = useSession();
-  
+
   useEffect(() => {
-    
     prismaRequest({
       model: "user",
       method: "find",
       request: {
         where: {
-          active: true
-        }
+          active: true,
+        },
       },
       callback: (data) => {
         if (data.data.length != 0) {
-          // console.log(data);
           setUsers(
             data.data.map((e) => {
-              return { ...e, name: `${e.firstName} ${e.lastName}`}
+              return { ...e, name: `${e.firstName} ${e.lastName}` };
             })
-          )
-        } 
-      }
+          );
+        }
+      },
     });
-    
+
     prismaRequest({
       model: "workGroup",
       method: "find",
       callback: (data) => setWorkGroups(data.data),
     });
-    
-  }, [])
-  
+  }, []);
+
   useEffect(() => {
-  
     prismaRequest({
       model: "workLog",
       method: "find",
@@ -101,7 +93,7 @@ function LogsPage() {
         const newLogs = data.data.map((e) => {
           const p1 = e.LoggedByUser;
           const p2 = e.LoggedForUser;
-          const p1name = p1 ? `${p1.firstName} ${p1.lastName}` : null
+          const p1name = p1 ? `${p1.firstName} ${p1.lastName}` : null;
           const p2name = p2 ? `${p2.firstName} ${p2.lastName}` : null;
           return {
             ...e,
@@ -109,10 +101,7 @@ function LogsPage() {
             loggedFor: p2name,
             vouchers: e.duration * 0.5,
             workedAt_num: parseISO(e.workedAt).getTime(),
-            workedAt: format(
-              parseISO(e.workedAt),
-              "dd.MM HH:mm"
-            ).toLowerCase(),
+            workedAt: format(parseISO(e.workedAt), "dd.MM HH:mm").toLowerCase(),
           };
         });
 
@@ -129,11 +118,9 @@ function LogsPage() {
         setVouchersEarned(parseFloat(newVouchers));
       },
     });
-    
-  }, [refresh])
-  
+  }, [refresh]);
+
   useEffect(() => {
-    
     prismaRequest({
       model: "voucherLog",
       method: "find",
@@ -143,7 +130,7 @@ function LogsPage() {
         },
         where: {
           semesterId: session.data.semester.id,
-        }
+        },
       },
       callback: (data) => {
         if (data.length == 0) return;
@@ -157,26 +144,22 @@ function LogsPage() {
           .reduce((total, e) => {
             return (total += e.amount);
           }, 0.0);
-        
+
         const newLogs = data.data.map((e) => {
           return {
             ...e,
             loggedFor: `${e.User.firstName} ${e.User.lastName}`,
             usedAt_num: parseISO(e.usedAt).getTime(),
-            usedAt: format(
-              parseISO(e.usedAt),
-              "dd MMM 'kl.'HH:mm"
-            ).toLowerCase(),
+            usedAt: format(parseISO(e.usedAt), "dd.MM HH:mm").toLowerCase(),
           };
-        })
+        });
 
         setVouchersUsed(parseFloat(newVouchers));
-        setVoucherLogs(newLogs)
+        setVoucherLogs(newLogs);
       },
     });
-    
-  }, [refresh])
-  
+  }, [refresh]);
+
   const layout = LogInput(
     session,
     users,
@@ -186,14 +169,9 @@ function LogsPage() {
     mode,
     setRefresh
   );
-  
-  if (session.status != "authenticated") {
-    return;
-  }
-  
+
   return (
     <Box>
-      {/* <PageHeader text={mode ? "Work logs" : "Voucher logs"} /> */}
       <PageHeader text="Logs" />
 
       <Grid container spacing={2}>
@@ -249,9 +227,6 @@ function LogsPage() {
         </Grid>
 
         <Grid item md={8} xs={12}>
-          {/* <Typography variant="h6" gutterBottom>
-            {mode ? "Work logs" : "Voucher logs"}
-          </Typography> */}
           {mode ? (
             <CustomTable
               headers={WORK_TABLE_HEADERS}
@@ -269,7 +244,6 @@ function LogsPage() {
       </Grid>
     </Box>
   );
-  
 }
 
-export default authWrapper(LogsPage)
+export default authWrapper(LogsPage);
