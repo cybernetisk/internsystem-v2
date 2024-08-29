@@ -15,10 +15,11 @@ export default class CustomNumberInput extends Component {
         error={error}
         onFocus={(e) => e.target.select()}
         onBlur={(e) => {
-          const value = check(e.target.value) ? 0 : e.target.value;
+          let value = check(e.target.value) ? 0 : e.target.value;
+          if (value === "") value = 0;
           const float = parseFloat(value);
-          const rounded = Math.round(float * 100);
-          setValue(rounded / 100);
+          const rounded = Math.round(float * 10);
+          setValue(rounded / 10);
         }}
         onChange={(e) => {
           const value = e.target.value;
