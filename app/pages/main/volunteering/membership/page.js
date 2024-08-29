@@ -1,18 +1,30 @@
+"use client";
 
-"use client"
-
-import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/app/components/CustomTable";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import { Box, Button, Card, CardContent, Divider, Grid, Stack, Table, TextField, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const MEMBERSHIP_TABLE_HEADERS = [
-  { id: "date_joined", name: "Member since", sortBy: "date_joined_num", flex: 2 },
+  {
+    id: "date_joined",
+    name: "Member since",
+    sortBy: "date_joined_num",
+    flex: 2,
+  },
   { id: "honorary", name: "Honorary", flex: 1 },
   { id: "lifetime", name: "Lifetime", flex: 1 },
   { id: "name", name: "Name", flex: 3 },
@@ -20,19 +32,17 @@ const MEMBERSHIP_TABLE_HEADERS = [
 ];
 
 function MembershipPage() {
-  
   const session = useSession();
 
   const [membershipData, setMembershipData] = useState([]);
   const [tableData, setTableData] = useState([]);
-  
+
   const [numSpecialMembers, setNumSpecialMembers] = useState(0);
   const [search, setSearch] = useState("");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberComment, setNewMemberComment] = useState("");
   const [refresh, setRefresh] = useState(false);
-  
-  
+
   useEffect(() => {
     prismaRequest({
       model: "userMembership",
@@ -48,7 +58,7 @@ function MembershipPage() {
             },
             {
               lifetime: true,
-            }
+            },
           ],
         },
       },
@@ -58,30 +68,29 @@ function MembershipPage() {
         const newMembershipData = data.data.map((e) => {
           return {
             ...e,
-            honorary: e.honorary ? "x" : "",
-            lifetime: e.lifetime ? "x" : "",
             date_joined_num: parseISO(e.date_joined).getTime(),
             date_joined: format(
               parseISO(e.date_joined),
-              "dd MMM yyyy 'kl.'HH:mm"
+              "dd.MM yyyy"
             ).toLowerCase(),
           };
         });
-        
+
         const newNumSpecialMembers = data.data.filter((e) => {
-          return e.honorary || e.lifetime
+          return e.honorary || e.lifetime;
         }).length;
 
         setMembershipData(newMembershipData);
         setTableData(newMembershipData);
+
         setNumSpecialMembers(newNumSpecialMembers);
       },
     });
-  }, [refresh])
-  
+  }, [refresh]);
+
   const handleFilterTable = (text) => {
     setSearch(text);
-    
+
     if (text != "") {
       setTableData(
         membershipData.filter((e) =>
@@ -91,10 +100,9 @@ function MembershipPage() {
     } else {
       setTableData(membershipData);
     }
-  }
-  
+  };
+
   const addNewMember = async () => {
-    
     const response = await prismaRequest({
       model: "userMembership",
       method: "create",
@@ -104,16 +112,15 @@ function MembershipPage() {
           email: "",
           comments: newMemberComment,
           seller_id: session.data.user.id,
-          semester_id: session.data.semester.id
-        }
+          semester_id: session.data.semester.id,
+        },
       },
       callback: (data) => {
         setRefresh(!refresh);
-      }
-    })
-    
-  }
-   
+      },
+    });
+  };
+
   return (
     <Box>
       <PageHeader
@@ -198,11 +205,7 @@ function MembershipPage() {
         </Grid>
 
         <Grid item md={9}>
-          <CustomTable
-            headers={MEMBERSHIP_TABLE_HEADERS}
-            data={tableData}
-            sortBy={"date_joined"}
-          />
+          <CustomTable headers={MEMBERSHIP_TABLE_HEADERS} data={tableData} />
         </Grid>
       </Grid>
     </Box>

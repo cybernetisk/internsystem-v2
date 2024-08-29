@@ -14,7 +14,7 @@ import authWrapper from "@/app/middleware/authWrapper";
 import Link from "next/link";
 import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/app/components/CustomTable";
 import { format, parseISO } from "date-fns";
 
 const FINANCE_TABLES = [
