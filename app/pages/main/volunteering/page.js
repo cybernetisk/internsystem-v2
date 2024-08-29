@@ -23,9 +23,9 @@ import { sanityClient } from "@/sanity/client";
 
 const BUTTON_CONTENT_1 = [
   // { title: "Economy", path: "volunteering/economy" },
-  { title: "Café shifts", path: "/pages/main/volunteering/cafe" },
-  { title: "Membership", path: "/pages/main/volunteering/membership" },
+  // { title: "Café shifts", path: "/pages/main/volunteering/cafe" },
   { title: "Vouchers", path: "/pages/main/volunteering/logs" },
+  { title: "Membership", path: "/pages/main/volunteering/membership" },
   { title: "Website content", path: "/studio" },
 ];
 
@@ -165,7 +165,7 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numV
       <Grid item md={2} xs>
         <Card elevation={3}>
           <CardContent>
-            <PageHeader text="TOOLS" variant="body1" gutter={false} />
+            <PageHeader text="Resources" variant="body1" gutter={false} />
             {buttonGroup1}
           </CardContent>
         </Card>
