@@ -34,6 +34,9 @@ model User {
   updatedAt                              DateTime          @updatedAt
   firstName                              String?
   lastName                               String?
+  recruitedById                          String?
+  recruitedByUser                        User?             @relation("UserToRecruiter", fields: [recruitedById], references: [id])
+  recruitedUsers                         User[]            @relation("UserToRecruiter")
   ActivateToken                          ActivateToken[]
   sessions                               Session[]
   ShiftCafe_ShiftCafe_shiftManagerToUser ShiftCafe[]       @relation("ShiftCafe_shiftManagerToUser")
