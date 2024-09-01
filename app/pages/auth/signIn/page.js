@@ -1,12 +1,13 @@
 
 "use client"
 
-import { useState } from "react";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 import { cybTheme } from "./../../../components/themeCYB";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { normalizeEmail } from "./../../../components/Login/authUtil";
 
 
 export default function SignInPage() {
@@ -31,11 +32,16 @@ export default function SignInPage() {
       return
     }
     
-    const response = await signIn("email", { email: email, redirect: false });
+    const normalizedEmail = normalizeEmail(email);
+    
+    const response = await signIn("email", {
+      email: normalizedEmail,
+      redirect: false,
+    });
     
     if (response.error == null) {
       setError(false)
-      setResponse("Email sent");
+      setResponse(`Email sent to ${normalizedEmail}`);
     }
     else {
       setError(true);
