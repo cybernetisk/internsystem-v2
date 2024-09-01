@@ -1,9 +1,9 @@
-name: Deploy to Production Server
+name: Deploy to dev.cyb.no
 
 on:
   push:
     branches:
-      - main
+      - development
 
 jobs:
   deploy:
@@ -22,9 +22,9 @@ jobs:
     - name: Connect and deploy
       run: |
         ssh -o StrictHostKeyChecking=no ${{ vars.TEMP_SERVER_USER }}@${{ vars.TEMP_SERVER_ADDRESS }} << 'EOF'
-        cd internsystem-v2
+        cd internsystem-v2-dev
         git checkout -f
-        git pull origin main
+        git pull origin development
         cat <<'EOT' > .env.production
         DATABASE_URL = 'mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@localhost:3306/${{ secrets.DATABASE_NAME }}'
         
@@ -45,5 +45,5 @@ jobs:
         npm install
         npx prisma generate
         npm run build
-        npx pm2 restart ISV2_start_script
+        npx pm2 restart ISV2_dev
         EOF

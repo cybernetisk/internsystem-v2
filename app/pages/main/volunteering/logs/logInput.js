@@ -220,8 +220,6 @@ function validateVoucherRequest(
 
 function WorkInput(props) {
   
-  // console.log(props)
-  
   return (
     <Stack spacing={2}>
       <CustomAutoComplete
@@ -250,7 +248,7 @@ function WorkInput(props) {
       />
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
         <DateTimePicker
-          label="Start time"
+          label="work date/time"
           defaultValue={props.selectedDateTime}
           ampm={false}
           disableOpenPicker
@@ -274,7 +272,7 @@ function WorkInput(props) {
         error={props.descriptionError}
       />
       <Button variant="outlined" onClick={props.handleWorkClick}>
-        Register
+        Register work
       </Button>
     </Stack>
   );
@@ -315,8 +313,6 @@ function VoucherInput(props) {
           </Typography>
           <Typography variant="caption">25kr / voucher</Typography>
         </Grid>
-        {/* <Grid item container md={4} xs={12} direction="column" alignContent="flex-start" justifyContent="flex-end">
-        </Grid> */}
       </Grid>
       <CustomNumberInput
         label={"# of vouchers"}
@@ -335,7 +331,7 @@ function VoucherInput(props) {
         onChange={(e) => props.setDescriptionVoucher(e.target.value)}
       />
       <Button variant="outlined" onClick={props.handleVoucherClick}>
-        Use
+        Use voucher
       </Button>
     </Stack>
   );

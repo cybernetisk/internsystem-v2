@@ -19,7 +19,7 @@ import Link from "next/link";
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import { setTimeout } from "timers";
 import { cybTheme } from "@/app/components/themeCYB";
-import CustomTable from "@/app/components/table";
+import CustomTable from "@/app/components/CustomTable";
 import { format, parseISO } from "date-fns";
 
 const TABLE_HEADERS_LOGS = [
