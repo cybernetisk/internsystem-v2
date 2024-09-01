@@ -6,20 +6,24 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   Grid,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
+import CafeShiftScheduler from "../../../../components/calendar/CafeShiftScheduler";
+import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
+import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
+import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import authWrapper from "@/app/middleware/authWrapper";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { useEffect, useState } from "react";
 import locale from "date-fns/locale/en-GB";
-import CafeShiftScheduler from "@/app/components/calendar/CafeShiftScheduler";
 import { Circle } from "@mui/icons-material";
+import { addWeeks } from "date-fns";
 
 
 function CafePage() {
@@ -33,7 +37,11 @@ function CafePage() {
   
   const [selectedShift, setSelectedShift] = useState(null);
   const [selectedDay, setSelectedDay] = useState(new Date());
+  const [comment, setComment] = useState("");
   const [refresh, setRefresh] = useState(false);
+  
+  const [repeat, setRepeat] = useState(false);
+  const [numberRepeats, setNumberRepeats] = useState(0);
   
   useEffect(() => {
     prismaRequest({
@@ -79,8 +87,43 @@ function CafePage() {
   
   const manageShift = async () => {
     
-    console.log(shiftManager, shiftWorker1, shiftWorker2)
+    const sendRequest = async (date, id) => {
+      const response = await fetch("/api/data/updateORCreateShift", {
+        method: "post",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          selectedDay: date,
+          comment: comment,
+          shiftManagerId: shiftManager ? shiftManager.id : null,
+          shiftWorker1Id: shiftWorker1 ? shiftWorker1.id : null,
+          shiftWorker2Id: shiftWorker2 ? shiftWorker2.id : null,
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // console.log(data);
+        setSelectedShift(data.data);
+        setRefresh(!refresh);
+      }
+    }
     
+    // console.log(selectedShift)
+    
+    // console.log(shiftManager, shiftWorker1, shiftWorker2, selectedShift?.id);
+    
+    if (repeat && numberRepeats > 0) {
+      for (let i = 1; i <= numberRepeats; i++) {
+        sendRequest(addWeeks(selectedDay, i), null);
+      }
+    }
+    sendRequest(selectedDay, selectedShift?.id ? selectedShift.id : null);
+  }
+  
+  const manageShiftClear = async () => {
     const response = await fetch("/api/data/updateORCreateShift", {
       method: "post",
       mode: "cors",
@@ -88,21 +131,19 @@ function CafePage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        selectedShiftId: selectedShift?.id,
         selectedDay: selectedDay,
-        shiftManagerId: shiftManager ? shiftManager.id : null,
-        shiftWorker1Id: shiftWorker1 ? shiftWorker1.id : null,
-        shiftWorker2Id: shiftWorker2 ? shiftWorker2.id : null,
+        shiftManagerId: null,
+        shiftWorker1Id: null,
+        shiftWorker2Id: null,
       }),
     });
     
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
+      setSelectedShift(data.data);
       setRefresh(!refresh);
     }
-    
-    
   }
   
   return (
@@ -117,16 +158,18 @@ function CafePage() {
         <Grid item xs>
           {CafeShiftScheduler({
             shifts,
+            selectedShift,
             setSelectedShift,
             setSelectedDay,
             setShiftManager,
             setShiftWorker1,
             setShiftWorker2,
+            setComment,
           })}
         </Grid>
 
         <Grid item xs={4} height="100%">
-          <Stack direction="column" spacing={1}>
+          <Stack direction="column" spacing={2}>
             <Card elevation={3}>
               <CardContent>
                 <PageHeader variant="h6" text="Manage shift" />
@@ -143,7 +186,7 @@ function CafePage() {
                       error={false}
                     />
                     <CustomAutoComplete
-                      label="volunteer"
+                      label="Volunteer"
                       dataLabel="firstName"
                       subDataLabel="email"
                       data={users}
@@ -152,7 +195,7 @@ function CafePage() {
                       error={false}
                     />
                     <CustomAutoComplete
-                      label="volunteer"
+                      label="Volunteer"
                       dataLabel="firstName"
                       subDataLabel="email"
                       data={users}
@@ -169,12 +212,45 @@ function CafePage() {
                         defaultValue={selectedDay}
                         value={selectedDay}
                         ampm={false}
+                        disabled
                         disableOpenPicker
                       />
                     </LocalizationProvider>
+                    <TextField
+                      multiline
+                      rows={2}
+                      InputLabelProps={{ shrink: true }}
+                      label="Comment"
+                      size="small"
+                      value={comment}
+                      onChange={(event) => setComment(event.target.value)}
+                    />
+                    
                     <Button variant="outlined" onClick={manageShift}>
                       Save
                     </Button>
+                    <Button variant="outlined" onClick={manageShiftClear}>
+                      Clear
+                    </Button>
+                    <Stack direction="row" alignItems="center">
+                      <Typography>Repeat shift</Typography>
+                      <Checkbox
+                        checked={repeat}
+                        onChange={(event) => setRepeat(event.target.checked)}
+                      />
+                    </Stack>
+
+                    {repeat ? (
+                      <CustomNumberInput
+                        label="# of weeks"
+                        value={numberRepeats}
+                        setValue={setNumberRepeats}
+                        check={(data) => data.match(/[^0-9]/)}
+                        // error={props.hoursError}
+                      />
+                    ) : (
+                      <></>
+                    )}
                   </Stack>
                 </Stack>
               </CardContent>
