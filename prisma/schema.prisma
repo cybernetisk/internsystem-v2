@@ -27,7 +27,7 @@ model VerificationToken {
 
 model User {
   id                                     String            @id @unique(map: "recruitedBy") @default(cuid())
-  email                                  String?           @unique
+  email                                  String            @unique
   emailVerified                          DateTime?
   active                                 Boolean           @default(false)
   createdAt                              DateTime          @default(now())

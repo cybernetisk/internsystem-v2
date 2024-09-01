@@ -4,7 +4,7 @@
 import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
-import { randomBytes } from "crypto";
+import { normalizeEmail } from "@/app/components/Login/authUtil";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -43,7 +43,7 @@ export default function registerPage() {
       setResponse(responseSVM.error);
       return;
     } else {
-      setResponse("User created. Email verification sent!") 
+      setResponse(`User created. Email sent to ${responseSVM.email}`);
     }
   }
   
@@ -129,21 +129,23 @@ const CheckedTextField = (title, textValue, textCallback) => {
 // 
 async function checkUserExists(email, debug) {
   
+  const normalizedEmail = normalizeEmail(email);
+  
   const response = await prismaRequest({
     model: "user",
     method: "find",
     request: {
       where: {
-        email: email,
+        email: normalizedEmail,
       },
     },
-    debug: debug
+    debug: debug,
   });
   
   if (!response.ok) {
     return { ok: false, error: "Unable to connect to database" };
   } else if (response.data.length > 0) {
-    return { ok: false, error: "Email already exists in database" };
+    return { ok: false, error: `${normalizedEmail} already exists in database` };
   }
   
   return {
@@ -154,6 +156,8 @@ async function checkUserExists(email, debug) {
 // 
 async function createUser(firstName, lastName, email, debug) {
   
+  const normalizedEmail = normalizeEmail(email);
+  
   const response = await fetch("/api/createUser/", {
     method: "post",
     mode: "cors",
@@ -163,9 +167,9 @@ async function createUser(firstName, lastName, email, debug) {
     body: JSON.stringify({
       firstName: firstName,
       lastName: lastName,
-      email: email,
+      email: normalizedEmail,
     }),
-  })
+  });
   
   if (debug) console.log("createUser response:", response);
   
