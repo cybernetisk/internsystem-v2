@@ -13,14 +13,14 @@ export async function POST(req) {
     const args = await req.json();
 
     const {
-      selectedShiftId,
       selectedDay,
       shiftManagerId,
       shiftWorker1Id,
       shiftWorker2Id,
+      comment,
     } = args;
     
-    console.log(args);
+    // console.log(args);
     
     let title;
     let shiftPosition;
@@ -30,40 +30,53 @@ export async function POST(req) {
     
     switch (selectedStartTime) {
       case 10:
-        title = "Opening Shift";
         shiftPosition = 0;
         break;
       case 12:
-        title = "Middle Shift";
         shiftPosition = 1;
         break;
       case 14:
-        title = "Closing Shift";
         shiftPosition = 2;
         break;
     }
     
     try {
+      
+      
+      const shiftExists = await prisma.shiftCafe.findFirst({
+        where: {
+          startAt: selectedDay,
+        },
+      });
+      
+      // console.log(shiftExists);
+      
       let data;
       
-      if (selectedShiftId && hasWorkers) {
+      // shift and workers exists
+      if (hasWorkers && shiftExists) {
         data = await prisma.shiftCafe.update({
           where: {
-            id: selectedShiftId
+            id: shiftExists.id,
+            // startAt: selectedDay,
           },
           data: {
             title: title,
-            startAt: selectedDay,
+            comment: comment,
             shiftPosition: shiftPosition,
             shiftManager: shiftManagerId,
             shiftWorker1: shiftWorker1Id,
             shiftWorker2: shiftWorker2Id,
-          }
+          },
         });
-      } else if (hasWorkers) {
+      }
+
+      // workers exist
+      else if (hasWorkers && !shiftExists) {
         data = await prisma.shiftCafe.create({
           data: {
             title: title,
+            comment: comment,
             startAt: selectedDay,
             shiftPosition: shiftPosition,
             shiftManager: shiftManagerId,
@@ -71,12 +84,13 @@ export async function POST(req) {
             shiftWorker2: shiftWorker2Id,
           },
         });
-      } else {
+      } else if (shiftExists) {
         data = await prisma.shiftCafe.delete({
           where: {
-            id: selectedShiftId
-          }
-        })
+            id: shiftExists.id,
+            // startAt: selectedDay,
+          },
+        });
       }
 
       return NextResponse.json({ data: data });

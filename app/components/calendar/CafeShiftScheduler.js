@@ -2,13 +2,11 @@
 "use client"
 
 import {
-  Box,
   Button,
   Card,
   CardActionArea,
   CardContent,
   Grid,
-  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -19,6 +17,9 @@ import {
   isToday,
   subWeeks,
   addWeeks,
+  isSameMonth,
+  isSameDay,
+  addHours,
 } from "date-fns";
 import {
   generateCalendarData,
@@ -29,20 +30,20 @@ import {
 import React, { useState, useMemo } from "react";
 import { enGB, nb } from "date-fns/locale";
 import { cybTheme } from "../themeCYB";
-import { PageBuilderSkeleton } from "../sanity/PageBuilder";
 
-const CARD_HEIGHT = "14vh";
 const NUM_DAYS = 5;
 
-const CafeShiftScheduler = (props) => {
+export default function CafeShiftScheduler(props) {
   
   const {
     shifts,
+    selectedShift,
     setSelectedShift,
     setSelectedDay,
     setShiftManager,
     setShiftWorker1,
-    setShiftWorker2
+    setShiftWorker2,
+    setComment,
   } = props
   
   const [focusedDay, setFocusedDay] = useState(new Date());
@@ -71,27 +72,56 @@ const CafeShiftScheduler = (props) => {
     setFocusedDay(modeOperations[mode](focusedDay, 1));
   }
 
-  const getDayColor = (day, check) => {
+  const getDayColor = (day, check, inactiveColor="GrayText") => {
     if (isToday(day)) return cybTheme.palette.primary.main;
-    if (!check(day, focusedDay)) return "GrayText";
+    if (!check(day, focusedDay)) return inactiveColor;
     return "";
   };
+  
+  const getShiftColor = (shift) => {
+    let shiftReady = 0;
+    shiftReady += shift.shiftManager ? 1 : 0;
+    shiftReady += shift.shiftWorker1 ? 1 : 0;
+    shiftReady += shift.shiftWorker2 ? 1 : 0;
+    switch (shiftReady) {
+      case 0:
+        return cybTheme.palette.error.main;
+      case 1:
+        return cybTheme.palette.warning.main;
+      case 2:
+        return cybTheme.palette.warning.main;
+      case 3:
+        return cybTheme.palette.success.main;
+    }
+  }
   
   const renderHeader = () => (
     <Grid container item direction="row">
       {focusedWeekdays.map((day, i) => (
         <Grid item xs={12 / focusedWeekdays.length} key={`header_${i}`}>
           <Card square>
-            <Box sx={{ p: 1 }}>
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              spacing={1}
+              sx={{ p: 1 }}
+            >
               <Typography
                 variant="body1"
-                color={getDayColor(day.value, isToday)}
+                color={getDayColor(day.value, isToday, "")}
               >
-                {mode == "month"
-                  ? format(day.value, "EE")
-                  : format(day.value, "EE do")}
+                {format(day.value, "EE")}
               </Typography>
-            </Box>
+
+              {mode === "week" ? (
+                <Typography
+                  color={getDayColor(day.value, isToday)}
+                >
+                  {format(day.value, " do")}
+                </Typography>
+              ) : (
+                <></>
+              )}
+            </Stack>
           </Card>
         </Grid>
       ))}
@@ -104,90 +134,59 @@ const CafeShiftScheduler = (props) => {
         {week
           .filter((day) => !day.isWeekend)
           .map((day, j) => (
-              <Grid item xs={12 / NUM_DAYS} key={`week${i}_day${j}_grid`}>
-                <Card square key={`week${i}_day${j}_card`}>
-                  <CardActionArea
-                    disabled={day.header}
-                    onClick={() => {
-                      setFocusedDay(day.value);
-                      setMode("week");
-                    }}
-                    key={`week${i}_day${j}_caa`}
+            <Grid item xs key={`week${i}_day${j}_grid`}>
+              <Card
+                square
+                key={`week${i}_day${j}_card`}
+                elevation={isSameDay(focusedDay, day.value) ? 6 : 1}
+              >
+                <CardActionArea
+                  onClick={() => {
+                    setFocusedDay(day.value);
+                    setMode("week");
+                  }}
+                  key={`week${i}_day${j}_caa`}
+                >
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    sx={{ p: 1 }}
+                    key={`week${i}_day${j}_stack`}
                   >
+                    <Typography
+                      variant="body2"
+                      color={getDayColor(day.value, isSameMonth)}
+                      key={`week${i}_day${j}_typography`}
+                    >
+                      {format(day.value, "dd", { locale: nb })}
+                    </Typography>
+
                     <Stack
                       direction="column"
-                      sx={{ p: 1 }}
-                      height={CARD_HEIGHT}
-                      justifyContent="space-between"
-                      key={`week${i}_day${j}_stack`}
+                      justifyContent="center"
+                      alignItems="start"
+                      key={`week${i}_day${j}_stack2`}
                     >
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        key={`week${i}_day${j}_stack`}
-                      >
+                      {day.shifts.map((shift, l) => (
                         <Typography
-                          variant="body2"
-                          // fontWeight={isToday(day.value) ? "bold" : ""}
-                          // color={getDayColor(day.value, isSameMonth)}
-                          key={`week${i}_day${j}_typography`}
+                          variant="caption"
+                          color={getShiftColor(shift)}
+                          textAlign="center"
+                          key={`week${i}_day${j}_shift${l}_typography`}
                         >
-                          {format(day.value, "dd", { locale: nb })}
+                          {format(shift.startAt, "HH", { locale: nb })}
+                          {" - "}
+                          {format(addHours(shift.startAt, 2), "HH", {
+                            locale: nb,
+                          })}
                         </Typography>
-                      </Stack>
-                      <Stack
-                        direction="column"
-                        justifyContent="center"
-                        alignItems="start"
-                        key={`week${i}_day${j}_stack2`}
-                      >
-                        {day.shifts.map((shift, l) => {
-                          let shiftReady = 0;
-                          let shiftColour;
-
-                          shiftReady += shift.shiftManager ? 1 : 0;
-                          shiftReady += shift.shiftWorker1 ? 1 : 0;
-                          shiftReady += shift.shiftWorker2 ? 1 : 0;
-
-                          switch (shiftReady) {
-                            case 0:
-                              shiftColour = cybTheme.palette.error.main;
-                              break;
-                            case 1:
-                              shiftColour = cybTheme.palette.warning.main;
-                              break;
-                            case 2:
-                              shiftColour = cybTheme.palette.warning.main;
-                              break;
-                            case 3:
-                              shiftColour = cybTheme.palette.success.main;
-                              break;
-                          }
-
-                          return (
-                            <Stack
-                              direction="row"
-                              alignItems="center"
-                              key={`week${i}_day${j}_shift${l}_stack`}
-                            >
-                              <Typography
-                                variant="caption"
-                                color={shiftColour}
-                                textAlign="center"
-                                key={`week${i}_day${j}_shift${l}_typography`}
-                              >
-                                {shift.title ? shift.title : "X"}
-                              </Typography>
-                            </Stack>
-                          );
-                        })}
-                      </Stack>
+                      ))}
                     </Stack>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            )
-          )}
+                  </Stack>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
       </Grid>
     ));
   };
@@ -221,10 +220,13 @@ const CafeShiftScheduler = (props) => {
                       square
                       sx={{ overflow: "hidden", lineClamp: 1 }}
                       key={`week${i}_day${j}_shift${l}_card`}
+                      elevation={selectedShift === shift ? 6 : 1}
                     >
                       <CardActionArea
                         key={`week${i}_day${j}_shift${l}_caa`}
                         onClick={() => {
+                          // console.log(selectedShift, shift);
+
                           setSelectedDay(shift.startAt);
 
                           if (shift.isReal) {
@@ -232,14 +234,18 @@ const CafeShiftScheduler = (props) => {
                             setShiftManager(shift.shiftManager);
                             setShiftWorker1(shift.shiftWorker1);
                             setShiftWorker2(shift.shiftWorker2);
+                            setComment(shift.comment ? shift.comment : "")
                           } else {
-                            setSelectedShift(null);
+                            setSelectedShift(shift);
+                            setShiftManager(null);
+                            setShiftWorker1(null);
+                            setShiftWorker2(null);
+                            setComment("")
                           }
                         }}
                       >
                         <Stack
                           sx={{ p: 1 }}
-                          height={CARD_HEIGHT}
                           justifyContent="space-between"
                           key={`week${i}_day${j}_shift${l}_box`}
                         >
@@ -256,7 +262,7 @@ const CafeShiftScheduler = (props) => {
                                 variant="caption"
                                 color={
                                   s
-                                    ? cybTheme.palette.success.main
+                                    ? getShiftColor(shift)
                                     : cybTheme.palette.error.main
                                 }
                                 key={`week${i}_day${j}_shift${l}_pos${k}`}
@@ -285,10 +291,13 @@ const CafeShiftScheduler = (props) => {
           <Grid
             container
             direction={{ xs: "column", md: "row" }}
-            justifyContent="space-between"
-            rowGap={1}
+            // justifyContent="space-between"
+            rowGap={{ xs: 1, md: 0 }}
+            columnGap={{ xs: 0, md: 1 }}
+            // spacing={2}
+            // columnGap={1}
           >
-            <Grid item container direction="row" alignItems="center" xs={5}>
+            <Grid item container direction="row" alignItems="center" xs={5} md>
               <Grid item xs>
                 <Button
                   variant="outlined"
@@ -315,24 +324,16 @@ const CafeShiftScheduler = (props) => {
                 </Button>
               </Grid>
             </Grid>
+            
             <Grid
               item
               container
               direction="row"
               justifyContent={{ xs: "space-between", md: "end" }}
               xs
+              md={4}
             >
-              <Grid item xs md={3}>
-                <Button
-                  variant="text"
-                  size="small"
-                  fullWidth
-                  onClick={() => setFocusedDay(new Date())}
-                >
-                  Today
-                </Button>
-              </Grid>
-              <Grid item xs md={3}>
+              <Grid item xs>
                 <Button
                   variant={mode === "month" ? "contained" : "outlined"}
                   size="small"
@@ -342,7 +343,7 @@ const CafeShiftScheduler = (props) => {
                   Month
                 </Button>
               </Grid>
-              <Grid item xs md={3}>
+              <Grid item xs>
                 <Button
                   variant={mode === "week" ? "contained" : "outlined"}
                   size="small"
@@ -353,18 +354,25 @@ const CafeShiftScheduler = (props) => {
                 </Button>
               </Grid>
             </Grid>
+            
+            <Grid item xs md={2}>
+              {/* <Grid item xs md={3}>
+              </Grid> */}
+              <Button
+                variant="outlined"
+                size="small"
+                fullWidth
+                onClick={() => setFocusedDay(new Date())}
+              >
+                Today
+              </Button>
+            </Grid>
           </Grid>
 
           {/* Calendar view */}
           <Grid container direction="column" rowGap={1}>
-            {shifts.length !== 0 ? (
-              <Box>
-                {renderHeader()}
-                {mode === "month" ? renderMonthBody() : renderWeekBody()}
-              </Box>
-            ) : (
-              <PageBuilderSkeleton />
-            )}
+            {renderHeader()}
+            {mode === "month" ? renderMonthBody() : renderWeekBody()}
           </Grid>
         </Stack>
       </CardContent>
@@ -372,4 +380,4 @@ const CafeShiftScheduler = (props) => {
   );
 };
 
-export default CafeShiftScheduler;
+// export default CafeShiftScheduler;

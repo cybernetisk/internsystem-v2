@@ -31,7 +31,7 @@ export async function POST(req) {
       console.error("Error with sending email: ", error);
     }
     
-    return NextResponse.json({ success: success, link: link }, { status: 200 });
+    return NextResponse.json({ success: success, email: user.email,  link: link }, { status: 200 });
   }
 
   return NextResponse.json(
