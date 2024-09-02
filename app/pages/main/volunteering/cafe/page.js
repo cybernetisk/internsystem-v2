@@ -279,4 +279,5 @@ function CafePage() {
   );
 }
 
-export default authWrapper(CafePage)
+// export default authWrapper(CafePage)
+export default CafePage

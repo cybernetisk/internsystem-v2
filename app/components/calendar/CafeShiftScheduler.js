@@ -2,6 +2,7 @@
 "use client"
 
 import {
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -99,15 +100,17 @@ export default function CafeShiftScheduler(props) {
     <Grid container item direction="row">
       {focusedWeekdays.map((day, i) => (
         <Grid item xs={12 / focusedWeekdays.length} key={`header_${i}`}>
-          <Card square>
+          <Card square key={`header_${i}_card`}>
             <Stack
               direction={{ xs: "column", md: "row" }}
               spacing={1}
               sx={{ p: 1 }}
+              key={`header_${i}_stack`}
             >
               <Typography
                 variant="body1"
                 color={getDayColor(day.value, isToday, "")}
+                key={`header_${i}_typography`}
               >
                 {format(day.value, "EE")}
               </Typography>
@@ -115,11 +118,12 @@ export default function CafeShiftScheduler(props) {
               {mode === "week" ? (
                 <Typography
                   color={getDayColor(day.value, isToday)}
+                  key={`header_${i}_typography_two`}
                 >
                   {format(day.value, " do")}
                 </Typography>
               ) : (
-                <></>
+                <React.Fragment key={`header_${i}_typography_two`}/>
               )}
             </Stack>
           </Card>
@@ -168,18 +172,36 @@ export default function CafeShiftScheduler(props) {
                       key={`week${i}_day${j}_stack2`}
                     >
                       {day.shifts.map((shift, l) => (
-                        <Typography
-                          variant="caption"
-                          color={getShiftColor(shift)}
-                          textAlign="center"
-                          key={`week${i}_day${j}_shift${l}_typography`}
+                        <Box
+                          key={`week${i}_day${j}_shift${l}_box`}
                         >
-                          {format(shift.startAt, "HH", { locale: nb })}
-                          {" - "}
-                          {format(addHours(shift.startAt, 2), "HH", {
-                            locale: nb,
-                          })}
-                        </Typography>
+                          <Typography
+                            variant="caption"
+                            color={getShiftColor(shift)}
+                            textAlign="center"
+                            display={{ xs: "block", md: "none" }}
+                            key={`week${i}_day${j}_shift${l}_typography_small`}
+                          >
+                            {format(shift.startAt, "HH", { locale: nb })}
+                            {" - "}
+                            {format(addHours(shift.startAt, 2), "HH", {
+                              locale: nb,
+                            })}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            color={getShiftColor(shift)}
+                            textAlign="center"
+                            display={{ xs: "none", md: "block" }}
+                            key={`week${i}_day${j}_shift${l}_typography_big`}
+                          >
+                            {format(shift.startAt, "HH:mm", { locale: nb })}
+                            {" - "}
+                            {format(addHours(shift.startAt, 2), "HH:mm", {
+                              locale: nb,
+                            })}
+                          </Typography>
+                        </Box>
                       ))}
                     </Stack>
                   </Stack>
@@ -234,13 +256,13 @@ export default function CafeShiftScheduler(props) {
                             setShiftManager(shift.shiftManager);
                             setShiftWorker1(shift.shiftWorker1);
                             setShiftWorker2(shift.shiftWorker2);
-                            setComment(shift.comment ? shift.comment : "")
+                            setComment(shift.comment ? shift.comment : "");
                           } else {
                             setSelectedShift(shift);
                             setShiftManager(null);
                             setShiftWorker1(null);
                             setShiftWorker2(null);
-                            setComment("")
+                            setComment("");
                           }
                         }}
                       >
@@ -258,17 +280,26 @@ export default function CafeShiftScheduler(props) {
                           </Typography>
                           <Stack key={`week${i}_day${j}_shift${l}_stack`}>
                             {curShifts.map((s, k) => (
-                              <Typography
-                                variant="caption"
-                                color={
-                                  s
-                                    ? getShiftColor(shift)
-                                    : cybTheme.palette.error.main
-                                }
-                                key={`week${i}_day${j}_shift${l}_pos${k}`}
-                              >
-                                {s ? getInitials(s.firstName) : "X"}
-                              </Typography>
+                              <Box sx={{ width: "100%", display: "flex" }}>                                
+                                <Typography
+                                  variant="caption"
+                                  noWrap
+                                  sx={{
+                                    flexGrow: 1,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                  color={
+                                    s
+                                      ? getShiftColor(shift)
+                                      : cybTheme.palette.error.main
+                                  }
+                                  key={`week${i}_day${j}_shift${l}_pos${k}`}
+                                >
+                                  {s ? getInitials(s.firstName) : "X"}
+                                </Typography>
+                              </Box>
                             ))}
                           </Stack>
                         </Stack>

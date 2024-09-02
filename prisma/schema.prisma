@@ -40,13 +40,15 @@ model User {
   ShiftCafe_ShiftCafe_shiftManagerToUser ShiftCafe[]       @relation("ShiftCafe_shiftManagerToUser")
   ShiftCafe_ShiftCafe_shiftWorker1ToUser ShiftCafe[]       @relation("ShiftCafe_shiftWorker1ToUser")
   ShiftCafe_ShiftCafe_shiftWorker2ToUser ShiftCafe[]       @relation("ShiftCafe_shiftWorker2ToUser")
-  User                                   User              @relation("UserToUser", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruitedById")
-  other_User                             User?             @relation("UserToUser")
+  User                                   User?             @relation("UserToUser", fields: [recruitedById], references: [id], onUpdate: NoAction, map: "recruitedById")
+  other_User                             User[]            @relation("UserToUser")
   roles                                  UserRole[]
   UserToWorkGroup                        UserToWorkGroup[]
   VoucherLog                             VoucherLog[]
   loggedByUser                           WorkLog[]         @relation("WorkLog_loggedByToUser")
   LoggedForUser                          WorkLog[]         @relation("WorkLog_loggedForToUser")
+
+  @@index([recruitedById], map: "recruitedById_idx")
 }
 
 model Role {
