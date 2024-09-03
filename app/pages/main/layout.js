@@ -1,4 +1,3 @@
-
 "use client";
 
 import "./../../globals.css";
@@ -16,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { NavBar } from "@/app/components/layout/AppBar";
 import { cybTheme } from "@/app/components/themeCYB";
 import LayoutFooter from "@/app/components/layout/Footer";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const NavItems = [
   { id: "home", path: "home", name: "Home", icon: <Home /> },
@@ -29,7 +29,6 @@ const NavItems = [
 ];
 
 export default function AppLayout({ children }) {
-  
   const pathname = usePathname();
 
   return (
@@ -54,13 +53,17 @@ export default function AppLayout({ children }) {
               component={Paper}
               elevation={1}
               square
+              disableGutters={useMediaQuery(cybTheme.breakpoints.down("md"))}
               sx={{
                 minHeight: "100vh",
                 p: 2,
-                boxShadow: 0
+                boxShadow: 0,
               }}
             >
-              <Container sx={{ mb: 3 }}>
+              <Container
+                sx={{ mb: 3 }}
+                disableGutters={useMediaQuery(cybTheme.breakpoints.down("md"))}
+              >
                 <SessionProvider>{children}</SessionProvider>
               </Container>
             </Container>
