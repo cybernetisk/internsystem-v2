@@ -42,14 +42,11 @@ export async function POST(req) {
     
     try {
       
-      
       const shiftExists = await prisma.shiftCafe.findFirst({
         where: {
           startAt: selectedDay,
         },
       });
-      
-      // console.log(shiftExists);
       
       let data;
       
@@ -88,7 +85,6 @@ export async function POST(req) {
         data = await prisma.shiftCafe.delete({
           where: {
             id: shiftExists.id,
-            // startAt: selectedDay,
           },
         });
       }

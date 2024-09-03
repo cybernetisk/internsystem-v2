@@ -8,6 +8,7 @@ import {
   CardActionArea,
   CardContent,
   Grid,
+  Icon,
   Stack,
   Typography,
 } from "@mui/material";
@@ -31,6 +32,8 @@ import {
 import React, { useState, useMemo } from "react";
 import { enGB, nb } from "date-fns/locale";
 import { cybTheme } from "../themeCYB";
+import { Circle } from "@mui/icons-material";
+import CommentIcon from '@mui/icons-material/Comment';
 
 const NUM_DAYS = 5;
 
@@ -86,11 +89,14 @@ export default function CafeShiftScheduler(props) {
     shiftReady += shift.shiftWorker2 ? 1 : 0;
     switch (shiftReady) {
       case 0:
-        return cybTheme.palette.error.main;
+        // return cybTheme.palette.error.main;
+        return "grey";
       case 1:
         return cybTheme.palette.warning.main;
+      // return "grey";
       case 2:
         return cybTheme.palette.warning.main;
+      // return "grey";
       case 3:
         return cybTheme.palette.success.main;
     }
@@ -123,7 +129,7 @@ export default function CafeShiftScheduler(props) {
                   {format(day.value, " do")}
                 </Typography>
               ) : (
-                <React.Fragment key={`header_${i}_typography_two`}/>
+                <React.Fragment key={`header_${i}_typography_two`} />
               )}
             </Stack>
           </Card>
@@ -224,30 +230,28 @@ export default function CafeShiftScheduler(props) {
               container
               item
               xs={12 / NUM_DAYS}
+              sx={{ overflow: "hidden", lineClamp: 1 }}
               direction="column"
               rowGap={1}
               key={`week${i}_day${j}_grid`}
             >
               {day.shifts.map((shift, l) => {
-                
                 const curShifts = [
                   shift.shiftManager,
                   shift.shiftWorker1,
-                  shift.shiftWorker2
-                ]
-                
+                  shift.shiftWorker2,
+                ];
+
                 return (
                   <Grid item key={`week${i}_day${j}_shift${l}_grid`}>
                     <Card
                       square
-                      sx={{ overflow: "hidden", lineClamp: 1 }}
-                      key={`week${i}_day${j}_shift${l}_card`}
                       elevation={selectedShift === shift ? 6 : 1}
+                      key={`week${i}_day${j}_shift${l}_card`}
                     >
                       <CardActionArea
                         key={`week${i}_day${j}_shift${l}_caa`}
                         onClick={() => {
-                          // console.log(selectedShift, shift);
 
                           setSelectedDay(shift.startAt);
 
@@ -267,40 +271,65 @@ export default function CafeShiftScheduler(props) {
                         }}
                       >
                         <Stack
-                          sx={{ p: 1 }}
+                          sx={{
+                            p: 1,
+                            overflow: "hidden",
+                            boxSizing: "border-box",
+                          }}
                           justifyContent="space-between"
                           key={`week${i}_day${j}_shift${l}_box`}
                         >
                           <Typography
                             variant="body2"
-                            fontWeight={isToday(shift.startAt) ? "bold" : ""}
                             key={`week${i}_day${j}_shift_${l}_typography`}
                           >
                             {format(shift.startAt, "HH:mm", { locale: nb })}
                           </Typography>
-                          <Stack key={`week${i}_day${j}_shift${l}_stack`}>
-                            {curShifts.map((s, k) => (
-                              <Box sx={{ width: "100%", display: "flex" }}>                                
-                                <Typography
-                                  variant="caption"
-                                  noWrap
-                                  sx={{
-                                    flexGrow: 1,
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                  color={
-                                    s
-                                      ? getShiftColor(shift)
-                                      : cybTheme.palette.error.main
-                                  }
-                                  key={`week${i}_day${j}_shift${l}_pos${k}`}
+
+                          <Stack
+                            direction="row"
+                            alignItems="end"
+                            justifyContent="space-between"
+                            key={`week${i}_day${j}_shift${l}_stack`}
+                          >
+                            <Stack key={`week${i}_day${j}_shift${l}_stack`}>
+                              {curShifts.map((s, k) => (
+                                <Box
+                                  key={`week${i}_day${j}_shift${l}_pos${k}_box`}
                                 >
-                                  {s ? getInitials(s.firstName) : "X"}
-                                </Typography>
-                              </Box>
-                            ))}
+                                  <Typography
+                                    variant="caption"
+                                    noWrap
+                                    sx={{
+                                      flexGrow: 1,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                    color={s ? getShiftColor(shift) : "gray"}
+                                    key={`week${i}_day${j}_shift${l}_pos${k}_typography_large`}
+                                  >
+                                    {s ? getInitials(s.firstName) : "free"}
+                                  </Typography>
+                                </Box>
+                              ))}
+                            </Stack>
+
+                            {shift.comment && shift.comment !== "" ? (
+                              <CommentIcon
+                                color="grey"
+                                sx={{
+                                  height: 15,
+                                  display: { xs: "none", sm: "block" },
+                                }}
+                                key={`header_${i}_typography_two`}
+                              />
+                            ) : (
+                              <Icon
+                                sx={{ height: 15 }}
+                                key={`header_${i}_typography_two`}
+                              />
+                            )}
                           </Stack>
                         </Stack>
                       </CardActionArea>
@@ -322,11 +351,8 @@ export default function CafeShiftScheduler(props) {
           <Grid
             container
             direction={{ xs: "column", md: "row" }}
-            // justifyContent="space-between"
             rowGap={{ xs: 1, md: 0 }}
             columnGap={{ xs: 0, md: 1 }}
-            // spacing={2}
-            // columnGap={1}
           >
             <Grid item container direction="row" alignItems="center" xs={5} md>
               <Grid item xs>
@@ -355,7 +381,7 @@ export default function CafeShiftScheduler(props) {
                 </Button>
               </Grid>
             </Grid>
-            
+
             <Grid
               item
               container
@@ -385,10 +411,8 @@ export default function CafeShiftScheduler(props) {
                 </Button>
               </Grid>
             </Grid>
-            
+
             <Grid item xs md={2}>
-              {/* <Grid item xs md={3}>
-              </Grid> */}
               <Button
                 variant="outlined"
                 size="small"
@@ -405,10 +429,25 @@ export default function CafeShiftScheduler(props) {
             {renderHeader()}
             {mode === "month" ? renderMonthBody() : renderWeekBody()}
           </Grid>
+
+          <Card>
+            <Grid container spacing={0} sx={{ p: 1}}>
+              <Grid item container direction="row" alignItems="center">
+                <Circle sx={{ height: 15 }} color="success" />
+                <Typography variant="caption">= Shift is full</Typography>
+              </Grid>
+              <Grid item container direction="row" alignItems="center">
+                <Circle sx={{ height: 15 }} color="warning" />
+                <Typography variant="caption">= Shift is open for help</Typography>
+              </Grid>
+              <Grid item container direction="row" alignItems="center">
+                <Circle sx={{ height: 15 }} color="grey" />
+                <Typography variant="caption">= Shift is empty </Typography>
+              </Grid>
+            </Grid>
+          </Card>
         </Stack>
       </CardContent>
     </Card>
   );
 };
-
-// export default CafeShiftScheduler;

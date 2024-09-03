@@ -87,7 +87,7 @@ function CafePage() {
   
   const manageShift = async () => {
     
-    const sendRequest = async (date, id) => {
+    const sendRequest = async (date) => {
       const response = await fetch("/api/data/updateORCreateShift", {
         method: "post",
         mode: "cors",
@@ -111,16 +111,13 @@ function CafePage() {
       }
     }
     
-    // console.log(selectedShift)
-    
-    // console.log(shiftManager, shiftWorker1, shiftWorker2, selectedShift?.id);
+    sendRequest(selectedDay);
     
     if (repeat && numberRepeats > 0) {
       for (let i = 1; i <= numberRepeats; i++) {
-        sendRequest(addWeeks(selectedDay, i), null);
+        sendRequest(addWeeks(selectedDay, i));
       }
     }
-    sendRequest(selectedDay, selectedShift?.id ? selectedShift.id : null);
   }
   
   const manageShiftClear = async () => {
@@ -225,7 +222,7 @@ function CafePage() {
                       value={comment}
                       onChange={(event) => setComment(event.target.value)}
                     />
-                    
+
                     <Button variant="outlined" onClick={manageShift}>
                       Save
                     </Button>
@@ -242,11 +239,10 @@ function CafePage() {
 
                     {repeat ? (
                       <CustomNumberInput
-                        label="# of weeks"
+                        label="Repeat for # next weeks"
                         value={numberRepeats}
                         setValue={setNumberRepeats}
                         check={(data) => data.match(/[^0-9]/)}
-                        // error={props.hoursError}
                       />
                     ) : (
                       <></>
@@ -256,22 +252,6 @@ function CafePage() {
               </CardContent>
             </Card>
 
-            <Card elevation={3}>
-              <CardContent>
-                <Stack direction="row" alignItems="center">
-                  <Circle sx={{ height: 15 }} color="success" />
-                  <Typography>= Shift is filled</Typography>
-                </Stack>
-                <Stack direction="row" alignItems="center">
-                  <Circle sx={{ height: 15 }} color="warning" />
-                  <Typography>= Shift has people</Typography>
-                </Stack>
-                <Stack direction="row" alignItems="center">
-                  <Circle sx={{ height: 15 }} color="error" />
-                  <Typography>= Shift is empty</Typography>
-                </Stack>
-              </CardContent>
-            </Card>
           </Stack>
         </Grid>
       </Grid>
@@ -279,5 +259,4 @@ function CafePage() {
   );
 }
 
-// export default authWrapper(CafePage)
 export default CafePage
