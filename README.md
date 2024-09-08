@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# The new CYB website
 
-First, run the development server:
+## cyb.no + in.cyb.no
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+CYB has previously had a separate volunteer system and website, both of which were maintained by the IT group (previously X-group). After the old volunteer system unfortunately stopped being maintained and (eventually) stop functioning, CYB lost access to tools for logging volunteer hours, tracking the stock in Escape, and managing membership. 
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After a grueling semester of google sheets and paper logs, we have finally gotten the new system live! Previously the volunteer system and the main CYB website have been separate, but in an attempt to make the main website more appealing, the two have been merged into a single resource.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Visit the website at [cyb.no](https://cyb.no)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Tech stack
 
-## Learn More
+This is more or less the tools used to create the website.
 
-To learn more about Next.js, take a look at the following resources:
+![current_tech_stack](https://github.com/user-attachments/assets/6ecb70d6-a299-4496-ae63-2572730de77d)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Hosting
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+* Domain registrar: domeneshop
+* DNS provider: Cloudflare
+* VPS: NREC
 
-## Deploy on Vercel
+## How to run a dev instance
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Coming soon.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+A dev-database and environment file are being developed so that volunteers in the IT-group may test features locally.
+
+Experimental features are available at [dev.cyb.no](https://dev.cyb.no)
