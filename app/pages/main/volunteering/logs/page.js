@@ -7,18 +7,22 @@ import {
   CardContent,
   Grid,
   Stack,
+  useMediaQuery,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { format, parseISO } from "date-fns";
+import { useSession } from "next-auth/react";
+import { PageHeader } from "@/app/components/sanity/PageBuilder";
+import { getUserInitials } from "@/app/components/textUtil";
+import { cybTheme } from "@/app/components/themeCYB";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import CustomTable from "@/app/components/CustomTable";
-import { format, parseISO } from "date-fns";
-import { useSession } from "next-auth/react";
-import LogInput from "./logInput";
-import { PageHeader } from "@/app/components/sanity/PageBuilder";
+import worklogInput from "./workLogInput";
+import voucherLogInput from "./voucherLogInput";
 
 const WORK_TABLE_HEADERS = [
-  { id: "workedAt", name: "work date", sortBy: "workedAt_num", flex: 2 },
+  { id: "workedAt_label", name: "work date", sortBy: "workedAt_num", flex: 2 },
   { id: "duration", name: "duration", flex: 1 },
   { id: "description", name: "description", flex: 3 },
   { id: "loggedBy", name: "log by", flex: 2 },
@@ -26,7 +30,7 @@ const WORK_TABLE_HEADERS = [
 ];
 
 const VOUCHER_TABLE_HEADERS = [
-  { id: "usedAt", name: "usage date", sortBy: "usedAt_num", flex: 2 },
+  { id: "usedAt_label", name: "usage date", sortBy: "usedAt_num", flex: 2 },
   { id: "amount", name: "vouchers", flex: 2 },
   { id: "description", name: "description", flex: 4 },
   { id: "loggedFor", name: "log for", flex: 2 },
@@ -38,14 +42,14 @@ function LogsPage() {
   const [workLogs, setWorkLogs] = useState([]);
   const [voucherLogs, setVoucherLogs] = useState([]);
 
-  const [mode, setMode] = useState(true);
+  const [mode, setMode] = useState(false);
   const [vouchersEarned, setVouchersEarned] = useState(0);
   const [vouchersUsed, setVouchersUsed] = useState(0);
 
   const [refresh, setRefresh] = useState(false);
 
   const session = useSession();
-
+  
   useEffect(() => {
     prismaRequest({
       model: "user",
@@ -55,15 +59,13 @@ function LogsPage() {
           active: true,
         },
       },
-      callback: (data) => {
-        if (data.data.length != 0) {
-          setUsers(
-            data.data.map((e) => {
-              return { ...e, name: `${e.firstName} ${e.lastName}` };
-            })
-          );
-        }
-      },
+      callback: (data) =>
+        setUsers(
+          data.data.map((e) => ({
+            ...e,
+            name: `${e.firstName} ${e.lastName}`
+          }))
+        ),
     });
 
     prismaRequest({
@@ -86,90 +88,48 @@ function LogsPage() {
           semesterId: session.data.semester.id,
         },
       },
-      callback: (data) => {
-        if (data.length == 0) return;
-        console.log(data.data);
-
-        const newLogs = data.data.map((e) => {
-          const p1 = e.LoggedByUser;
-          const p2 = e.LoggedForUser;
-          const p1name = p1 ? `${p1.firstName} ${p1.lastName}` : null;
-          const p2name = p2 ? `${p2.firstName} ${p2.lastName}` : null;
-          return {
-            ...e,
-            loggedBy: p1name,
-            loggedFor: p2name,
-            vouchers: e.duration * 0.5,
-            workedAt_num: parseISO(e.workedAt).getTime(),
-            workedAt: format(parseISO(e.workedAt), "dd.MM HH:mm").toLowerCase(),
-          };
-        });
-
-        const newVouchers = data.data
-          .filter((e) => {
-            const person = e.LoggedForUser;
-            return person && person.id == session.data.user.id;
-          })
-          .reduce((total, e) => {
-            return (total += e.duration * 0.5);
-          }, 0.0);
-
-        setWorkLogs(newLogs);
-        setVouchersEarned(parseFloat(newVouchers));
-      },
+      callback: (data) => handleWorkLogs(data.data, session, setWorkLogs, setVouchersEarned)
     });
-  }, [refresh]);
-
-  useEffect(() => {
+    
     prismaRequest({
       model: "voucherLog",
       method: "find",
       request: {
         include: {
-          User: true,
+          LoggedForUser: true,
         },
         where: {
           semesterId: session.data.semester.id,
         },
       },
-      callback: (data) => {
-        if (data.length == 0) return;
-
-        const newVouchers = data.data
-          .filter((e) => {
-            const person = e.User;
-            const personId = person.id;
-            return personId == session.data.user.id;
-          })
-          .reduce((total, e) => {
-            return (total += e.amount);
-          }, 0.0);
-
-        const newLogs = data.data.map((e) => {
-          return {
-            ...e,
-            loggedFor: `${e.User.firstName} ${e.User.lastName}`,
-            usedAt_num: parseISO(e.usedAt).getTime(),
-            usedAt: format(parseISO(e.usedAt), "dd.MM HH:mm").toLowerCase(),
-          };
-        });
-
-        setVouchersUsed(parseFloat(newVouchers));
-        setVoucherLogs(newLogs);
-      },
+      callback: (data) => handleVoucherLogs(data.data, session, setVoucherLogs, setVouchersUsed)
     });
   }, [refresh]);
-
-  const layout = LogInput(
+  
+  const worklogInputLayout = worklogInput(
     session,
     users,
     workGroups,
-    vouchersEarned,
-    vouchersUsed,
-    mode,
     setRefresh
   );
-
+  
+  const voucherLogInputLayout = voucherLogInput(
+    session,
+    vouchersEarned,
+    vouchersUsed,
+    setRefresh
+  );
+  
+  const inputLayout = mode ? worklogInputLayout : voucherLogInputLayout;
+  const tableLayout = (
+    <CustomTable
+      key={mode ? "workLogTable" : "voucherLogTable"}
+      headers={mode ? WORK_TABLE_HEADERS : VOUCHER_TABLE_HEADERS}
+      data={mode ? workLogs : voucherLogs}
+      defaultFilterBy="loggedFor"
+    />
+  );
+  
   return (
     <Box>
       <PageHeader text="Logs" />
@@ -178,72 +138,86 @@ function LogsPage() {
         <Grid item md={4} xs={12} alignContent="start">
           <Card elevation={3}>
             <CardContent>
-              <Stack
-                direction="row"
-                spacing={1}
-                pb={4}
-                sx={{ display: { xs: "flex", lg: "none" } }}
-              >
+              <Stack direction="row" spacing={1} pb={4}>
                 <Button
                   fullWidth
                   variant={mode ? "contained" : "outlined"}
                   onClick={() => setMode(true)}
                 >
-                  Register
+                  Register{" "}
+                  {useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Work"}
                 </Button>
                 <Button
                   fullWidth
                   variant={!mode ? "contained" : "outlined"}
                   onClick={() => setMode(false)}
                 >
-                  Use
-                </Button>
-              </Stack>
-              <Stack
-                direction="row"
-                spacing={1}
-                pb={4}
-                sx={{ display: { xs: "none", lg: "flex" } }}
-              >
-                <Button
-                  fullWidth
-                  variant={mode ? "contained" : "outlined"}
-                  onClick={() => setMode(true)}
-                >
-                  Register work
-                </Button>
-                <Button
-                  fullWidth
-                  variant={!mode ? "contained" : "outlined"}
-                  onClick={() => setMode(false)}
-                >
-                  Use voucher
+                  Use{" "}
+                  {useMediaQuery(cybTheme.breakpoints.down("md"))
+                    ? ""
+                    : "Voucher"}
                 </Button>
               </Stack>
 
-              {layout}
+              {inputLayout}
             </CardContent>
           </Card>
         </Grid>
 
         <Grid item md={8} xs={12}>
-          {mode ? (
-            <CustomTable
-              headers={WORK_TABLE_HEADERS}
-              data={workLogs}
-              sortBy={"workedAt"}
-            />
-          ) : (
-            <CustomTable
-              headers={VOUCHER_TABLE_HEADERS}
-              data={voucherLogs}
-              sortBy={"usedAt"}
-            />
-          )}
+          {tableLayout}
         </Grid>
       </Grid>
     </Box>
   );
+}
+
+function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
+  
+  const newWorkLogs = logs.map((log) => ({
+    ...log,
+    loggedBy: getUserInitials(log.LoggedByUser),
+    loggedFor: getUserInitials(log.LoggedForUser),
+    workedAt_num: parseISO(log.workedAt).getTime(),
+    workedAt_label: format(parseISO(log.workedAt), "dd.MM HH:mm").toLowerCase(),
+  }));
+
+  const newVouchersEarned = logs
+    .filter((e) => {
+      const person = e.LoggedForUser;
+      return person && person.id == session.data.user.id;
+    })
+    .reduce((total, e) => {
+      return (total += e.duration * 0.5);
+    }, 0.0);
+
+  console.log(newWorkLogs);
+    
+  setWorkLogs(newWorkLogs);
+  setVouchersEarned(newVouchersEarned);
+}
+
+function handleVoucherLogs(logs, session, setVoucherLogs, setVouchersUsed) {
+
+  const newVoucherLogs = logs.map((log) => ({
+    ...log,
+    loggedFor: getUserInitials(log.LoggedForUser),
+    usedAt_num: parseISO(log.usedAt).getTime(),
+    usedAt_label: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase(),
+  }));
+  
+  const newVouchersUsed = logs
+    .filter((e) => {
+      const person = e.LoggedForUser;
+      const personId = person.id;
+      return personId == session.data.user.id;
+    })
+    .reduce((total, e) => {
+      return (total += e.amount);
+    }, 0.0);
+
+  setVouchersUsed(parseFloat(newVouchersUsed));
+  setVoucherLogs(newVoucherLogs);
 }
 
 export default authWrapper(LogsPage);

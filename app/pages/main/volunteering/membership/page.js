@@ -71,7 +71,7 @@ function MembershipPage() {
             date_joined_num: parseISO(e.date_joined).getTime(),
             date_joined: format(
               parseISO(e.date_joined),
-              "dd.MM yyyy"
+              "dd.MM.yyyy"
             ).toLowerCase(),
           };
         });
@@ -205,7 +205,11 @@ function MembershipPage() {
         </Grid>
 
         <Grid item md={9}>
-          <CustomTable headers={MEMBERSHIP_TABLE_HEADERS} data={tableData} />
+          <CustomTable
+            headers={MEMBERSHIP_TABLE_HEADERS}
+            data={tableData}
+            defaultFilterBy="name"
+          />
         </Grid>
       </Grid>
     </Box>
