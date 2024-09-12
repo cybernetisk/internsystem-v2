@@ -97,8 +97,10 @@ Xb4KOXTMAESdMAAAAYZGJ0dW5uZWxAaW50ZXJuc3lzdGVtLXYyAQID
 
 7. In a separate terminal, connect to the databse using an ssh-tunnel: `ssh -L 3307:localhost:3306 -i ~/.ssh/dbtunnel dbtunnel@158.39.200.46 -N`
 
-8. Start a development environment: `npm run dev`
+8. Generate database adapter client: `npx prisma generate`
 
-9. Navigate to the development endpoint: `http://localhost:3005`
+9. Start a development environment: `npm run dev`
+
+10. Navigate to the development endpoint: `http://localhost:3005`
 
 BTW: Notify easvebak@cyb.no if you are able to somehow gain access to the VPS, and you will be given 5 vouchers. (this is not a challenge, lol)
