@@ -39,6 +39,7 @@ function ProfilePage() {
   const [lastName, setLastName] = useState("");
   const [users, setUsers] = useState([]);
   const [recruitLogs, setRecruitLogs] = useState([]);
+  const [recruitHours, setRecruitHours] = useState([]);
   
   const [selectedRecruiter, setSelectedRecruiter] = useState(
     session.data.user.RecruitedByUser
@@ -97,7 +98,8 @@ function ProfilePage() {
           });
         });
 
-        console.log(newLogs);
+        // console.log(newLogs);
+        setRecruitHours(newLogs.reduce((sum, next) => sum += next.duration, 0))
         setRecruitLogs(newLogs);
       },
     });
@@ -182,7 +184,7 @@ function ProfilePage() {
             })}
           </Grid>
 
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={3}>
             {section2({
               userRoles,
               session,
@@ -192,7 +194,7 @@ function ProfilePage() {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} md={5}>
+        <Grid item xs={12} md={4}>
           {section3({
             recruitLogs,
             recruiter,
@@ -202,6 +204,7 @@ function ProfilePage() {
             setSelectedRecruiter,
             handleConfirmSelection,
             recruitedById: session.data.user.recruitedById,
+            recruitHours,
           })}
         </Grid>
       </Grid>
@@ -255,6 +258,11 @@ function section2(props) {
                   {props.userRoles.length == 0 ? "none" : ""}
                 </Typography>
               </Box>
+              {BoardRedirectButton(
+                props.session,
+                props.router,
+                props.buttonProps
+              )}
               {AdminRedirectButton(
                 props.session,
                 props.router,
@@ -280,63 +288,38 @@ function section3(props) {
       <Grid item>
         <Card elevation={3}>
           <CardContent>
-            {props.recruiter ? (
-              <Stack direction="column" spacing={2}>
-                <Typography variant="body1">
-                  Recruiter: {props.recruiter.firstName}{" "}
-                  {props.recruiter.lastName}
-                </Typography>
-              </Stack>
-            ) : (
-              <Stack direction="column" spacing={2}>
-                <Stack>
-                  <Typography variant="caption" p={0} m={0}>
-                    Who recruited you?
-                  </Typography>
-                  <Typography variant="caption" p={0} m={0}>
-                    This cannot be changed.
-                  </Typography>
-                </Stack>
+            <Stack direction="column" spacing={2}>
+              <CustomAutoComplete
+                label="Who recruited you?"
+                dataLabel="firstName"
+                subDataLabel="email"
+                data={props.users}
+                value={props.selectedRecruiter}
+                callback={props.setSelectedRecruiter}
+              />
+              <Button
+                variant="outlined"
+                onClick={() => props.handleConfirmSelection()}
+              >
+                Confirm choice
+              </Button>
 
-                <CustomAutoComplete
-                  label="Recruiter"
-                  dataLabel="firstName"
-                  subDataLabel="email"
-                  defaultValue={props.recruiter}
-                  data={props.users}
-                  value={props.selectedRecruiter}
-                  disable={props.recruitedById !== null}
-                  callback={props.setSelectedRecruiter}
-                />
-                <Button
-                  variant="outlined"
-                  onClick={() => props.handleConfirmSelection()}
-                >
-                  Confirm choice
-                </Button>
-              </Stack>
-            )}
+              {props.usersRecruited && props.usersRecruited != 0 ? (
+                <Typography>Your recruits: {props.usersRecruited}</Typography>
+              ) : (
+                <></>
+              )}
+
+              {props.usersRecruited && props.usersRecruited != 0 ? (
+                <Typography>Recruit hours: {props.recruitHours}</Typography>
+              ) : (
+                <></>
+              )}
+            </Stack>
           </CardContent>
         </Card>
       </Grid>
 
-      {props.usersRecruited && props.usersRecruited != 0 ? (
-        <Grid item>
-          <Card elevation={3}>
-            <CardContent>Users recruited: {props.usersRecruited}</CardContent>
-          </Card>
-        </Grid>
-      ) : (
-        <></>
-      )}
-
-      {props.usersRecruited && props.usersRecruited != 0 ? (
-        <Grid item>
-          <CustomTable headers={RECRUIT_TABLE_HEADERS} data={props.recruitLogs} />
-        </Grid>
-      ) : (
-        <></>
-      )}
     </Grid>
   );
 }
@@ -346,10 +329,21 @@ const AdminRedirectButton = (session, router, buttonProps) => {
   if (!userRoles.includes("admin")) return
   return (
     <Button {...buttonProps} onClick={() => router.push("admin")}>
-      Admin settings
+      Admin Tools
     </Button>
   );
 }
+
+const BoardRedirectButton = (session, router, buttonProps) => {
+  const userRoles = session.data.user.roles.map((e) => e.name);
+  if (!userRoles.includes("board")) return;
+  return (
+    <Button {...buttonProps} onClick={() => router.push("board")}>
+      Board Tools
+    </Button>
+  );
+};
+
 
 const CheckedTextField = (title, textValue, textCallback, disabled=false) => {
   return (

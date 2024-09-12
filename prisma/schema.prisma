@@ -26,8 +26,8 @@ model VerificationToken {
 }
 
 model User {
-  id                                     String            @id @default(cuid())
-  email                                  String?           @unique
+  id                                     String            @id @unique(map: "recruitedBy") @default(cuid())
+  email                                  String            @unique
   emailVerified                          DateTime?
   active                                 Boolean           @default(false)
   createdAt                              DateTime          @default(now())
@@ -35,18 +35,20 @@ model User {
   firstName                              String?
   lastName                               String?
   recruitedById                          String?
-  recruitedByUser                        User?             @relation("UserToRecruiter", fields: [recruitedById], references: [id])
-  recruitedUsers                         User[]            @relation("UserToRecruiter")
   ActivateToken                          ActivateToken[]
   sessions                               Session[]
   ShiftCafe_ShiftCafe_shiftManagerToUser ShiftCafe[]       @relation("ShiftCafe_shiftManagerToUser")
   ShiftCafe_ShiftCafe_shiftWorker1ToUser ShiftCafe[]       @relation("ShiftCafe_shiftWorker1ToUser")
   ShiftCafe_ShiftCafe_shiftWorker2ToUser ShiftCafe[]       @relation("ShiftCafe_shiftWorker2ToUser")
+  recruitedByUser                        User?             @relation("UserToRecruiter", fields: [recruitedById], references: [id], onUpdate: NoAction, map: "recruitedById")
+  recruitedUsers                         User[]            @relation("UserToRecruiter")
   roles                                  UserRole[]
   UserToWorkGroup                        UserToWorkGroup[]
   VoucherLog                             VoucherLog[]
   loggedByUser                           WorkLog[]         @relation("WorkLog_loggedByToUser")
   LoggedForUser                          WorkLog[]         @relation("WorkLog_loggedForToUser")
+
+  @@index([recruitedById], map: "recruitedById_idx")
 }
 
 model Role {
@@ -331,10 +333,10 @@ model Event {
 
 model ShiftCafe {
   id                  String   @id @default(cuid())
-  title               String   @db.VarChar(45)
   startAt             DateTime @db.DateTime(0)
   createdAt           DateTime @default(now()) @db.DateTime(0)
   shiftPosition       Int
+  comment             String?  @db.VarChar(120)
   shiftManager        String?
   shiftWorker1        String?
   shiftWorker2        String?
