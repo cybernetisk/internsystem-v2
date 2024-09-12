@@ -30,7 +30,7 @@
     "date-fns": "^3.6.0",
     "dotenv-cli": "^7.3.0",
     "mui-image": "^1.0.7",
-    "next": "14.1.0",
+    "next": "^14.2.10",
     "next-auth": "^4.24.5",
     "next-sanity": "^7.1.4",
     "nodemailer": "^6.9.14",
