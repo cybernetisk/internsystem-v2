@@ -1,5 +1,5 @@
 
-import { Button, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -90,59 +90,54 @@ export default function workLogInput(
   };
 
   return (
-    <Stack  direction="column" spacing={2}>
-      <CustomAutoComplete
-        label="registered by"
-        dataLabel="name"
-        data={users}
-        defaultValue={session.data.user}
-        error={false}
-      />
-      <CustomAutoComplete
-        label="registered for"
-        dataLabel="name"
-        subDataLabel="email"
-        data={users}
-        value={registeredFor}
-        callback={setRegisteredFor}
-        error={registeredForError}
-      />
-      <CustomAutoComplete
-        label="work group"
-        dataLabel="name"
-        data={workGroups}
-        value={selectedGroup}
-        callback={setSelectedGroup}
-        error={selectedGroupError}
-      />
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
-        <DateTimePicker
-          label="work date/time"
-          defaultValue={selectedDateTime}
-          ampm={false}
-          disableOpenPicker
-          onChange={(e) => setSelectedDateTime(e)}
+    <Stack direction="column" spacing={1}>
+      <Stack  direction="column" spacing={2}>
+        <CustomAutoComplete
+          label="Registered for"
+          dataLabel="name"
+          subDataLabel="email"
+          data={users}
+          value={registeredFor}
+          callback={setRegisteredFor}
+          error={registeredForError}
         />
-      </LocalizationProvider>
-      <CustomNumberInput
-        label="# of hours"
-        value={hours}
-        setValue={setHours}
-        check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
-        error={hoursError}
-      />
-      <TextField
-        label="Description"
-        size="small"
-        multiline
-        InputLabelProps={{ shrink: true }}
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        error={descriptionError}
-      />
-      <Button variant="outlined" onClick={handleClick}>
-        Register work
-      </Button>
+        <CustomAutoComplete
+          label="Work group"
+          dataLabel="name"
+          data={workGroups}
+          value={selectedGroup}
+          callback={setSelectedGroup}
+          error={selectedGroupError}
+        />
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+          <DateTimePicker
+            label="Start of work"
+            defaultValue={selectedDateTime}
+            ampm={false}
+            disableOpenPicker
+            onChange={(e) => setSelectedDateTime(e)}
+          />
+        </LocalizationProvider>
+        <CustomNumberInput
+          label="Hours worked"
+          value={hours}
+          setValue={setHours}
+          check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
+          error={hoursError}
+        />
+        <TextField
+          label="Description"
+          size="small"
+          multiline
+          InputLabelProps={{ shrink: true }}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          error={descriptionError}
+        />
+        <Button variant="outlined" onClick={handleClick}>
+          Register work
+        </Button>
+      </Stack>
       <Typography variant="subtitle1">
         {requestResponse != "" ? (
           requestResponse

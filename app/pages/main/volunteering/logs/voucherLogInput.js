@@ -1,5 +1,5 @@
 
-import { Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
@@ -62,38 +62,38 @@ export default function voucherLogInput(
   };
 
   return (
-    <Stack direction="column" spacing={2}>
-      <Stack direction="column">
-        
-        <Typography variant="body2">Vouchers remaining: </Typography>
-        <Typography variant="body2">
-          {vouchersEarned.toFixed(1)} - {vouchersUsed.toFixed(1)} ={" "}
-          {diff.toFixed(1)}
-        </Typography>
-        
-        <Stack alignItems="end" width="100%">
-          <Typography variant="caption">25kr / voucher</Typography>
+    <Stack direction="column" spacing={1}>
+      <Stack direction="column" spacing={2}>
+        <Stack direction="column">
+          <Typography variant="body2">Vouchers remaining: </Typography>
+          <Typography variant="body2">{diff.toFixed(1)}</Typography>
+
+          <Stack alignItems="end" width="100%">
+            <Typography variant="caption">25kr / voucher</Typography>
+          </Stack>
         </Stack>
+
+        <CustomNumberInput
+          label={"Vouchers to use"}
+          value={numVouchers}
+          setValue={setNumVouchers}
+          check={(data) => data.match(/[^0-9]/)}
+          error={numVouchersError}
+        />
+        <TextField
+          label="Description"
+          size="small"
+          multiline
+          InputLabelProps={{ shrink: true }}
+          value={descriptionVoucher}
+          error={descriptionVoucherError}
+          onChange={(e) => setDescriptionVoucher(e.target.value)}
+        />
+        <Button variant="outlined" onClick={handleClick}>
+          Use voucher
+        </Button>
       </Stack>
-      <CustomNumberInput
-        label={"# of vouchers"}
-        value={numVouchers}
-        setValue={setNumVouchers}
-        check={(data) => data.match(/[^0-9]/)}
-        error={numVouchersError}
-      />
-      <TextField
-        label="Description"
-        size="small"
-        multiline
-        InputLabelProps={{ shrink: true }}
-        value={descriptionVoucher}
-        error={descriptionVoucherError}
-        onChange={(e) => setDescriptionVoucher(e.target.value)}
-      />
-      <Button variant="outlined" onClick={handleClick}>
-        Use voucher
-      </Button>
+
       <Typography variant="subtitle1">
         {requestResponse != "" ? (
           requestResponse
