@@ -22,18 +22,18 @@ import worklogInput from "./workLogInput";
 import voucherLogInput from "./voucherLogInput";
 
 const WORK_TABLE_HEADERS = [
-  { id: "workedAt_label", name: "work date", sortBy: "workedAt_num", flex: 2 },
-  { id: "duration", name: "duration", flex: 1 },
-  { id: "description", name: "description", flex: 3 },
-  { id: "loggedBy", name: "log by", flex: 2 },
-  { id: "loggedFor", name: "log for", flex: 2 },
+  { id: "workedAt_label", type: "date",     name: "work date",    flex: 2, sortBy: "workedAt_num" },
+  { id: "duration",       type: "number",   name: "duration",     flex: 1 },
+  { id: "description",    type: "string",   name: "description",  flex: 3 },
+  { id: "loggedBy",       type: "string",   name: "log by",       flex: 2 },
+  { id: "loggedFor",      type: "string",   name: "log for",      flex: 2 },
 ];
 
 const VOUCHER_TABLE_HEADERS = [
-  { id: "usedAt_label", name: "usage date", sortBy: "usedAt_num", flex: 2 },
-  { id: "amount", name: "vouchers", flex: 2 },
-  { id: "description", name: "description", flex: 4 },
-  { id: "loggedFor", name: "log for", flex: 2 },
+  { id: "usedAt_label",   type: "date",     name: "usage date",   flex: 2, sortBy: "usedAt_num" },
+  { id: "amount",         type: "number",   name: "vouchers",     flex: 2 },
+  { id: "description",    type: "string",   name: "description",  flex: 4 },
+  { id: "loggedFor",      type: "string",   name: "log for",      flex: 2 },
 ];
 
 function LogsPage() {

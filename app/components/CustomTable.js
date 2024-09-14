@@ -1,8 +1,8 @@
 
-import React, { useState, useMemo } from "react";
 import {
   Box,
   Button,
+  Card,
   Container,
   Grid,
   Paper,
@@ -16,13 +16,16 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography,
   useMediaQuery,
 } from "@mui/material";
+import React, { useState, useMemo } from "react";
 import { styled } from "@mui/system";
 import PropTypes from "prop-types";
 import { cybTheme } from "./themeCYB";
 import CustomAutoComplete from "./input/CustomAutocomplete";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import locale from "date-fns/locale/en-GB";
 
 // Styled table component
 const TableStyle = styled(Table)(({ theme }) => ({
@@ -41,6 +44,18 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     : cybTheme.spacing(1),  
 }));
 
+const filterTableOptions = [
+  { id: "contains", name: "contains" },
+  { id: "larger_than", name: "is larger than" },
+  { id: "less_than", name: "is less than" },
+  { id: "equal_to", name: "is equal to" },
+];
+
+const booleanFilterOptions = [
+  { id: "true", name: "True" },
+  { id: "false", name: "False" },
+]
+
 function CustomTable({ headers, data, defaultFilterBy }) {
   const [sortBy, setSortBy] = useState(() => headers[0]?.sortBy || null);
   const [sortDirection, setSortDirection] = useState("DESC");
@@ -49,33 +64,74 @@ function CustomTable({ headers, data, defaultFilterBy }) {
   
   const [refresh, setRefresh] = useState(true);
   const [searchString, setSearchString] = useState("");
-  const [selectedSearchColumn, setSelectedSearchColumn] = useState(
-    headers.filter((e) => e.id === defaultFilterBy)[0]
-  );
+  const [selectedDateTime, setSelectedDateTime] = useState(new Date());
+  
+  const [availableFilterOptions, setAvailableFilterOptions] = useState([]);
+  const [selectedFilterOption, setSelectedFilterOption] = useState(null);
+  const [selectedSearchColumn, setSelectedSearchColumn] = useState(null);
+  const [selectedBooleanOption, setSelectedBooleanOption] = useState(null);
 
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => sortTableRows(a, b, sortBy, sortDirection));
   }, [data, sortBy, sortDirection]);
 
-  console.log(selectedSearchColumn)
-  
-  const paginatedData = useMemo(() => {
-    return sortedData
-    .filter((row) => {
-      
-      if (searchString.length === 0 || selectedSearchColumn === null) {
+  const filteredData = useMemo(() => {
+    return sortedData.filter((row) => {
+      if (selectedSearchColumn === null || selectedFilterOption === null) {
         return true;
       }
       
-      return row[selectedSearchColumn.id]
-        .toLowerCase()
-        .includes(searchString.toLocaleLowerCase());
-    })
-    .slice(
+      let e1, e2;
+      
+      switch (selectedSearchColumn.type) {
+        case "date":
+          e1 = selectedDateTime.getTime();
+          break;
+        case "boolean":
+          e1 = selectedBooleanOption?.id;
+          break;
+        default:
+          e1 = searchString
+          break;
+      }
+          
+      if (!e1 || e1.length === 0 || e1 === 0) {
+        return true;
+      }
+
+      e2 = 
+        selectedSearchColumn.sortBy
+        ? row[selectedSearchColumn.sortBy]
+        : row[selectedSearchColumn.id]
+
+      try {
+        switch (selectedFilterOption.id) {
+          case "contains":
+            return e2
+              .toString()
+              .toLowerCase()
+              .includes(e1.toLocaleLowerCase());
+          case "larger_than":
+            return Number(e2) > Number(e1);
+          case "less_than":
+            return Number(e2) < Number(e1);
+          case "equal_to":
+            return Number(e2) === Number(e1);
+        }
+      } catch (error) {
+        console.log("error??", error);
+        return true;
+      }
+      
+    });
+  }, [sortedData, refresh]);
+  
+  const paginatedData = useMemo(() => {
+    return filteredData.slice(
       page * rowsPerPage,
       page * rowsPerPage + rowsPerPage
     );
-  }, [sortedData, page, rowsPerPage, refresh]);
+  }, [filteredData, page, rowsPerPage]);
 
   const handleSort = (headerId, altSortBy) => {
     const newSortBy =
@@ -93,6 +149,75 @@ function CustomTable({ headers, data, defaultFilterBy }) {
     setSortBy(newSortBy);
     setSortDirection(newSortDirection);
   };
+  
+  const handleSelectedSortColumn = (e) => {
+    if (!e) {
+      setAvailableFilterOptions([]);
+    } else if (e.type === "string" || e.type === "boolean") {
+      setAvailableFilterOptions(filterTableOptions.filter((e) => e.id === "contains"));
+    } else {
+      setAvailableFilterOptions(filterTableOptions.filter((e) => e.id !== "contains"));
+    }
+    
+    setSelectedFilterOption(null);
+    setSelectedBooleanOption(null);
+    setSearchString("");
+    
+    setSelectedSearchColumn(e);
+  }
+  
+  let searchComponent = (
+    <TextField
+      label="Search string"
+      size="small"
+      fullWidth
+      onKeyDown={(e) => (e.key === "Enter" ? setRefresh(!refresh) : null)}
+      InputLabelProps={{ shrink: true }}
+      value={searchString}
+      onChange={(e) => setSearchString(e.target.value)}
+    />
+  );
+  
+  if (selectedSearchColumn) {    
+    switch (selectedSearchColumn.type) {
+      case "boolean":
+        searchComponent = (
+          <CustomAutoComplete
+            label="Boolean"
+            dataLabel="name"
+            data={booleanFilterOptions}
+            value={selectedBooleanOption}
+            callback={setSelectedBooleanOption}
+          />
+        );
+        break;
+      case "date":
+        searchComponent = (
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={locale}
+          >
+            <DateTimePicker
+              label="Search date/time"
+              defaultValue={selectedDateTime}
+              ampm={false}
+              disableOpenPicker
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  size: "small",
+                  onKeyDown: (e) => {
+                    e.key === "Enter" ? setRefresh(!refresh) : null;
+                  },
+                },
+              }}
+              onChange={(e) => setSelectedDateTime(e)}
+            />
+          </LocalizationProvider>
+        );
+        break;
+    }
+  }
 
   const HeaderFlexTotal = headers
     ? headers.reduce((total, cur) => (total += cur.flex || 0), 0)
@@ -102,110 +227,112 @@ function CustomTable({ headers, data, defaultFilterBy }) {
     console.error("table render error: ", data);
     return <div>Error: Data is not an array.</div>;
   }
-
+  
   return (
-    <Container
-      component={Paper}
-      elevation={3}
-      disableGutters
-      square
-      sx={{ overflowX: { xs: "scroll", sm: "hidden" } }}
-    >
-      <Box sx={{ padding: 2 }}>
-        <Grid
-          container
-          direction={{ xs: "column-reverse", md: "row" }}
-          justifyContent="end"
-          // columnSpacing={2}
-          rowGap={{ xs: 2, md: 0 }}
-          columnGap={{ xs: 0, md: 2 }}
-        >
-          <Grid item xs={2}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{ height: "100%" }}
-              onClick={() => setRefresh(!refresh)}
-            >
-              Search
-            </Button>
-          </Grid>
-          <Grid item xs={3}>
-            <TextField
-              label="Search string"
-              size="small"
-              fullWidth
-              onKeyDown={(e) =>
-                e.key === "Enter" ? setRefresh(!refresh) : null
-              }
-              InputLabelProps={{ shrink: true }}
-              value={searchString}
-              onChange={(e) => setSearchString(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <CustomAutoComplete
-              label="Filter by row"
-              dataLabel="name"
-              data={headers}
-              value={selectedSearchColumn}
-              callback={setSelectedSearchColumn}
-            />
-          </Grid>
-        </Grid>
-      </Box>
-      <TableStyle stickyHeader size="small">
-        <TableHead>
-          <TableRow>
-            {headers.map((header) => (
-              <TableCell
-                key={header.id}
-                sx={{
-                  width: `${100 / (HeaderFlexTotal / header.flex)}%`,
-                  // border: 1,
-                  borderBottom: 1,
-                  borderColor: cybTheme.palette.primary.main,
-                  // color: cybTheme.palette.primary.main,
-                  backgroundColor: cybTheme.palette.background.paper,
-                  // backgroundColor: "red",
-                  textDecoration:
-                    header.id === sortBy || header.sortBy === sortBy
-                      ? "underline"
-                      : "none",
-                  ":hover": {
-                    cursor: "pointer",
-                  },
-                }}
-                onClick={() => handleSort(header.id, header.sortBy)}
+    <Stack spacing={2}>
+      <Card elevation={3}>
+        <Box sx={{ padding: 2 }}>
+          <Grid
+            container
+            direction={{ xs: "column", md: "row" }}
+            justifyContent="end"
+            rowGap={{ xs: 2, md: 0 }}
+            columnGap={{ xs: 0, md: 2 }}
+          >
+            <Grid item xs={3}>
+              <CustomAutoComplete
+                label="Column to filter"
+                dataLabel="name"
+                data={headers}
+                value={selectedSearchColumn}
+                callback={handleSelectedSortColumn}
+              />
+            </Grid>
+            <Grid item xs>
+              <CustomAutoComplete
+                label="Filter option"
+                dataLabel="name"
+                data={availableFilterOptions}
+                value={selectedFilterOption}
+                callback={setSelectedFilterOption}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              {searchComponent}
+            </Grid>
+            <Grid item xs={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                sx={{ height: "100%" }}
+                onClick={() => setRefresh(!refresh)}
               >
-                {header.name}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedData.map((row, index) =>
-            createTableRow(row, index, headers)
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              count={data.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={(_, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(event) => {
-                setRowsPerPage(parseInt(event.target.value, 10));
-                setPage(0);
-              }}
-              showFirstButton
-              showLastButton
-            />
-          </TableRow>
-        </TableFooter>
-      </TableStyle>
-    </Container>
+                Search
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </Card>
+      <Container
+        component={Paper}
+        elevation={3}
+        disableGutters
+        square
+        sx={{ overflowX: { xs: "scroll", sm: "hidden" } }}
+      >
+        <TableStyle stickyHeader size="small">
+          <TableHead>
+            <TableRow>
+              {headers.map((header) => (
+                <TableCell
+                  key={header.id}
+                  sx={{
+                    width: `${100 / (HeaderFlexTotal / header.flex)}%`,
+                    // border: 1,
+                    borderBottom: 1,
+                    borderColor: cybTheme.palette.primary.main,
+                    // color: cybTheme.palette.primary.main,
+                    backgroundColor: cybTheme.palette.background.paper,
+                    // backgroundColor: "red",
+                    textDecoration:
+                      header.id === sortBy || header.sortBy === sortBy
+                        ? "underline"
+                        : "none",
+                    ":hover": {
+                      cursor: "pointer",
+                    },
+                  }}
+                  onClick={() => handleSort(header.id, header.sortBy)}
+                >
+                  {header.name}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedData.map((row, index) =>
+              createTableRow(row, index, headers)
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                count={filteredData.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(parseInt(event.target.value, 10));
+                  setPage(0);
+                }}
+                showFirstButton
+                showLastButton
+              />
+            </TableRow>
+          </TableFooter>
+        </TableStyle>
+      </Container>
+    </Stack>
   );
 }
 
@@ -259,9 +386,10 @@ CustomTable.propTypes = {
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+      flex: PropTypes.number.isRequired,
       sortBy: PropTypes.string,
-      flex: PropTypes.number,
     })
   ).isRequired,
   data: PropTypes.array.isRequired,
