@@ -242,21 +242,20 @@ model ActivateToken {
 }
 
 model VoucherLog {
-  id          String   @id @default(cuid())
-  loggedFor   String?
-  usedAt      DateTime @default(now()) @db.Timestamp(0)
-  amount      Int
-  description String   @db.VarChar(120)
-  semesterId  Int
-  Semester    Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
-  User        User?    @relation(fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor0")
+  id              String   @id @default(cuid())
+  loggedFor       String?
+  usedAt          DateTime @default(now()) @db.Timestamp(0)
+  amount          Int
+  description     String   @db.VarChar(120)
+  semesterId      Int
+  Semester        Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
+  LoggedForUser   User?    @relation(fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor0")
 
   @@index([id], map: "logID_idx")
   @@index([loggedFor], map: "loggedFor_idx")
   @@index([semesterId], map: "VoucherLog_Semester_idx")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model WorkLog {
   id            String    @id @default(cuid())
   loggedBy      String?

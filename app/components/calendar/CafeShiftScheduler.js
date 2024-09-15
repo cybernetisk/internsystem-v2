@@ -25,8 +25,8 @@ import {
   generateCalendarData,
   getFilteredCalendarData,
   getFocusedWeekdays,
-  getInitials,
 } from "./schedulerUtils";
+import { getUserInitials } from "./../textUtil";
 import React, { useState, useMemo } from "react";
 import { enGB, nb } from "date-fns/locale";
 import { cybTheme } from "../themeCYB";
@@ -267,7 +267,7 @@ export default function CafeShiftScheduler(props) {
                                 }
                                 key={`week${i}_day${j}_shift${l}_pos${k}`}
                               >
-                                {s ? getInitials(s.firstName) : "X"}
+                                {s ? getUserInitials(s.firstName) : "X"}
                               </Typography>
                             ))}
                           </Stack>
