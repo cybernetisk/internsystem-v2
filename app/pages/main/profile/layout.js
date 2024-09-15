@@ -1,6 +1,6 @@
 
 export const metadata = {
-  title: "Profile",
+  title: "My profile",
   description: "user profile for cyb.no",
 };
 

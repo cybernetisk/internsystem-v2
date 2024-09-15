@@ -42,16 +42,18 @@ const handler = NextAuth({
       
       const cybUser = await prisma.user.findFirst({
         where: {
-          email: session.user.email
+          email: session.user.email,  
         },
         include: {
+          recruitedByUser: true,
+          recruitedUsers: true,
           roles: {
             include: {
-              role: true
-            }
-          }
-        }
-      })
+              role: true,
+            },
+          },
+        },
+      });
       
       const semesters = await prisma.semester.findMany({
         orderBy: {

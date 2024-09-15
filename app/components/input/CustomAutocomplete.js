@@ -14,6 +14,7 @@ export default class CustomAutoComplete extends Component {
       callback,
       defaultValue,
       error,
+      disable,
     } = this.props;
     
     let displayValue = null;
@@ -23,15 +24,12 @@ export default class CustomAutoComplete extends Component {
       displayValue = value
     }
     
-    // console.log(data, data.length);
-    // console.log(Math.min([data.length, 10]), Math.min(data.length, 10));
-    
     const maxSuggestions = data ? Math.min(data.length, 10) : 10;
     const filterOptions = createFilterOptions();
     
     return (
       <Autocomplete
-        disabled={defaultValue != undefined}
+        disabled={disable || defaultValue != undefined}
         size="small"
         fullWidth
         disablePortal
