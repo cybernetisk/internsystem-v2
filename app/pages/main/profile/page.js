@@ -76,7 +76,6 @@ function ProfilePage() {
       },
       callback: (data) => {
         let newLogs = [];
-        console.log(data.data);
 
         data.data.forEach((e) => {
           e.LoggedForUser.forEach((f) => {
@@ -98,7 +97,6 @@ function ProfilePage() {
           });
         });
 
-        // console.log(newLogs);
         setRecruitHours(newLogs.reduce((sum, next) => sum += next.duration, 0))
         setRecruitLogs(newLogs);
       },
