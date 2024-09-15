@@ -119,7 +119,7 @@ function CustomTable({ headers, data, defaultFilterBy }) {
             return Number(e2) === Number(e1);
         }
       } catch (error) {
-        console.log("error??", error);
+        console.error("An error occured while filtering table rows", error);
         return true;
       }
       
@@ -322,8 +322,8 @@ function CustomTable({ headers, data, defaultFilterBy }) {
                 rowsPerPage={rowsPerPage}
                 onPageChange={(_, newPage) => setPage(newPage)}
                 onRowsPerPageChange={(event) => {
-                  setRowsPerPage(parseInt(event.target.value, 10));
                   setPage(0);
+                  setRowsPerPage(parseInt(event.target.value, 10));
                 }}
                 showFirstButton
                 showLastButton
