@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
-import { getUserInitials } from "@/app/components/textUtil";
+import { getUserInitials, getUserName } from "@/app/components/textUtil";
 import { cybTheme } from "@/app/components/themeCYB";
 import authWrapper from "@/app/middleware/authWrapper";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
@@ -176,8 +176,8 @@ function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
   
   const newWorkLogs = logs.map((log) => ({
     ...log,
-    loggedBy: getUserInitials(log.LoggedByUser),
-    loggedFor: getUserInitials(log.LoggedForUser),
+    loggedBy: getUserName(log.LoggedByUser),
+    loggedFor: getUserName(log.LoggedForUser),
     workedAt_num: parseISO(log.workedAt).getTime(),
     workedAt_label: format(parseISO(log.workedAt), "dd.MM HH:mm").toLowerCase(),
   }));
@@ -190,8 +190,6 @@ function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
     .reduce((total, e) => {
       return (total += e.duration * 0.5);
     }, 0.0);
-
-  console.log(newWorkLogs);
     
   setWorkLogs(newWorkLogs);
   setVouchersEarned(newVouchersEarned);
@@ -201,7 +199,7 @@ function handleVoucherLogs(logs, session, setVoucherLogs, setVouchersUsed) {
 
   const newVoucherLogs = logs.map((log) => ({
     ...log,
-    loggedFor: getUserInitials(log.LoggedForUser),
+    loggedFor: getUserName(log.LoggedForUser),
     usedAt_num: parseISO(log.usedAt).getTime(),
     usedAt_label: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase(),
   }));

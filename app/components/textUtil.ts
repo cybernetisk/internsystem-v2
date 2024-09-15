@@ -23,3 +23,12 @@ export function getUserInitials(user: {
   
   return `${firstFirstName} ${initials}`;
 }
+
+export function getUserName(user: {
+  firstName: string;
+  lastName: string;
+}) {
+  let firstName = user && user.firstName ? user.firstName : "";
+  let lastName = user && user.lastName ? user.lastName : "";
+  return `${firstName} ${lastName}`;
+}
