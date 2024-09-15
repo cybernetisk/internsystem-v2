@@ -130,6 +130,14 @@ function LogsPage() {
     />
   );
   
+  const registerButtonText = `Register ${
+    useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Work"
+  }`;
+  
+  const useButtonText = `Use ${
+    useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Voucher"
+  }`;
+  
   return (
     <Box>
       <PageHeader text="Logs" />
@@ -144,18 +152,14 @@ function LogsPage() {
                   variant={mode ? "contained" : "outlined"}
                   onClick={() => setMode(true)}
                 >
-                  Register{" "}
-                  {useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Work"}
+                  {registerButtonText}
                 </Button>
                 <Button
                   fullWidth
                   variant={!mode ? "contained" : "outlined"}
                   onClick={() => setMode(false)}
                 >
-                  Use{" "}
-                  {useMediaQuery(cybTheme.breakpoints.down("md"))
-                    ? ""
-                    : "Voucher"}
+                  {useButtonText}
                 </Button>
               </Stack>
 
