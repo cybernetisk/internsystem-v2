@@ -110,7 +110,6 @@ export default function LoginButton(props) {
             >
               <Typography
                 variant="body1"
-                width="3em"
                 // color={cybTheme.palette.text.secondary}
                 sx={{ display: { xs: "none", md: "flex" } }}
               >
