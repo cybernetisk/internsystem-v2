@@ -163,7 +163,7 @@ function NavElementSmallScreen(item, index, iconProps, currentPath) {
                 }}
                 primary={
                   <Typography key={`link_snav${index}_typography`} variant="caption">
-                    {item.name}
+                    {item.name == "About CYB" ? "About" : item.name}
                   </Typography>
                 }
               />
