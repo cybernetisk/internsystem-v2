@@ -55,9 +55,9 @@ export default function LoginButton(props) {
   const buttonText = () => {
     if (session.data != undefined) {
       let firstName = session.data.user.name.split(" ")[0]
-      // Shorten the first name if it is longer than 25 characters
-      if (firstName.length > 25) {
-        firstName = firstName.slice(0, 22) + "..."
+      // Shorten the first name if it is longer than 15 characters
+      if (firstName.length > 15) {
+        firstName = firstName.slice(0, 12) + "..."
       }
       return firstName
     }
