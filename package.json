@@ -27,6 +27,7 @@
     "@sanity/structure": "^2.36.2",
     "@sanity/vision": "^3.31.0",
     "@sanity/visual-editing": "^2.1.6",
+    "d3": "^7.9.0",
     "date-fns": "^3.6.0",
     "dotenv-cli": "^7.3.0",
     "mui-image": "^1.0.7",
