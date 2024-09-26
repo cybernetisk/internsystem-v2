@@ -52,7 +52,7 @@ const USEFUL_LINKS = [
   },
   {
     name: "Rent Escape",
-    link: "/pages/main/aboutEscape/rentingEscape",
+    link: "/aboutEscape/rentingEscape",
   },
   {
     name: "Submit issue",

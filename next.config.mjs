@@ -3,20 +3,14 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/",
-        destination: "/pages/main/home",
+        source: "/home",
+        destination: "/",
         permanent: true,
         basePath: false,
       },
       {
-        source: "/pages",
-        destination: "/pages/main/home",
-        permanent: true,
-        basePath: false,
-      },
-      {
-        source: "/pages/main",
-        destination: "/pages/main/home",
+        source: "/pages/main/home",
+        destination: "/",
         permanent: true,
         basePath: false,
       },

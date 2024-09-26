@@ -63,7 +63,7 @@ export class NavBar extends Component {
             sx={{ display: { xs: "none", md: "flex" } }}
           >
             <Grid item>
-              <Link href={`/pages/main/home`}>
+              <Link href={`/`}>
                 <Avatar
                   sx={{
                     height: 45,
@@ -101,7 +101,7 @@ function NavElementLargeScreen(item, index, currentPath) {
     return (
       <Link
         key={`link_nav${index}`}
-        href={`/pages/main/${item.path}`}
+        href={`/${item.path}`}
         style={{ textDecoration: "none" }}
       >
         <ListItem key={`link_nav${index}_item`} disablePadding>
@@ -110,7 +110,7 @@ function NavElementLargeScreen(item, index, currentPath) {
               key={`link_nav${index}_itemtext`}
               sx={{
                 color:
-                  currentPath == `/pages/main/${item.path}`
+                  currentPath == `/${item.path}`
                     ? cybTheme.palette.primary.main
                     : cybTheme.palette.text.primary,
               }}
@@ -135,7 +135,7 @@ function NavElementSmallScreen(item, index, iconProps, currentPath) {
     return (
       <Link
         key={`link_snav${index}`}
-        href={`/pages/main/${item.path}`}
+        href={`/${item.path}`}
         style={{ textDecoration: "none" }}
         sx={{ width: "100%" }}
       >
@@ -157,7 +157,7 @@ function NavElementSmallScreen(item, index, iconProps, currentPath) {
                 key={`link_snav${index}_itemtext`}
                 sx={{
                   color:
-                    currentPath == `/pages/main/${item.path}`
+                    currentPath == `/${item.path}`
                       ? cybTheme.palette.primary.main
                       : cybTheme.palette.text.primary,
                 }}

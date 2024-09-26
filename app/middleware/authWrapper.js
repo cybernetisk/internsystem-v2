@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { PageBuilderSkeleton } from "../components/sanity/PageBuilder";
 
-export default function authWrapper(WrappedComponent, requiredRole="", redirect="/pages/main/unauthorized") {
+export default function authWrapper(WrappedComponent, requiredRole="", redirect="/unauthorized") {
   return function AuthenticatedComponent(props) {
     
     const router = useRouter();
