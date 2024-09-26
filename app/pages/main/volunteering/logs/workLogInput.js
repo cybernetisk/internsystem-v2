@@ -7,6 +7,7 @@ import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB";
+import { set } from "sanity";
 
 export default function workLogInput(
   session,
@@ -17,6 +18,7 @@ export default function workLogInput(
   const [registeredFor, setRegisteredFor] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
+  const [endDateTime, setEndDateTime] = useState(new Date());
   const [hours, setHours] = useState(0);
   const [description, setDescription] = useState("");
 
@@ -118,10 +120,25 @@ export default function workLogInput(
             onChange={(e) => setSelectedDateTime(e)}
           />
         </LocalizationProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+          <DateTimePicker
+            label="End of work"
+            value={endDateTime} // Replacing defaultValue to make it synced with the actual value
+            ampm={false}
+            disableOpenPicker
+            onChange={(e) => {
+              setEndDateTime(e);
+              setHours(Math.round(((e - selectedDateTime) / 3600000) * 10) / 10) // Update hours
+            }}
+          />
+        </LocalizationProvider>
         <CustomNumberInput
           label="Hours worked"
           value={hours}
-          setValue={setHours}
+          setValue={(value) => {
+            setHours(value);
+            setEndDateTime(new Date(selectedDateTime.getTime() + value * 3600000)); // Update endDateTime
+          }}
           check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
           error={hoursError}
         />
