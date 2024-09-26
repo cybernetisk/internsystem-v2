@@ -1,14 +1,10 @@
 # Development database
 
-Usage:
+## Usage
 
-```
-docker compose up
-```
+Either do `docker-compose up` in the project root directory (recommended). No other steps required.
 
-And there you go. A development database MVP.
-
-You will need to update your `.env` file to point to this container. Like so:
+Or build a separate image based on the `Dockerfile` in this directory (see the `docker-compose.yml` at root to get an idea on how to run it). You will then need to update your `.env` file to point to this container. For example:
 
 ```
 ...
@@ -18,7 +14,7 @@ DATABASE_URL = "mysql://root:rootpassword@localhost:3306/mydb"
 
 ## Requirements
 
-You need to install `docker compose`. Otherwise, other requirements should be handled inside the Docker containers. Unless you want to fiddle with the data generation code, which is in Python. Then I would recommend making a virtual environment within the `data-generation/` directory.
+You need to install `docker-compose`. Otherwise, other requirements should be handled inside the Docker containers. Unless you want to fiddle with the data generation code, which is in Python. Then I would recommend making a virtual environment within the `data-generation/` directory.
 
 ## How it works
 
