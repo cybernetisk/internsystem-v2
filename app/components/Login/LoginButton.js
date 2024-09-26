@@ -52,7 +52,17 @@ export default function LoginButton(props) {
     bgcolor: cybTheme.palette.primary.main,
   };
   
-  
+  const buttonText = () => {
+    if (session.data != undefined) {
+      let firstName = session.data.user.name.split(" ")[0].replace('-', '‑')
+      // Shorten the first name if it is longer than 15 characters
+      if (firstName.length > 15) {
+        firstName = firstName.slice(0, 12) + "..."
+      }
+      return firstName
+    }
+    return "Login"
+  }
   
   return (
     <>
@@ -84,7 +94,7 @@ export default function LoginButton(props) {
                 }}
                 primary={
                   <Typography variant="caption">
-                    {session.data != undefined ? "Profile" : "Login"}
+                    {buttonText()}
                   </Typography>
                 }
               />
@@ -105,11 +115,10 @@ export default function LoginButton(props) {
             >
               <Typography
                 variant="body1"
-                width="3em"
                 // color={cybTheme.palette.text.secondary}
                 sx={{ display: { xs: "none", md: "flex" } }}
               >
-                {session.data != undefined ? "Profile" : "Login"}
+                {buttonText()}
               </Typography>
 
               {session.status == "authenticated" ? (
@@ -122,7 +131,7 @@ export default function LoginButton(props) {
               ) : (
                 <Avatar sx={{ ...avatarProps }}>
                   <Person
-                    color={cybTheme.palette.background.main}
+                      color={cybTheme.palette.background.main}
                     // color= sx={{
                     //   color: cybTheme.palette.background.main
                     //   }}

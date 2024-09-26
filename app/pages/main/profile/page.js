@@ -112,9 +112,8 @@ function ProfilePage() {
     }
   }, [session])
   
-  const handleUpdateData = () => {
-    
-    prismaRequest({
+  const handleUpdateData = async () => {
+    await prismaRequest({
       model: "user",
       method: "update",
       request: {
@@ -126,8 +125,8 @@ function ProfilePage() {
           lastName: lastName,
         }
       }
-    })
-    
+    });
+    window.location.reload();
   }
   
   const handleConfirmSelection = async () => {
