@@ -1,5 +1,5 @@
 
-import { mailOptions, transporter } from "@/app/pages/auth/email";
+import { mailOptions, transporter } from "@/app/(pages)/auth/email";
 import { NextResponse } from "next/server";
 
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || "";

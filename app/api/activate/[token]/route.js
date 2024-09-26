@@ -45,5 +45,5 @@ export async function GET(request, {params}) {
     }
   })
   
-  redirect("/pages/auth/signIn")
+  redirect("/auth/signIn")
 }

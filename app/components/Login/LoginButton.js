@@ -40,7 +40,7 @@ export default function LoginButton(props) {
   const handleClick = (event) => {
     console.log("CLICK")
     if (session.status == "authenticated") {
-      router.push("/pages/main/profile");
+      router.push("/profile");
     } else {
       signIn();
     }
@@ -78,7 +78,7 @@ export default function LoginButton(props) {
                 key={`link_item_text_login`}
                 sx={{
                   color:
-                    currentPath == `/pages/main/profile`
+                    currentPath == `/profile`
                       ? cybTheme.palette.primary.main
                       : cybTheme.palette.text.primary,
                 }}

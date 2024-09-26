@@ -37,7 +37,7 @@ DATABASE_SCHEMA = 'ISV2_development'
 DATABASE_URL = "mysql://${DATABASE_USER}:${DATABASE_PASS}@localhost:3307/${DATABASE_SCHEMA}"
 
 NEXTAUTH_URL = 'http://localhost:3005'
-NEXTAUTH_CALLBACK = '/pages/main/home'
+NEXTAUTH_CALLBACK = '/'
 NEXTAUTH_SECRET = 'QuTxFdD3yon9X+83rRaio/vSgkfhvnwUglcIrnUwTLA='
 
 NODEMAILER_NOREPLY_USER = 'noreply@cyb.no'
