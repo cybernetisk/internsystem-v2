@@ -7,6 +7,7 @@ import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/materia
 import { normalizeEmail } from "@/app/components/Login/authUtil";
 import Link from "next/link";
 import { useState } from "react";
+import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
 
 export default function registerPage() {
   
@@ -14,13 +15,18 @@ export default function registerPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("")
   const [response, setResponse] = useState("")
+	const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [severity, setSeverity] = useState("")
   
   const debug = true;
   
   const handleRegister = async () => {
+    setSnackbarOpen(false)
 
     if (!email.includes("@")) {
       setResponse("Email is invalid")
+      setSeverity("error")
+      setSnackbarOpen(true)
       return
     }
     
@@ -28,6 +34,8 @@ export default function registerPage() {
     
     if (!responseCUE.ok) {
       setResponse(responseCUE.error);
+      setSeverity("error")
+      setSnackbarOpen(true)
       return;
     }
       
@@ -35,6 +43,8 @@ export default function registerPage() {
 
     if (!responseCU.ok) {
       setResponse(responseCU.error)
+      setSeverity("error")
+      setSnackbarOpen(true)
       return;
     }
     
@@ -46,9 +56,13 @@ export default function registerPage() {
     
     if (!responseSVM.ok) {
       setResponse(responseSVM.error);
+      setSeverity("error")
+      setSnackbarOpen(true)
       return;
     } else {
       setResponse(`User created. Email sent to ${responseSVM.email}`);
+      setSeverity("success")
+      setSnackbarOpen(true)
     }
   }
   
@@ -97,7 +111,12 @@ export default function registerPage() {
         <Grid item>
           <Typography variant="caption">
             {response != "" ? (
-              response
+              <SnackbarAlert 
+              open={snackbarOpen} 
+              setOpen={setSnackbarOpen} 
+              response={response}
+              severity={severity}
+              />
             ) : (
               <Skeleton
                 animation={false}
