@@ -2,6 +2,7 @@
 "use client"
 
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
 import { cybTheme } from "./../../../components/themeCYB";
 import { signIn, useSession } from "next-auth/react";
@@ -15,6 +16,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [response, setResponse] = useState("")
   const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
   
   const session = useSession()
   const router = useRouter()
@@ -25,10 +27,12 @@ export default function SignInPage() {
   }
   
   const handleLogin = async () => {
+    setLoading(true);
     
     if (email == "") {
       setError(true)
       setResponse("Please fill in your email")
+      setLoading(false);
       return
     }
     
@@ -42,10 +46,11 @@ export default function SignInPage() {
     if (response.error == null) {
       setError(false)
       setResponse(`Email sent to ${normalizedEmail}`);
-    }
-    else {
+      setLoading(false);
+    } else {
       setError(true);
       setResponse(response.error);
+      setLoading(false);
     }
   }
   
@@ -76,8 +81,24 @@ export default function SignInPage() {
         </Grid>
 
         <Grid item>
-          <Button fullWidth variant="contained" onClick={() => handleLogin()}>
+          <Button 
+            fullWidth
+            variant="contained"
+            onClick={() => handleLogin()}
+            disabled={loading}
+          >
             Send magic link
+            {loading && (
+            <CircularProgress
+              size={24}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-12px',
+                marginLeft: '-12px',
+              }}/>
+          )}
           </Button>
         </Grid>
 
