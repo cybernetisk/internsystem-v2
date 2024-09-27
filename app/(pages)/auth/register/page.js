@@ -202,7 +202,7 @@ async function sendVerificiationMail(newUser, activateToken, debug) {
   if (debug) console.log("sendVerificiationMail response:", response);
   
   if (!response.ok) {
-    return { ok: false, error: response.error };
+    return { ok: false, error: response.statusText };
   }
   
   const data = await response.json();
