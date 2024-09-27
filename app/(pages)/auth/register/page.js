@@ -18,6 +18,11 @@ export default function registerPage() {
   const debug = true;
   
   const handleRegister = async () => {
+
+    if (!email.includes("@")) {
+      setResponse("Email is invalid")
+      return
+    }
     
     const responseCUE = await checkUserExists(email, debug)
     
