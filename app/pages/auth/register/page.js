@@ -4,6 +4,7 @@
 import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
 import { normalizeEmail } from "@/app/components/Login/authUtil";
 import Link from "next/link";
 import { useState } from "react";
@@ -13,10 +14,12 @@ export default function registerPage() {
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("")
-  const [response, setResponse] = useState("")
 	const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [severity, setSeverity] = useState("")
+  const [email, setEmail] = useState("");
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   
   const debug = true;
   
@@ -29,6 +32,8 @@ export default function registerPage() {
       setSnackbarOpen(true)
       return
     }
+
+    setLoading(true);
     
     const responseCUE = await checkUserExists(email, debug)
     
@@ -36,6 +41,7 @@ export default function registerPage() {
       setResponse(responseCUE.error);
       setSeverity("error")
       setSnackbarOpen(true)
+      setLoading(false);
       return;
     }
       
@@ -45,6 +51,7 @@ export default function registerPage() {
       setResponse(responseCU.error)
       setSeverity("error")
       setSnackbarOpen(true)
+      setLoading(false);
       return;
     }
     
@@ -58,11 +65,15 @@ export default function registerPage() {
       setResponse(responseSVM.error);
       setSeverity("error")
       setSnackbarOpen(true)
+      setLoading(false);
       return;
     } else {
       setResponse(`User created. Email sent to ${responseSVM.email}`);
       setSeverity("success")
+      setSuccess(true);
       setSnackbarOpen(true)
+      setLoading(false);
+      return;
     }
   }
   
@@ -87,10 +98,35 @@ export default function registerPage() {
           <Button
             fullWidth
             variant="contained"
+            disabled={loading}
             onClick={() => handleRegister()}
           >
             Register
+            
+          {loading && (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-12px',
+              marginLeft: '-12px',
+            }}/>
+          )}
           </Button>
+          </Grid>
+          <Grid item>
+          {success && 
+          <Link href="/pages/auth/signIn">
+            <Button
+              fullWidth
+              variant = "contained">
+              Login
+            </Button>
+          </Link>
+          }
+
         </Grid>
 
         <Grid item container direction="row" justifyContent="flex-end">
