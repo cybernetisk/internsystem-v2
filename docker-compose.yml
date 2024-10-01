@@ -1,0 +1,25 @@
+services:
+  mysql:
+    container_name: internsystem-v2-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+    build:
+      context: dev-database/
+      dockerfile: Dockerfile
+    ports:
+      - "3306:3306"
+
+  frontend:
+    container_name: internsystem-v2-frontend
+    depends_on:
+      - mysql
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "mysql://root:rootpassword@mysql:3306/mydb"
+    ports:
+      - "3005:3005"
