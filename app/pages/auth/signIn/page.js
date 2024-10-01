@@ -9,6 +9,7 @@ import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { normalizeEmail } from "./../../../components/Login/authUtil";
+import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
 
 
 export default function SignInPage() {
@@ -17,6 +18,8 @@ export default function SignInPage() {
   const [response, setResponse] = useState("")
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [severity, setSeverity] = useState("")
   
   const session = useSession()
   const router = useRouter()
@@ -31,8 +34,10 @@ export default function SignInPage() {
     
     if (email == "") {
       setError(true)
+      setSeverity("error")
       setResponse("Please fill in your email")
       setLoading(false);
+      setSnackbarOpen(true);
       return
     }
     
@@ -45,12 +50,16 @@ export default function SignInPage() {
     
     if (response.error == null) {
       setError(false)
+      setSeverity("success")
       setResponse(`Email sent to ${normalizedEmail}`);
       setLoading(false);
+      setSnackbarOpen(true);
     } else {
       setError(true);
+      setSeverity("error")
       setResponse(response.error);
       setLoading(false);
+      setSnackbarOpen(true);
     }
   }
   
@@ -120,12 +129,16 @@ export default function SignInPage() {
               Register new user
             </Typography>
           </Link>
-        </Grid>
-
-        <Grid item container>
-          <Typography variant="subtitle1" >
+        </Grid>        
+        <Grid item>
+          <Typography variant="caption">
             {response != "" ? (
-              response
+              <SnackbarAlert 
+              open={snackbarOpen} 
+              setOpen={setSnackbarOpen} 
+              response={response}
+              severity={severity}
+              />
             ) : (
               <Skeleton
                 animation={false}
