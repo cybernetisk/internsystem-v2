@@ -83,7 +83,7 @@ export class NavBar extends Component {
               </Box>
             </Grid>
 
-            <Grid item>
+            <Grid item sx={{ flexShrink: 1 }}>
               <SessionProvider>
                 <LoginButton />
               </SessionProvider>
