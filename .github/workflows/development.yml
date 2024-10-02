@@ -42,9 +42,7 @@ jobs:
         NEXT_PUBLIC_SANITY_DATASET = '${{ vars.NEXT_PUBLIC_SANITY_DATASET }}'
         NEXT_PUBLIC_SANITY_PROJECT_ID = '${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}'
         EOT
-        npm install -f
-        npm audit fix
-        npm run prismapull
+        npm install
         npx prisma generate
         npm run build
         npx pm2 restart ISV2_dev

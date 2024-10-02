@@ -4,25 +4,44 @@
 import { cybTheme } from "@/app/components/themeCYB";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
 import { normalizeEmail } from "@/app/components/Login/authUtil";
 import Link from "next/link";
 import { useState } from "react";
+import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
 
 export default function registerPage() {
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("")
-  const [response, setResponse] = useState("")
+	const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [severity, setSeverity] = useState("")
+  const [email, setEmail] = useState("");
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   
   const debug = true;
   
   const handleRegister = async () => {
+    setSnackbarOpen(false)
+
+    if (!email.includes("@")) {
+      setResponse("Email is invalid")
+      setSeverity("error")
+      setSnackbarOpen(true)
+      return
+    }
+
+    setLoading(true);
     
     const responseCUE = await checkUserExists(email, debug)
     
     if (!responseCUE.ok) {
       setResponse(responseCUE.error);
+      setSeverity("error")
+      setSnackbarOpen(true)
+      setLoading(false);
       return;
     }
       
@@ -30,6 +49,9 @@ export default function registerPage() {
 
     if (!responseCU.ok) {
       setResponse(responseCU.error)
+      setSeverity("error")
+      setSnackbarOpen(true)
+      setLoading(false);
       return;
     }
     
@@ -41,9 +63,17 @@ export default function registerPage() {
     
     if (!responseSVM.ok) {
       setResponse(responseSVM.error);
+      setSeverity("error")
+      setSnackbarOpen(true)
+      setLoading(false);
       return;
     } else {
       setResponse(`User created. Email sent to ${responseSVM.email}`);
+      setSeverity("success")
+      setSuccess(true);
+      setSnackbarOpen(true)
+      setLoading(false);
+      return;
     }
   }
   
@@ -68,10 +98,35 @@ export default function registerPage() {
           <Button
             fullWidth
             variant="contained"
+            disabled={loading}
             onClick={() => handleRegister()}
           >
             Register
+            
+          {loading && (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-12px',
+              marginLeft: '-12px',
+            }}/>
+          )}
           </Button>
+          </Grid>
+          <Grid item>
+          {success && 
+          <Link href="/pages/auth/signIn">
+            <Button
+              fullWidth
+              variant = "contained">
+              Login
+            </Button>
+          </Link>
+          }
+
         </Grid>
 
         <Grid item container direction="row" justifyContent="flex-end">
@@ -92,7 +147,12 @@ export default function registerPage() {
         <Grid item>
           <Typography variant="caption">
             {response != "" ? (
-              response
+              <SnackbarAlert 
+              open={snackbarOpen} 
+              setOpen={setSnackbarOpen} 
+              response={response}
+              severity={severity}
+              />
             ) : (
               <Skeleton
                 animation={false}
@@ -202,7 +262,7 @@ async function sendVerificiationMail(newUser, activateToken, debug) {
   if (debug) console.log("sendVerificiationMail response:", response);
   
   if (!response.ok) {
-    return { ok: false, error: response.error };
+    return { ok: false, error: response.statusText };
   }
   
   const data = await response.json();

@@ -29,6 +29,7 @@ export async function POST(req) {
       
     } catch (error) {
       console.error("Error with sending email: ", error);
+      return NextResponse.json({ success: success, email: user.email, error: error }, { status: 400, statusText: `Can't send email to ${user.email}` })
     }
     
     return NextResponse.json({ success: success, email: user.email,  link: link }, { status: 200 });
