@@ -18,7 +18,7 @@ import { cybTheme } from "@/app/components/themeCYB";
 import LayoutFooter from "@/app/components/layout/Footer";
 
 const NavItems = [
-  { id: "home", path: "home", name: "Home", icon: <Home /> },
+  { id: "home", path: "", name: "Home", icon: <Home /> },
   { id: "aboutCYB", path: "aboutCYB", name: "About CYB", icon: <Groups /> },
   {
     id: "volunteering",
