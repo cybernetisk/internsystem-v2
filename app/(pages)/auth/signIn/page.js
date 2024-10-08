@@ -20,7 +20,7 @@ export default function SignInPage() {
   const router = useRouter()
    
   if (session.status == "authenticated") {
-    router.push("/pages/main/home");
+    router.push("/");
     return;
   }
   
@@ -88,7 +88,7 @@ export default function SignInPage() {
           justifyContent="flex-end"
         >
           <Link
-            href="/pages/auth/register"
+            href="/auth/register"
             passHref
             style={{ textDecoration: "none", cursor: "pointer" }}
           >

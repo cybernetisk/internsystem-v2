@@ -76,7 +76,7 @@ export default function registerPage() {
 
         <Grid item container direction="row" justifyContent="flex-end">
           <Link
-            href="/pages/auth/signIn"
+            href="/auth/signIn"
             passHref
             style={{ textDecoration: "none", cursor: "pointer" }}
           >

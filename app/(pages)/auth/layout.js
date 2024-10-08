@@ -17,7 +17,7 @@ export default function AuthLayout({ children }) {
       <body>
         <ThemeProvider theme={cybTheme}>
           <Box sx={{ p:2, px:3 }}>
-            <Link href={`/pages/main/home`}>
+            <Link href={`/`}>
               <Avatar
                 sx={{
                   height: 45,

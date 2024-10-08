@@ -26,7 +26,7 @@ export default function WebsiteBreadcrumbs(path, navItems) {
     const path = `/${pathBits.slice(0, index + 1).join("/")}`;
 
     return (
-      <Link key={"link_" + path} href={"/pages/main/" + path}>
+      <Link key={"link_" + path} href={"/" + path}>
         <Typography
           // color="text.primary"
           variant="body2"
