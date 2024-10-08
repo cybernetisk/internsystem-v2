@@ -127,6 +127,7 @@ export default function workLogInput(
             ampm={false}
             disableOpenPicker
             onChange={(e) => {
+              if (e < selectedDateTime) return; // Prevent endDateTime from being before startDateTime
               setEndDateTime(e);
               setHours(Math.round(((e - selectedDateTime) / 3600000) * 10) / 10) // Update hours
             }}
@@ -188,7 +189,7 @@ function validateWorkLogRequest(
     registeredForError: registeredFor == null,
     selectedGroupError: selectedGroup == null,
     selectedDateTimeError: false, // TODO: add semester validation
-    hoursError: hours <= 0 || hours > 24,
+    hoursError: Number.isNaN(hours) || hours <= 0 || hours > 24,
     descriptionError: description.length == 0,
   };
 
