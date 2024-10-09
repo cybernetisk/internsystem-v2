@@ -120,29 +120,37 @@ export default function workLogInput(
             onChange={(e) => setSelectedDateTime(e)}
           />
         </LocalizationProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
-          <DateTimePicker
-            label="End of work"
-            value={endDateTime} // Replacing defaultValue to make it synced with the actual value
-            ampm={false}
-            disableOpenPicker
-            onChange={(e) => {
-              if (e < selectedDateTime) return; // Prevent endDateTime from being before startDateTime
-              setEndDateTime(e);
-              setHours(Math.round(((e - selectedDateTime) / 3600000) * 10) / 10) // Update hours
+        <Stack
+          direction="column"
+          spacing={1}
+          padding={2}
+          outline={"1px solid #575757"}
+          borderRadius={"4px"}
+        >
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+            <DateTimePicker
+              label="End of work"
+              value={endDateTime} // Replacing defaultValue to make it synced with the actual value
+              ampm={false}
+              disableOpenPicker
+              onChange={(e) => {
+                if (e < selectedDateTime) return; // Prevent endDateTime from being before startDateTime
+                setEndDateTime(e);
+                setHours(Math.round(((e - selectedDateTime) / 3600000) * 10) / 10) // Update hours
+              }}
+            />
+          </LocalizationProvider>
+          <CustomNumberInput
+            label="Hours worked"
+            value={hours}
+            setValue={(value) => {
+              setHours(value);
+              setEndDateTime(new Date(selectedDateTime.getTime() + value * 3600000)); // Update endDateTime
             }}
+            check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
+            error={hoursError}
           />
-        </LocalizationProvider>
-        <CustomNumberInput
-          label="Hours worked"
-          value={hours}
-          setValue={(value) => {
-            setHours(value);
-            setEndDateTime(new Date(selectedDateTime.getTime() + value * 3600000)); // Update endDateTime
-          }}
-          check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
-          error={hoursError}
-        />
+        </Stack>
         <TextField
           label="Description"
           size="small"
