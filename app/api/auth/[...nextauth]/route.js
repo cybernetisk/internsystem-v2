@@ -84,7 +84,7 @@ const handler = NextAuth({
     }
   },
   pages: {
-    signIn: "/pages/auth/signIn"
+    signIn: "/auth/signIn"
   },
   adapter: PrismaAdapter(prisma),
 });
