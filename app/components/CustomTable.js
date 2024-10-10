@@ -76,6 +76,7 @@ function CustomTable({ headers, data, defaultFilterBy }) {
   }, [data, sortBy, sortDirection]);
 
   const filteredData = useMemo(() => {
+    setPage(0);
     return sortedData.filter((row) => {
       if (selectedSearchColumn === null || selectedFilterOption === null) {
         return true;
