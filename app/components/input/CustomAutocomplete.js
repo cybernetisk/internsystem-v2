@@ -99,7 +99,7 @@ export default class CustomAutoComplete extends Component {
               <Stack direction="column" alignItems="start">
                 <Typography
                   key={`option_box_name_${props.id}`}
-                  // color="MenuText"
+                  color="white"
                 >
                   {option[dataLabel]}
                 </Typography>
