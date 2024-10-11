@@ -77,6 +77,26 @@ export default function registerPage() {
     }
   }
   
+
+  const CheckedTextField = (title, textValue, textCallback) => {
+  
+    return (
+      <Grid item>
+        <TextField
+          fullWidth
+          required
+          variant="filled"
+          label={title}
+          value={textValue}
+          onChange={(event) => textCallback(event.target.value)}
+          InputLabelProps={{ shrink: true }}
+          onKeyUp={(e)=>{if(e.key==="Enter") handleRegister()}}
+        />
+      </Grid>
+    );
+    
+  }
+  
   return (
     <Box>
       <Grid
@@ -165,23 +185,6 @@ export default function registerPage() {
   
 }
 
-const CheckedTextField = (title, textValue, textCallback) => {
-  
-  return (
-    <Grid item>
-      <TextField
-        fullWidth
-        required
-        variant="filled"
-        label={title}
-        value={textValue}
-        onChange={(event) => textCallback(event.target.value)}
-        InputLabelProps={{ shrink: true }}
-      />
-    </Grid>
-  );
-  
-}
 
 // 
 async function checkUserExists(email, debug) {
