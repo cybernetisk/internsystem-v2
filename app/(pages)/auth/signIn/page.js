@@ -86,6 +86,7 @@ export default function SignInPage() {
             error={error}
             onChange={(event) => setEmail(event.target.value)}
             InputLabelProps={{ shrink: true }}
+            onKeyUp={(e) => {if(e.key==="Enter") handleLogin()}}
           />
         </Grid>
 
