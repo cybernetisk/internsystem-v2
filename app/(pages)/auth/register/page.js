@@ -107,15 +107,29 @@ export default function registerPage() {
           )}
           </Button>
           </Grid>
-          <Grid item>
-          {success && 
-          <Link href="/pages/auth/signIn">
-            <Button
-              fullWidth
-              variant = "contained">
-              Login
-            </Button>
-          </Link>
+          {success ? 
+            <Grid item>
+            <Link href="/pages/auth/signIn">
+              <Button
+                fullWidth
+                variant = "contained">
+                Login
+              </Button>
+            </Link>
+          </Grid>
+          :
+          <Grid item container justifyContent="flex-end">
+            <Link
+              href="/pages/auth/signIn"
+              passHref
+              style={{ textDecoration: "none", cursor: "pointer" }}>
+                <Typography
+                  variant="caption"
+                  color={cybTheme.palette.primary.main}>
+                  Log in
+                </Typography>
+              </Link>
+            </Grid>
           }
 
         </Grid>
