@@ -1,5 +1,11 @@
-
-import { Box, Button, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -9,12 +15,7 @@ import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB";
 import { set } from "sanity";
 
-export default function workLogInput(
-  session,
-  users,
-  workGroups,
-  setRefresh
-) {
+export default function workLogInput(session, users, workGroups, setRefresh) {
   const [registeredFor, setRegisteredFor] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
@@ -83,7 +84,7 @@ export default function workLogInput(
         },
       },
     });
-    
+
     setRegisteredFor(null);
     setRequestResponse("Work registered.");
     setTimeout(() => {
@@ -93,7 +94,7 @@ export default function workLogInput(
 
   return (
     <Stack direction="column" spacing={1}>
-      <Stack  direction="column" spacing={2}>
+      <Stack direction="column" spacing={2}>
         <CustomAutoComplete
           label="Registered for"
           dataLabel="name"
@@ -111,13 +112,16 @@ export default function workLogInput(
           callback={setSelectedGroup}
           error={selectedGroupError}
         />
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+        <LocalizationProvider
+          dateAdapter={AdapterDateFns}
+          adapterLocale={locale}
+        >
           <DateTimePicker
             label="Start of work"
             defaultValue={selectedDateTime}
             ampm={false}
-            disableOpenPicker
             onChange={(e) => setSelectedDateTime(e)}
+            views={["year", "day", "hours", "minutes"]}
           />
         </LocalizationProvider>
         <Stack
@@ -127,17 +131,22 @@ export default function workLogInput(
           outline={"1px solid #575757"}
           borderRadius={"4px"}
         >
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={locale}
+          >
             <DateTimePicker
               label="End of work"
               value={endDateTime} // Replacing defaultValue to make it synced with the actual value
               ampm={false}
-              disableOpenPicker
               onChange={(e) => {
                 if (e < selectedDateTime) return; // Prevent endDateTime from being before startDateTime
                 setEndDateTime(e);
-                setHours(Math.round(((e - selectedDateTime) / 3600000) * 10) / 10) // Update hours
+                setHours(
+                  Math.round(((e - selectedDateTime) / 3600000) * 10) / 10
+                ); // Update hours
               }}
+              views={["year", "day", "hours", "minutes"]}
             />
           </LocalizationProvider>
           <CustomNumberInput
@@ -145,7 +154,9 @@ export default function workLogInput(
             value={hours}
             setValue={(value) => {
               setHours(value);
-              setEndDateTime(new Date(selectedDateTime.getTime() + value * 3600000)); // Update endDateTime
+              setEndDateTime(
+                new Date(selectedDateTime.getTime() + value * 3600000)
+              ); // Update endDateTime
             }}
             check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
             error={hoursError}
@@ -191,7 +202,6 @@ function validateWorkLogRequest(
   setHoursError,
   setDescriptionError
 ) {
-  
   // Define an object to store the errors
   const errors = {
     registeredForError: registeredFor == null,
