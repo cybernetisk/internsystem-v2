@@ -2,12 +2,14 @@
 "use client"
 
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
 import { cybTheme } from "./../../../components/themeCYB";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { normalizeEmail } from "./../../../components/Login/authUtil";
+import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
 
 
 export default function SignInPage() {
@@ -15,6 +17,9 @@ export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [response, setResponse] = useState("")
   const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [severity, setSeverity] = useState("")
   
   const session = useSession()
   const router = useRouter()
@@ -25,10 +30,14 @@ export default function SignInPage() {
   }
   
   const handleLogin = async () => {
+    setLoading(true);
     
     if (email == "") {
       setError(true)
+      setSeverity("error")
       setResponse("Please fill in your email")
+      setLoading(false);
+      setSnackbarOpen(true);
       return
     }
     
@@ -41,11 +50,16 @@ export default function SignInPage() {
     
     if (response.error == null) {
       setError(false)
+      setSeverity("success")
       setResponse(`Email sent to ${normalizedEmail}`);
-    }
-    else {
+      setLoading(false);
+      setSnackbarOpen(true);
+    } else {
       setError(true);
+      setSeverity("error")
       setResponse(response.error);
+      setLoading(false);
+      setSnackbarOpen(true);
     }
   }
   
@@ -72,12 +86,29 @@ export default function SignInPage() {
             error={error}
             onChange={(event) => setEmail(event.target.value)}
             InputLabelProps={{ shrink: true }}
+            onKeyUp={(e) => {if(e.key==="Enter") handleLogin()}}
           />
         </Grid>
 
         <Grid item>
-          <Button fullWidth variant="contained" onClick={() => handleLogin()}>
+          <Button 
+            fullWidth
+            variant="contained"
+            onClick={() => handleLogin()}
+            disabled={loading}
+          >
             Send magic link
+            {loading && (
+            <CircularProgress
+              size={24}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-12px',
+                marginLeft: '-12px',
+              }}/>
+          )}
           </Button>
         </Grid>
 
@@ -99,12 +130,16 @@ export default function SignInPage() {
               Register new user
             </Typography>
           </Link>
-        </Grid>
-
-        <Grid item container>
-          <Typography variant="subtitle1" >
+        </Grid>        
+        <Grid item>
+          <Typography variant="caption">
             {response != "" ? (
-              response
+              <SnackbarAlert 
+              open={snackbarOpen} 
+              setOpen={setSnackbarOpen} 
+              response={response}
+              severity={severity}
+              />
             ) : (
               <Skeleton
                 animation={false}
