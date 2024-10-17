@@ -14,10 +14,12 @@ export default function registerPage() {
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("")
-  const [response, setResponse] = useState("")
 	const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [severity, setSeverity] = useState("")
+  const [email, setEmail] = useState("");
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   
   const debug = true;
   
@@ -38,6 +40,7 @@ export default function registerPage() {
       setResponse(responseCUE.error);
       setSeverity("error")
       setSnackbarOpen(true)
+      setLoading(false);
       return;
     }
       
@@ -47,6 +50,7 @@ export default function registerPage() {
       setResponse(responseCU.error)
       setSeverity("error")
       setSnackbarOpen(true)
+      setLoading(false);
       return;
     }
     
@@ -60,11 +64,15 @@ export default function registerPage() {
       setResponse(responseSVM.error);
       setSeverity("error")
       setSnackbarOpen(true)
+      setLoading(false);
       return;
     } else {
       setResponse(`User created. Email sent to ${responseSVM.email}`);
       setSeverity("success")
+      setSuccess(true);
       setSnackbarOpen(true)
+      setLoading(false);
+      return;
     }
   }
   
@@ -151,23 +159,6 @@ export default function registerPage() {
               </Link>
             </Grid>
           }
-
-        </Grid>
-
-        <Grid item container direction="row" justifyContent="flex-end">
-          <Link
-            href="/auth/signIn"
-            passHref
-            style={{ textDecoration: "none", cursor: "pointer" }}
-          >
-            <Typography
-              variant="caption"
-              color={cybTheme.palette.primary.main}
-            >
-              Log in
-            </Typography>
-          </Link>
-        </Grid>
 
         <Grid item>
           <Typography variant="caption">
