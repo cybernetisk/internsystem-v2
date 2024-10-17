@@ -5,7 +5,7 @@ export const cybTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#d2a30e",
+      main: "#E66C2C",
     },
     secondary: {
       main: "#ac0bce",
