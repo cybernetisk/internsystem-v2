@@ -138,7 +138,7 @@ export default function registerPage() {
           </Grid>
           {success ? 
             <Grid item>
-            <Link href="/pages/auth/signIn">
+            <Link href="/auth/signIn">
               <Button
                 fullWidth
                 variant = "contained">
@@ -149,7 +149,7 @@ export default function registerPage() {
           :
           <Grid item container justifyContent="flex-end">
             <Link
-              href="/pages/auth/signIn"
+              href="/auth/signIn"
               passHref
               style={{ textDecoration: "none", cursor: "pointer" }}>
                 <Typography
