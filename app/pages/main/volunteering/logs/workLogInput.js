@@ -1,5 +1,5 @@
 
-import { Box, Button, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import { Button, Fab, Skeleton, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -7,7 +7,7 @@ import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB";
-import { set } from "sanity";
+import { CalendarToday, PunchClock } from "@mui/icons-material";
 
 export default function workLogInput(
   session,
@@ -21,6 +21,8 @@ export default function workLogInput(
   const [endDateTime, setEndDateTime] = useState(new Date());
   const [hours, setHours] = useState(0);
   const [description, setDescription] = useState("");
+  const [shouldInputHours, setShouldInputHours] = useState(false);
+  const [endInputMethodTooltip, setEndInputMethodTooltip] = useState("Change to 'End of work'");
 
   const [registeredForError, setRegisteredForError] = useState(false);
   const [selectedGroupError, setSelectedGroupError] = useState(false);
@@ -91,6 +93,21 @@ export default function workLogInput(
     }, 5000);
   };
 
+  const switchEndInputMethod = () => {
+    if (!shouldInputHours) {
+      setShouldInputHours(true);
+      document.querySelector(".endDateTime").setAttribute("style", "display: inline");
+      document.querySelector(".hours").setAttribute("style", "display: none");
+      setEndInputMethodTooltip("Change to 'Hours worked'");
+
+    } else {
+      setShouldInputHours(false);
+      document.querySelector(".endDateTime").setAttribute("style", "display: none");
+      document.querySelector(".hours").setAttribute("style", "display: inline");
+      setEndInputMethodTooltip("Change to 'End of work'");
+    }
+  };
+
   return (
     <Stack direction="column" spacing={1}>
       <Stack  direction="column" spacing={2}>
@@ -118,17 +135,16 @@ export default function workLogInput(
             ampm={false}
             disableOpenPicker
             onChange={(e) => setSelectedDateTime(e)}
-          />
+            />
         </LocalizationProvider>
         <Stack
-          direction="column"
-          spacing={1}
-          padding={2}
-          outline={"1px solid #575757"}
-          borderRadius={"4px"}
+          direction="row"
+          alignItems={"stretch"}
         >
           <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
             <DateTimePicker
+              className="endDateTime"
+              sx={{ display: "none" }}
               label="End of work"
               value={endDateTime} // Replacing defaultValue to make it synced with the actual value
               ampm={false}
@@ -141,15 +157,27 @@ export default function workLogInput(
             />
           </LocalizationProvider>
           <CustomNumberInput
+            className="hours"
             label="Hours worked"
             value={hours}
-            setValue={(value) => {
-              setHours(value);
-              setEndDateTime(new Date(selectedDateTime.getTime() + value * 3600000)); // Update endDateTime
-            }}
+            setValue={(value) => {setHours(value);}}
             check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
             error={hoursError}
           />
+          <Tooltip
+            className="endInputMethodTooltip"
+            title={ endInputMethodTooltip }
+          >
+            <Fab
+              className="endInputMethodChangeButton"
+              size="small"
+              color="primary"
+              style={{ marginLeft: "10px" }}
+              onClick={() => {switchEndInputMethod();}}
+            >
+              { shouldInputHours ? <PunchClock /> : <CalendarToday /> }
+            </Fab>
+          </Tooltip>
         </Stack>
         <TextField
           label="Description"

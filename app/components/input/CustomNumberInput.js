@@ -4,10 +4,11 @@ import { Component } from "react";
 
 export default class CustomNumberInput extends Component {
   render() {
-    const { label, value, setValue, check, error } = this.props;
+    const { label, value, setValue, check, error, className } = this.props;
 
     return (
       <TextField
+        className={className}
         label={label}
         size="small"
         InputLabelProps={{ shrink: true }}
