@@ -1,12 +1,25 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
+
 
 /**
  * @param {NextRequest} req
  * @returns {NextResponse}
  */
 export async function POST(req) {
+  
+  // TODO: update logic so that session is ONLY checked if method is NOT "find".
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      { error: "Unauthorized: Please log in" },
+      { status: 401 }
+    );
+  }
 
   const args = await req.json();
 
