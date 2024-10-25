@@ -123,6 +123,8 @@ function MembershipPage() {
       },
       callback: (data) => {
         setRefresh(!refresh);
+        setNewMemberComment("");
+        setNewMemberName("");
       },
     });
   };
