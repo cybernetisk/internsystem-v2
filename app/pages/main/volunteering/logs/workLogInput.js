@@ -145,6 +145,7 @@ export default function workLogInput(
             <DateTimePicker
               className="endDateTime"
               sx={{ display: "none" }}
+              slotProps={{ textField: { fullWidth: true } }}
               label="End of work"
               value={endDateTime} // Replacing defaultValue to make it synced with the actual value
               ampm={false}
@@ -172,7 +173,10 @@ export default function workLogInput(
               className="endInputMethodChangeButton"
               size="small"
               color="primary"
-              style={{ marginLeft: "10px" }}
+              style={{
+                marginLeft: "10px",
+                padding: "10px",
+               }}
               onClick={() => {switchEndInputMethod();}}
             >
               { shouldInputHours ? <PunchClock /> : <CalendarToday /> }

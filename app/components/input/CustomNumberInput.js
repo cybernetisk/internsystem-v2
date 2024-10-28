@@ -15,6 +15,7 @@ export default class CustomNumberInput extends Component {
         value={value}
         error={error}
         onFocus={(e) => e.target.select()}
+        fullWidth
         onBlur={(e) => {
           let value = check(e.target.value) ? 0 : e.target.value;
           if (value === "") value = 0;
