@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 
+
 export async function GET(req) {
   
   if (req.method != "GET") {
@@ -35,6 +36,5 @@ export async function GET(req) {
       { error: `something went wrong: ${error}` },
       { status: 500 }
     );
-  }
-  
+  } 
 }

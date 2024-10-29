@@ -68,11 +68,11 @@ function LogsPage() {
         ),
     });
 
-    prismaRequest({
-      model: "workGroup",
-      method: "find",
-      callback: (data) => setWorkGroups(data.data),
-    });
+    fetch("/api/v2/workGroups")
+    .then(res => res.json())
+    .then(groups => {
+      setWorkGroups(groups.groups)
+    })
   }, []);
 
   useEffect(() => {
