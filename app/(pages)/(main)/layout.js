@@ -61,7 +61,7 @@ export default function AppLayout({ children }) {
               }}
             >
               <Container sx={{ mb: 3 }}>
-                <SessionProvider>{children}</SessionProvider>
+                <SessionProvider basePath="/api/v2/auth">{children}</SessionProvider>
               </Container>
             </Container>
           </Box>

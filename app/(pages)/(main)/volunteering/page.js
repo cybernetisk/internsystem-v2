@@ -63,18 +63,10 @@ function VolunteeringPage(params) {
   
   useEffect(() => {
     
-    prismaRequest({
-      model: "semester",
-      method: "find",
-      request: {
-        orderBy: {
-          id: "desc"
-        }
-      },
-      callback: (data) => {
-        if (data.length == 0) return;
-        setSemester(data.data[0])
-      }
+    fetch("/api/v2/semester")
+    .then(res => res.json)
+    .then(data => {
+      setSemester(data.semester)
     });
     
     prismaRequest({

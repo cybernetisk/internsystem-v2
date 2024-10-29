@@ -76,35 +76,18 @@ function LogsPage() {
   }, []);
 
   useEffect(() => {
-    prismaRequest({
-      model: "workLog",
-      method: "find",
-      request: {
-        include: {
-          LoggedByUser: true,
-          LoggedForUser: true,
-        },
-        where: {
-          semesterId: session.data.semester.id,
-        },
-      },
-      callback: (data) => handleWorkLogs(data.data, session, setWorkLogs, setVouchersEarned)
-    });
+    fetch("/api/v2/workLogs")
+    .then(res => res.json())
+    .then(resData => {
+      handleWorkLogs(resData.workLogs, session, setWorkLogs, setVouchersEarned)
+    })
     
-    prismaRequest({
-      model: "voucherLog",
-      method: "find",
-      request: {
-        include: {
-          LoggedForUser: true,
-        },
-        where: {
-          semesterId: session.data.semester.id,
-        },
-      },
-      callback: (data) => handleVoucherLogs(data.data, session, setVoucherLogs, setVouchersUsed)
-    });
-  }, [refresh]);
+    fetch("/api/v2/voucherLogs")
+    .then(res => res.json())
+    .then(voucherLog => {
+      handleVoucherLogs(voucherLog.voucherLogs, session, setVoucherLogs, setVouchersUsed)
+    })
+  }, [refresh])
   
   const worklogInputLayout = worklogInput(
     session,

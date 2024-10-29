@@ -48,7 +48,7 @@ export class NavBar extends Component {
             ))}
 
             <Grid item xs>
-              <SessionProvider>
+              <SessionProvider basePath="/api/v2/auth">
                 <LoginButton currentPath={currentPath} iconProps={iconProps} />
               </SessionProvider>
             </Grid>
@@ -84,7 +84,7 @@ export class NavBar extends Component {
             </Grid>
 
             <Grid item sx={{ flexShrink: 1 }}>
-              <SessionProvider>
+              <SessionProvider basePath="/api/v2/auth">
                 <LoginButton />
               </SessionProvider>
             </Grid>

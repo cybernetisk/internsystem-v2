@@ -50,7 +50,7 @@ export default function AuthLayout({ children }) {
                 sx={{ minHeight: "100vh" }}
               >
                 <Paper>
-                  <SessionProvider basePath="/api/v2/auth">{children}</SessionProvider>
+                  <SessionProvider>{children}</SessionProvider>
                 </Paper>
               </Stack>
             </Box>

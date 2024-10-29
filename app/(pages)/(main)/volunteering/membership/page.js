@@ -45,7 +45,7 @@ const MEMBERSHIP_TABLE_HEADERS = [
     flex: 3,
   },
   {
-    id: "comment",
+    id: "comments",
     type: "string",
     name: "Comment",
     flex: 2,
@@ -64,28 +64,12 @@ function MembershipPage() {
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    prismaRequest({
-      model: "userMembership",
-      method: "find",
-      request: {
-        where: {
-          OR: [
-            {
-              semester_id: session.data.semester.id,
-            },
-            {
-              honorary: true,
-            },
-            {
-              lifetime: true,
-            },
-          ],
-        },
-      },
-      callback: (data) => {
+    fetch("/api/v2/memberships").then(res => {
+      res.json().then((data) => {
+        console.log(data)
         if (data.length == 0) return;
 
-        const newMembershipData = data.data.map((e) => {
+        const newMembershipData = data.memberships.map((e) => {
           return {
             ...e,
             date_joined_num: parseISO(e.date_joined).getTime(),
@@ -96,7 +80,7 @@ function MembershipPage() {
           };
         });
 
-        const newNumSpecialMembers = data.data.filter((e) => {
+        const newNumSpecialMembers = data.memberships.filter((e) => {
           return e.honorary || e.lifetime;
         }).length;
 
@@ -104,8 +88,8 @@ function MembershipPage() {
         setTableData(newMembershipData);
 
         setNumSpecialMembers(newNumSpecialMembers);
-      },
-    });
+      })
+    })
   }, [refresh]);
 
   const addNewMember = async () => {
