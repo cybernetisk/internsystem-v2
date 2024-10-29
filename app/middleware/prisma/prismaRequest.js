@@ -8,7 +8,7 @@ export default async function prismaRequest({
   debug = false,
 }) {
   
-  const response = await fetch("/api/data/prisma", {
+  const response = await fetch("/api/v1/data/prisma", {
     method: "post",
     mode: "cors",
     headers: {

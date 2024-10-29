@@ -217,7 +217,7 @@ function roleSettings(
 ) {
   
   const handleSave = async () => {
-    const response = await fetch("/api/data/setRoles", {
+    const response = await fetch("/api/v1/data/setRoles", {
       method: "post",
       mode: "cors",
       headers: {

@@ -218,7 +218,7 @@ async function createUser(firstName, lastName, email, debug) {
   
   const normalizedEmail = normalizeEmail(email);
   
-  const response = await fetch("/api/createUser/", {
+  const response = await fetch("/api/v1/createUser/", {
     method: "post",
     mode: "cors",
     headers: {
@@ -247,7 +247,7 @@ async function createUser(firstName, lastName, email, debug) {
 // 
 async function sendVerificiationMail(newUser, activateToken, debug) {
   
-  const response = await fetch("/api/sendVerification/", {
+  const response = await fetch("/api/v1/sendVerification/", {
     method: "post",
     mode: "cors",
     headers: {

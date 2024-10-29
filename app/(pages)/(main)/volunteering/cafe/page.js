@@ -88,7 +88,7 @@ function CafePage() {
   const manageShift = async () => {
     
     const sendRequest = async (date, id) => {
-      const response = await fetch("/api/data/updateORCreateShift", {
+      const response = await fetch("/api/v1/data/updateORCreateShift", {
         method: "post",
         mode: "cors",
         headers: {
@@ -124,7 +124,7 @@ function CafePage() {
   }
   
   const manageShiftClear = async () => {
-    const response = await fetch("/api/data/updateORCreateShift", {
+    const response = await fetch("/api/v1/data/updateORCreateShift", {
       method: "post",
       mode: "cors",
       headers: {
