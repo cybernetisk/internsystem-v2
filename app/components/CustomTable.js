@@ -56,7 +56,11 @@ const booleanFilterOptions = [
   { id: "false", name: "False" },
 ]
 
-function CustomTable({ headers, data, defaultFilterBy }) {
+function CustomTable({ headers, data, defaultFilterBy=null }) {
+  let header = null;
+  if (defaultFilterBy) {
+    header = headers.filter(h => h.id == defaultFilterBy)[0];
+  }
   const [sortBy, setSortBy] = useState(() => headers[0]?.sortBy || null);
   const [sortDirection, setSortDirection] = useState("DESC");
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -66,10 +70,14 @@ function CustomTable({ headers, data, defaultFilterBy }) {
   const [searchString, setSearchString] = useState("");
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   
-  const [availableFilterOptions, setAvailableFilterOptions] = useState([]);
-  const [selectedFilterOption, setSelectedFilterOption] = useState(null);
-  const [selectedSearchColumn, setSelectedSearchColumn] = useState(null);
+  const [availableFilterOptions, setAvailableFilterOptions] = useState(
+    header.type === "string" || header.type === "boolean" ? filterTableOptions.filter((e) => e.id === "contains") : filterTableOptions.filter((e) => e.id !== "contains")
+  );
+  const [selectedFilterOption, setSelectedFilterOption] = useState(availableFilterOptions[0]);
+  const [selectedSearchColumn, setSelectedSearchColumn] = useState(header);
   const [selectedBooleanOption, setSelectedBooleanOption] = useState(null);
+
+  
 
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => sortTableRows(a, b, sortBy, sortDirection));
@@ -160,7 +168,7 @@ function CustomTable({ headers, data, defaultFilterBy }) {
       setAvailableFilterOptions(filterTableOptions.filter((e) => e.id !== "contains"));
     }
     
-    setSelectedFilterOption(null);
+    setSelectedFilterOption(availableFilterOptions.length > 0 ? availableFilterOptions[0] : null);
     setSelectedBooleanOption(null);
     setSearchString("");
     
@@ -394,7 +402,7 @@ CustomTable.propTypes = {
     })
   ).isRequired,
   data: PropTypes.array.isRequired,
-  sortBy: PropTypes.string
+  sortBy: PropTypes.string,
 };
 
 export default CustomTable;
