@@ -116,7 +116,7 @@ function MembershipPage() {
         data: {
           name: newMemberName,
           email: "",
-          comment: newMemberComment,
+          comments: newMemberComment,
           seller_id: session.data.user.id,
           semester_id: session.data.semester.id,
         },
