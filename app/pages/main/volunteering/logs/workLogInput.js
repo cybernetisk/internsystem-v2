@@ -132,6 +132,7 @@ export default function workLogInput(
           <DateTimePicker
             label="Start of work"
             defaultValue={selectedDateTime}
+            slotProps={{ textField: { fullWidth: true, size: "small" } }}
             ampm={false}
             disableOpenPicker
             onChange={(e) => setSelectedDateTime(e)}
@@ -145,7 +146,7 @@ export default function workLogInput(
             <DateTimePicker
               className="endDateTime"
               sx={{ display: "none" }}
-              slotProps={{ textField: { fullWidth: true } }}
+              slotProps={{ textField: { fullWidth: true, size: "small" } }}
               label="End of work"
               value={endDateTime} // Replacing defaultValue to make it synced with the actual value
               ampm={false}
