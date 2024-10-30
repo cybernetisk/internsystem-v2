@@ -17,6 +17,7 @@ import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import TextFieldWithX from "@/app/components/input/TextFieldWithX";
 
 const MEMBERSHIP_TABLE_HEADERS = [
   {
@@ -140,23 +141,17 @@ function MembershipPage() {
             <Card elevation={3}>
               <CardContent>
                 <Stack direction="column" spacing={2}>
-                  <TextField
-                    variant="outlined"
-                    size="small"
+                  <TextFieldWithX
                     label="new member"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
+                    name="membername"
                     value={newMemberName}
-                    onChange={(e) => setNewMemberName(e.target.value)}
+                    setValue={setNewMemberName}
                   />
-                  <TextField
-                    variant="outlined"
-                    size="small"
+                  <TextFieldWithX
                     label="comment"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
+                    name="membercomment"
                     value={newMemberComment}
-                    onChange={(e) => setNewMemberComment(e.target.value)}
+                    setValue={setNewMemberComment}
                   />
                   <Button
                     fullWidth

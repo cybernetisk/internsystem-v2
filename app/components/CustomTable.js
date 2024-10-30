@@ -26,6 +26,7 @@ import CustomAutoComplete from "./input/CustomAutocomplete";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import locale from "date-fns/locale/en-GB";
+import TextFieldWithX from "./input/TextFieldWithX";
 
 // Styled table component
 const TableStyle = styled(Table)(({ theme }) => ({
@@ -176,14 +177,12 @@ function CustomTable({ headers, data, defaultFilterBy=null }) {
   }
   
   let searchComponent = (
-    <TextField
+    <TextFieldWithX
       label="Search string"
-      size="small"
-      fullWidth
-      onKeyDown={(e) => (e.key === "Enter" ? setRefresh(!refresh) : null)}
-      InputLabelProps={{ shrink: true }}
+      name="searchString"
       value={searchString}
-      onChange={(e) => setSearchString(e.target.value)}
+      setValue={setSearchString}
+      onKeyDown={(e) => (e.key === "Enter" ? setRefresh(!refresh) : null)}
     />
   );
   
