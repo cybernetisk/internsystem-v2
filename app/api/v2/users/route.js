@@ -57,18 +57,14 @@ export async function POST(req) {
 
 export async function GET(req) {
   const params = req.nextUrl.searchParams
+
+  const queryParams = {}
   if (params.get("active") === "true") {
-    const res = await prisma.user.findMany({
-      where: {
-        active: true
-      }
-    })
-    return NextResponse.json(
-      res,
-      {status: 200}
-    )
+    queryParams.update({where: {active: true}})
   }
+  const res = await prisma.user.findMany(queryParams)
   return NextResponse.json(
+    {users: res},
     {status: 200}
   )
 }
