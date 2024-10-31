@@ -4,6 +4,7 @@ import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
+import CustomMultiAutoComplete from "@/app/components/input/CustomMultiAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB";
@@ -44,6 +45,53 @@ export default function workLogInput(
 
     if (isInvalid) return;
 
+    for (let user of registeredFor) {
+      const response = await prismaRequest({
+        model: "workLog",
+        method: "create",
+        request: {
+          data: {
+            loggedBy: session.data.user.id,
+            loggedFor: user.id,
+            workedAt: selectedDateTime.toISOString(),
+            duration: hours,
+            description: description,
+            semesterId: session.data.semester.id,
+          },
+        },
+        callback: (data) => {
+          setRegisteredFor(registeredFor.filter((u) => u.id != user.id));
+          setSelectedGroup(null);
+          setHours(0);
+          setDescription("");
+          setRefresh(data);
+        },
+      });
+
+      if (!response.ok) {
+        setRequestResponse("Failed to register work. Please try again.");
+        return;
+      }
+
+      prismaRequest({
+        model: "userToWorkGroup",
+        method: "create",
+        request: {
+          data: {
+            userId: user.id,
+            workGroupId: selectedGroup.id,
+          },
+        },
+      });
+    };
+    setRegisteredFor(null);
+    setRequestResponse("Work registered.");
+    setTimeout(() => {
+      setRequestResponse("");
+    }, 5000);
+  };
+
+    /*
     const response = await prismaRequest({
       model: "workLog",
       method: "create",
@@ -88,11 +136,12 @@ export default function workLogInput(
       setRequestResponse("");
     }, 5000);
   };
+  */
 
   return (
     <Stack direction="column" spacing={1}>
       <Stack  direction="column" spacing={2}>
-        <CustomAutoComplete
+        <CustomMultiAutoComplete
           label="Registered for"
           dataLabel="name"
           subDataLabel="email"
@@ -168,7 +217,7 @@ function validateWorkLogRequest(
   
   // Define an object to store the errors
   const errors = {
-    registeredForError: registeredFor == null,
+    registeredForError: registeredFor == [],
     selectedGroupError: selectedGroup == null,
     selectedDateTimeError: false, // TODO: add semester validation
     hoursError: hours <= 0 || hours > 24,
