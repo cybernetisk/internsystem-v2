@@ -91,53 +91,6 @@ export default function workLogInput(
     }, 5000);
   };
 
-    /*
-    const response = await prismaRequest({
-      model: "workLog",
-      method: "create",
-      request: {
-        data: {
-          loggedBy: session.data.user.id,
-          loggedFor: registeredFor.id,
-          workedAt: selectedDateTime.toISOString(),
-          duration: hours,
-          description: description,
-          semesterId: session.data.semester.id,
-        },
-      },
-      callback: (data) => {
-        setRegisteredFor(null);
-        setSelectedGroup(null);
-        setHours(0);
-        setDescription("");
-        setRefresh(data);
-      },
-    });
-
-    if (!response.ok) {
-      setRequestResponse("Failed to register work. Please try again.");
-      return;
-    }
-
-    prismaRequest({
-      model: "userToWorkGroup",
-      method: "create",
-      request: {
-        data: {
-          userId: registeredFor.id,
-          workGroupId: selectedGroup.id,
-        },
-      },
-    });
-    
-    setRegisteredFor(null);
-    setRequestResponse("Work registered.");
-    setTimeout(() => {
-      setRequestResponse("");
-    }, 5000);
-  };
-  */
-
   return (
     <Stack direction="column" spacing={1}>
       <Stack  direction="column" spacing={2}>

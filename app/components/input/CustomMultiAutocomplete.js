@@ -39,11 +39,7 @@ export default class CustomMultiAutoComplete extends Component {
         
         // when a dropdown item is selected
         onChange={(e, v) => {
-          // console.log(v);
           callback(v);
-          // if (typeof v == "string") {
-          // } else {
-          // }
         }}
         
         // when looking for an item
@@ -91,16 +87,10 @@ export default class CustomMultiAutoComplete extends Component {
               key={props.id}
               component="li"
               color="InfoBackground"
-              // flexDirection="column"
-              // alignContent="start"
-              // alignItems="flex-start"
-              // onClick={}
-              // key={`option_box_${props.key}`}
             >
               <Stack direction="column" alignItems="start">
                 <Typography
                   key={`option_box_name_${props.id}`}
-                  // color="MenuText"
                 >
                   {option[dataLabel]}
                 </Typography>
