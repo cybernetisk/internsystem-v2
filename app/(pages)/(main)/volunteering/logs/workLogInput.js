@@ -7,6 +7,7 @@ import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB";
+import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
 
 export default function workLogInput(
   session,
@@ -27,6 +28,9 @@ export default function workLogInput(
   const [descriptionError, setDescriptionError] = useState(false);
 
   const [requestResponse, setRequestResponse] = useState("");
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [severity, setSeverity] = useState("")
 
   const handleClick = async () => {
     const isInvalid = validateWorkLogRequest(
@@ -68,6 +72,8 @@ export default function workLogInput(
 
     if (!response.ok) {
       setRequestResponse("Failed to register work. Please try again.");
+      setSeverity("error")
+      setSnackbarOpen(true)
       return;
     }
 
@@ -84,7 +90,10 @@ export default function workLogInput(
     
     setRegisteredFor(null);
     setRequestResponse("Work registered.");
+    setSeverity("success");
+    setSnackbarOpen(true)
     setTimeout(() => {
+      setSnackbarOpen(false)
       setRequestResponse("");
     }, 5000);
   };
@@ -140,7 +149,13 @@ export default function workLogInput(
       </Stack>
       <Typography variant="subtitle1">
         {requestResponse != "" ? (
-          requestResponse
+          <SnackbarAlert 
+            open={snackbarOpen}
+            setOpen={setSnackbarOpen}
+            severity={severity}
+            response={requestResponse}
+            
+          />
         ) : (
           <Skeleton
             animation={false}

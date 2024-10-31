@@ -3,6 +3,7 @@ import { Box, Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/
 import { useState } from "react";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
+import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
 
 export default function voucherLogInput(
   session,
@@ -18,13 +19,16 @@ export default function voucherLogInput(
 
   const [requestResponse, setRequestResponse] = useState("");
   
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [severity, setSeverity] = useState("")
+  
   const diff = vouchersEarned - vouchersUsed;
   
   const handleClick = async () => {
     const isInvalid = validateVoucherLogRequest(
       numVouchers,
       descriptionVoucher,
-      vouchersEarned,
+      diff,
       setNumVouchersError,
       setDescriptionVoucherError
     );
@@ -51,12 +55,17 @@ export default function voucherLogInput(
     
     if (!response.ok) {
       setRequestResponse("Failed to use voucher. Please try again.");
+      setSeverity("error")
+      setSnackbarOpen(true)
       return;
     }
     
     setRequestResponse("Voucher used.");
+    setSeverity("success")
+    setSnackbarOpen(true)
     setTimeout(() => {
       setRequestResponse("");
+      setSnackbarOpen(false)
     }, 5000);
     
   };
@@ -96,7 +105,12 @@ export default function voucherLogInput(
 
       <Typography variant="subtitle1">
         {requestResponse != "" ? (
-          requestResponse
+          <SnackbarAlert 
+            open={snackbarOpen} 
+            setOpen={setSnackbarOpen} 
+            response={requestResponse}
+            severity={severity}
+          />
         ) : (
           <Skeleton
             animation={false}
