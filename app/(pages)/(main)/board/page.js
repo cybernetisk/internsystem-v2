@@ -12,6 +12,12 @@ export default function BoardPage() {
   const [data, setData] = useState({ nodes: [], links: [] });
   
   useEffect(() => {
+    fetch(`/api/v2/recruitsGraph`)
+    .then(res => res.json())
+    .then(data => {
+      
+    })
+
     prismaRequest({
       model: "User",
       method: "find",
