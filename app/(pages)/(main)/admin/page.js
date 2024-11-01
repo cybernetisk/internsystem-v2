@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import authWrapper from "@/app/middleware/authWrapper";
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import Link from "next/link";
@@ -29,8 +28,9 @@ const TABLE_HEADERS_LOGS = [
   { id: "description", name: "Description" },
 ];
 
-function AdminPage(params) {
-  
+function AdminPage({ props }) {
+
+
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);

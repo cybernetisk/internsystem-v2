@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function middleware(req) {
+export function middleware(req) {
+    console.log("Main middleware")
     return NextResponse.next()
 }

@@ -11,7 +11,7 @@ import {
   ThemeProvider,
   Paper,
 } from "@mui/material";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { NavBar } from "@/app/components/layout/AppBar";
 import { cybTheme } from "@/app/components/themeCYB";
@@ -28,7 +28,7 @@ const NavItems = [
   },
 ];
 
-export default function AppLayout({ children }) {
+export default async function AppLayout({ children }) {
   
   const pathname = usePathname();
 

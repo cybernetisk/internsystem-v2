@@ -89,4 +89,5 @@ const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
 });
 
-export { handler as GET, handler as POST };
+// export { handler as GET, handler as POST };
+export { handler }
