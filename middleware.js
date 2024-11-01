@@ -17,7 +17,7 @@ const allowList = new Set([
 
 export async function middleware(req) {
 
-    // return NextResponse.next()
+    return NextResponse.next()
 
     // Prevent infinate redirect to unauthorized
     const path = req.nextUrl.pathname;
