@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { duration } from "@mui/material";
+import { inc } from "sanity";
 
 
 export async function GET(req, {params}) {
@@ -22,6 +23,8 @@ export async function GET(req, {params}) {
         return handleGetRoles(userID)
       case "workLogs":
         return handleGetWorkLogs(userID)
+      case "recruitInfo":
+        return handleGetRecruitInfo(userID)
       default:
         return handleGetUser(req)
     }
@@ -89,4 +92,43 @@ async function handleGetRoles(userID) {
     {userRoles: userRoles},
     {status: 200}
   )
+}
+
+async function handleGetRecruitInfo(userID) {
+  const numRecruits = (await prisma.User.findFirst({
+    where: {
+      id: userID
+    },
+    select: {
+      _count: {
+        include: {
+          recruitedUsers: true
+        }
+      }
+    }
+  }))._count.recruitedUsers
+
+  const recruitLogs = await prisma.User.findFirst({
+    where: {
+      id: userID
+    },
+    select: {
+      recruitedUsers: {
+        select: {
+          LoggedForUser: {
+            select: {
+              duration: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  const recruitHours = recruitLogs.recruitedUsers.flatMap(user => user.LoggedForUser).reduce((sum, log) => sum + log.duration, 0)
+  
+  return NextResponse.json({
+    numRecruits: numRecruits,
+    recruitHours: recruitHours
+  })
 }

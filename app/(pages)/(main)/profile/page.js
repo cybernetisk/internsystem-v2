@@ -16,7 +16,6 @@ import { PageHeader } from "@/app/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
 import prismaRequest from "@/app/middleware/prisma/prismaRequest"
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import CustomTable from "@/app/components/CustomTable";
 import { signOut, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -52,55 +51,16 @@ function ProfilePage() {
   
   useEffect(() => {
     if (!recruiter) {
-      prismaRequest({
-        model: "user",
-        method: "find",
-        callback: (data) => setUsers(data.data),
-      });
+      fetch("/api/v2/users")
+      .then(res => res.json())
+      .then(data => setUsers(data.users))
     }
-    prismaRequest({
-      model: "user",
-      method: "find",
-      request: {
-        where: {
-          recruitedById: session.data.user.id,
-        },
-        include: {
-          LoggedForUser: {
-            include: {
-              LoggedForUser: true,
-              LoggedByUser: true,
-            },
-          },
-        },
-      },
-      callback: (data) => {
-        let newLogs = [];
 
-        data.data.forEach((e) => {
-          e.LoggedForUser.forEach((f) => {
-            const p1 = f.LoggedByUser;
-            const p2 = f.LoggedForUser;
-            const p1name = p1 ? `${p1.firstName} ${p1.lastName}` : "";
-            const p2name = p2 ? `${p2.firstName} ${p2.lastName}` : "";
-            ;
-            newLogs.push({
-              ...f,
-              loggedBy: getInitials(p1name),
-              loggedFor: getInitials(p2name),
-              workedAt_num: parseISO(f.workedAt).getTime(),
-              workedAt: format(
-                parseISO(f.workedAt),
-                "dd.MM HH:mm"
-              ).toLowerCase(),
-            });
-          });
-        });
-
-        setRecruitHours(newLogs.reduce((sum, next) => sum += next.duration, 0))
-        setRecruitLogs(newLogs);
-      },
-    });
+    fetch(`/api/v2/users/${session.data.user.id}/recruitInfo`)
+    .then(res => res.json())
+    .then(data => {
+      setRecruitHours(data.recruitHours)
+    })
   }, []);
   
   // queries database for user data
