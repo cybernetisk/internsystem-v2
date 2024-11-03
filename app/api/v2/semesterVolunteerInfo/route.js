@@ -54,7 +54,7 @@ export async function GET(req) {
     return NextResponse.json({ 
       membershipsPaid: membershipsPaid,
       numberVolunteers: numberVolunteers,
-      totVolunteerHours: totVolunteerHours,
+      volunteerHours: totVolunteerHours,
       vouchersEarned: totVolunteerHours * VOUCHER_MODIFIER,
       vouchersUsed: vouchersUsed
     });
