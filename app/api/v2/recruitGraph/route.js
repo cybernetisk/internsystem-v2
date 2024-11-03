@@ -13,13 +13,33 @@ export async function GET(req) {
   
   
   try {
-    const roles = await prisma.role.findMany({
+    const users = await prisma.user.findMany({
         select: {
-            name: true
+            firstName: true,
+            lastName: true,
+            id: true,
+            recruitedById: true
         }
     });
 
-    return NextResponse.json({ roles: roles.map(e => e.name) });
+    const userIdToId = {}
+    for (const [i, user] of users.entries()) {
+      userIdToId[user.id] = i
+    }
+
+    const nodes = users.map(user => {
+      return {
+        id: userIdToId[user.id], 
+        firstName: user.firstName, 
+        lastName: user.lastName
+      }
+    })
+
+    const edges = users.filter(user => user.recruitedById).map(user => {
+      return [userIdToId[user.id], userIdToId[user.recruitedById]]
+    })
+
+    return NextResponse.json({ nodes: nodes, edges: edges });
   }
   
   catch (error) {

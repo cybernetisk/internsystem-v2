@@ -9,54 +9,15 @@ import Forcegraph from "@/app/components/RecruitmentGraph"
 
 export default function BoardPage() {
 
-  const [data, setData] = useState({ nodes: [], links: [] });
+  const [data, setData] = useState({ nodes: [], edges: [] });
   
   useEffect(() => {
-    fetch(`/api/v2/recruitsGraph`)
+    fetch(`/api/v2/recruitGraph`)
     .then(res => res.json())
     .then(data => {
-      
+      setData({ nodes: data.nodes, edges: data.edges})
     })
 
-    prismaRequest({
-      model: "User",
-      method: "find",
-      request: {
-        include: {
-          recruitedByUser: true,
-          recruitedUsers: true,
-        },
-        where: {
-          OR: [
-            { recruitedById: { not: null } },
-            { recruitedUsers: { some: {} } }
-          ]
-        },
-      },
-      callback: (data) => {
-        
-        const links = data.data
-        .filter((element) => element.recruitedByUser)
-        .map((element) => ({
-          source: element,
-          target: element.recruitedByUser,
-        }));
-        
-        const connectedNodes = new Set(
-          links.flatMap((link) => [link.source.id, link.target.id])
-        );
-        const filteredNodes = data.data.filter((node) =>
-          connectedNodes.has(node.id) || connectedNodes.has(node.recruitedById)
-        );
-        const filteredLinks = links.filter((link) =>
-          connectedNodes.has(link.source.id) && connectedNodes.has(link.target.id)
-        );
-        
-        const newData = { nodes: filteredNodes, links: filteredLinks };
-        
-        setData(newData);
-      },
-    });
   }, []);
 
   return (
