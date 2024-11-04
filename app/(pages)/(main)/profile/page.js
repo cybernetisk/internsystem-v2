@@ -73,35 +73,32 @@ function ProfilePage() {
   }, [session])
   
   const handleUpdateData = async () => {
-    await prismaRequest({
-      model: "user",
-      method: "update",
-      request: {
-        where: {
-          email: session.data.user.email
-        },
-        data: {
-          firstName: firstName,
-          lastName: lastName,
-        }
-      }
+
+    await fetch(`/api/v2/users/${session.data.user.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        firstName: firstName,
+        lastName: lastName,
+      }),
     });
+
     window.location.reload();
   }
   
   const handleConfirmSelection = async () => {
-    await prismaRequest({
-      model: "user",
-      method: "update",
-      request: {
-        where: {
-          email: session.data.user.email,
-        },
-        data: {
-          recruitedById: selectedRecruiter.id,
-        },
+    await fetch(`/api/v2/users/${session.data.user.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        recruitedById: selectedRecruiter.id,
+      }),
     });
+
     window.location.reload()
   }
   
