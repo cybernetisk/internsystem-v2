@@ -16,7 +16,6 @@ import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import { getUserInitials, getUserName } from "@/app/components/textUtil";
 import { cybTheme } from "@/app/components/themeCYB";
 import authWrapper from "@/app/middleware/authWrapper";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import CustomTable from "@/app/components/CustomTable";
 import worklogInput from "./workLogInput";
 import voucherLogInput from "./voucherLogInput";
@@ -51,22 +50,16 @@ function LogsPage() {
   const session = useSession();
   
   useEffect(() => {
-    prismaRequest({
-      model: "user",
-      method: "find",
-      request: {
-        where: {
-          active: true,
-        },
-      },
-      callback: (data) =>
-        setUsers(
-          data.data.map((e) => ({
-            ...e,
-            name: `${e.firstName} ${e.lastName}`
-          }))
-        ),
-    });
+    fetch("/api/v2/users")
+    .then(res => res.json())
+    .then(data => {
+      setUsers(
+        data.users.map((e) => ({
+          ...e,
+          name: `${e.firstName} ${e.lastName}`
+        }))
+      )
+    })
 
     fetch("/api/v2/workGroups")
     .then(res => res.json())

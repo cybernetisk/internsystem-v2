@@ -2,8 +2,7 @@
 "use client"
 
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import Forcegraph from "@/app/components/RecruitmentGraph"
 

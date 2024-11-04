@@ -44,44 +44,29 @@ function CafePage() {
   const [numberRepeats, setNumberRepeats] = useState(0);
   
   useEffect(() => {
-    prismaRequest({
-      model: "user",
-      method: "find",
-      callback: (data) => {
-        if (data.data.length == 0) return;
-        setUsers(data.data);
-      }
-    })
+    fetch("/api/v2/users")
+    .then(res => res.json())
+    .then(data => {setUsers(data.users)})
   }, [])
   
   useEffect(() => {
-    prismaRequest({
-      model: "shiftCafe",
-      method: "find",
-      request: {
-        include: {
-          UserForShiftManager: true,
-          UserForShiftWorker1: true,
-          UserForShiftWorker2: true,
+    fetch("/api/v2/shifts")
+    .then(res => res.json())
+    .then(data => {
+      const newShifts = data.shifts.map((e) => {
+        return {
+          ...e,
+          isReal: true,
+          startAt: new Date(Date.parse(e.startAt)),
+          shiftManager: e.UserForShiftManager,
+          shiftWorker1: e.UserForShiftWorker1,
+          shiftWorker2: e.UserForShiftWorker2,
         }
-      },
-      callback: (data) => {
-        if (data.data.length == 0) return;
-        
-        const newShifts = data.data.map((e) => {
-          return {
-            ...e,
-            isReal: true,
-            startAt: new Date(Date.parse(e.startAt)),
-            shiftManager: e.UserForShiftManager,
-            shiftWorker1: e.UserForShiftWorker1,
-            shiftWorker2: e.UserForShiftWorker2,
-          }
-        })
-        
-        // console.log(newShifts);
-        setShifts(newShifts);
-      }
+      })
+      
+      // console.log(newShifts);
+      setShifts(newShifts);
+
     })
   }, [refresh]);
   

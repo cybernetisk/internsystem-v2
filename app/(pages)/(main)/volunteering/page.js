@@ -17,7 +17,6 @@ import {
 } from "@/app/components/sanity/PageBuilder";
 import { useEffect, useState } from "react";
 import { cybTheme } from "@/app/components/themeCYB";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import Link from "next/link";
 import { sanityClient } from "@/sanity/client";
 
