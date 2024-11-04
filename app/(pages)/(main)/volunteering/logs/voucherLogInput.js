@@ -2,7 +2,6 @@
 import { Box, Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 
 export default function voucherLogInput(
   session,
@@ -31,23 +30,22 @@ export default function voucherLogInput(
 
     if (isInvalid) return;
 
-    const response = await prismaRequest({
-      model: "voucherLog",
-      method: "create",
-      request: {
-        data: {
-          loggedFor: session.data.user.id,
-          amount: numVouchers,
-          description: descriptionVoucher,
-          semesterId: session.data.semester.id,
-        },
+    const response = await fetch("/api/v2/voucherLogs", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
       },
-      callback: (data) => {
+      body: JSON.stringify({
+        loggedFor: session.data.user.id,
+        amount: numVouchers,
+        description: descriptionVoucher,
+        semesterId: session.data.semester.id,
+      })
+    }).then(res => {
         setNumVouchers(0);
         setDescriptionVoucher("");
-        setRefresh(data);
-      },
-    });
+        setRefresh();
+      })
     
     if (!response.ok) {
       setRequestResponse("Failed to use voucher. Please try again.");

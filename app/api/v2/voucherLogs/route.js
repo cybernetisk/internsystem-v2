@@ -38,3 +38,28 @@ export async function GET(req) {
     );
   } 
 }
+
+export async function POST(req) {
+  const args = await req.json()
+  
+  if (
+    !(args.hasOwnProperty("loggedFor") &&
+    args.hasOwnProperty("amount") &&
+    args.hasOwnProperty("description") &&
+    args.hasOwnProperty("semesterId"))
+  ) return NextResponse.json({error: "Malformed request"}, {status: 400})
+
+  let res = await prisma.voucherLog.create({
+    data: {
+      loggedFor: args.loggedFor,
+      amount: args.amount,
+      description: args.description,
+      semesterId: args.semesterId
+    }
+  })
+
+  if (res) {
+    return NextResponse.json({status: 200})
+  }
+
+}

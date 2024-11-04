@@ -17,7 +17,6 @@ import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import authWrapper from "@/app/middleware/authWrapper";
 import { useEffect, useState } from "react";

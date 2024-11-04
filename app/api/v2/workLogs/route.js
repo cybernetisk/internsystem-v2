@@ -39,3 +39,30 @@ export async function GET(req) {
   }
   
 }
+
+export async function POST(req) {
+  const args = await req.json()
+
+  if (!(
+    args.hasOwnProperty("loggedBy") &&
+    args.hasOwnProperty("loggedFor") &&
+    args.hasOwnProperty("workedAt") &&
+    args.hasOwnProperty("duration") &&
+    args.hasOwnProperty("description") &&
+    args.hasOwnProperty("semesterId")
+  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
+
+  const res = await prisma.workLog.create({
+    data: {
+      loggedBy: args.loggedBy,
+      loggedFor: args.loggedFor,
+      workedAt: args.workedAt,
+      duration: args.duration,
+      description: args.description,
+      semesterId: args.semesterId
+    }
+  })
+
+  if (res)
+    return NextResponse.json({status: 200})
+}

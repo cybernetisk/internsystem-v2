@@ -14,13 +14,10 @@ import {
 } from "@mui/material";
 import { PageHeader } from "@/app/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
-import prismaRequest from "@/app/middleware/prisma/prismaRequest"
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import { signOut, useSession } from "next-auth/react"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { format, parseISO } from "date-fns";
-import { getInitials } from "@/app/components/calendar/schedulerUtils";
 
 const RECRUIT_TABLE_HEADERS = [
   { id: "workedAt", name: "work date", sortBy: "workedAt_num", flex: 2 },

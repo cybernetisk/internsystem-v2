@@ -44,27 +44,26 @@ export default function workLogInput(
 
     if (isInvalid) return;
 
-    const response = await prismaRequest({
-      model: "workLog",
-      method: "create",
-      request: {
-        data: {
-          loggedBy: session.data.user.id,
-          loggedFor: registeredFor.id,
-          workedAt: selectedDateTime.toISOString(),
-          duration: hours,
-          description: description,
-          semesterId: session.data.semester.id,
-        },
+    const response = await fetch("/api/v2/workLogs", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
       },
-      callback: (data) => {
+      body: JSON.stringify({
+        loggedBy: session.data.user.id,
+        loggedFor: registeredFor.id,
+        workedAt: selectedDateTime.toISOString(),
+        duration: hours,
+        description: description,
+        semesterId: session.data.semester.id,
+      }),
+      }).then(res => {
         setRegisteredFor(null);
         setSelectedGroup(null);
         setHours(0);
         setDescription("");
         setRefresh(data);
-      },
-    });
+      });
 
     if (!response.ok) {
       setRequestResponse("Failed to register work. Please try again.");
