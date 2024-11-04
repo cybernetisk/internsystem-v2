@@ -17,9 +17,9 @@ export async function GET(req) {
         select: {
             shiftPosition: true,
             startAt: true,
-            UserForShiftManager: {select: {_count:true}},
-            UserForShiftWorker1: {select: {_count:true}},
-            UserForShiftWorker2: {select: {_count:true}}
+            UserForShiftManager: {select: {firstName: true, lastName: true}},
+            UserForShiftWorker1: {select: {firstName: true, lastName: true}},
+            UserForShiftWorker2: {select: {firstName: true, lastName: true}}
         }
     })
 

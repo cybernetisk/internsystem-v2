@@ -64,7 +64,6 @@ function CafePage() {
         }
       })
       
-      // console.log(newShifts);
       setShifts(newShifts);
 
     })

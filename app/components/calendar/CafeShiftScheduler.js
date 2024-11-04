@@ -214,6 +214,7 @@ export default function CafeShiftScheduler(props) {
                   shift.shiftWorker2
                 ]
                 
+
                 return (
                   <Grid item key={`week${i}_day${j}_shift${l}_grid`}>
                     <Card
@@ -267,7 +268,7 @@ export default function CafeShiftScheduler(props) {
                                 }
                                 key={`week${i}_day${j}_shift${l}_pos${k}`}
                               >
-                                {s ? getUserInitials(s.firstName) : "X"}
+                                {s ? getUserInitials(s) : "X"}
                               </Typography>
                             ))}
                           </Stack>
