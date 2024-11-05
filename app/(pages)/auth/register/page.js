@@ -2,7 +2,6 @@
 "use client"
 
 import { cybTheme } from "@/app/components/themeCYB";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import { normalizeEmail } from "@/app/components/Login/authUtil";
@@ -34,16 +33,6 @@ export default function registerPage() {
     }
 
     setLoading(true);
-    
-    const responseCUE = await checkUserExists(email, debug)
-    
-    if (!responseCUE.ok) {
-      setResponse(responseCUE.error);
-      setSeverity("error")
-      setSnackbarOpen(true)
-      setLoading(false);
-      return;
-    }
       
     const responseCU = await createUser(firstName, lastName, email, debug);
 
@@ -53,22 +42,8 @@ export default function registerPage() {
       setSnackbarOpen(true)
       setLoading(false);
       return;
-    }
-    
-    const responseSVM = await sendVerificiationMail(
-      responseCU.data.newUser,
-      responseCU.data.activateToken,
-      debug
-    );
-    
-    if (!responseSVM.ok) {
-      setResponse(responseSVM.error);
-      setSeverity("error")
-      setSnackbarOpen(true)
-      setLoading(false);
-      return;
     } else {
-      setResponse(`User created. Email sent to ${responseSVM.email}`);
+      setResponse(`User created. Email sent to ${email}`);
       setSeverity("success")
       setSuccess(true);
       setSnackbarOpen(true)
@@ -185,40 +160,12 @@ export default function registerPage() {
   
 }
 
-
-// 
-async function checkUserExists(email, debug) {
-  
-  const normalizedEmail = normalizeEmail(email);
-  
-  const response = await prismaRequest({
-    model: "user",
-    method: "find",
-    request: {
-      where: {
-        email: normalizedEmail,
-      },
-    },
-    debug: debug,
-  });
-  
-  if (!response.ok) {
-    return { ok: false, error: "Unable to connect to database" };
-  } else if (response.data.length > 0) {
-    return { ok: false, error: `${normalizedEmail} already exists in database` };
-  }
-  
-  return {
-    ok: true
-  };
-}
-
 // 
 async function createUser(firstName, lastName, email, debug) {
   
   const normalizedEmail = normalizeEmail(email);
   
-  const response = await fetch("/api/v1/createUser/", {
+  const response = await fetch("/api/v2/users", {
     method: "post",
     mode: "cors",
     headers: {
@@ -241,33 +188,5 @@ async function createUser(firstName, lastName, email, debug) {
   
   if (debug) console.log("createUser:", data);
   
-  return { ok: true, ...data };
-}
-
-// 
-async function sendVerificiationMail(newUser, activateToken, debug) {
-  
-  const response = await fetch("/api/v1/sendVerification/", {
-    method: "post",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      user: newUser,
-      activateToken: activateToken,
-    }),
-  })
-  
-  if (debug) console.log("sendVerificiationMail response:", response);
-  
-  if (!response.ok) {
-    return { ok: false, error: response.statusText };
-  }
-  
-  const data = await response.json();
-  
-  if (debug) console.log("sendVerificiationMail:", data);
-  
-  return { ok: true, ...data };
+  return { ok: true };
 }
