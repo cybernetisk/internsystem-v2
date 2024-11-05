@@ -4,6 +4,18 @@ import prisma from "@/prisma/prismaClient";
 import { duration } from "@mui/material";
 import { inc } from "sanity";
 
+export async function POST(req, {params}) {
+  const args = await req.json()
+  const {userID, action} = await params
+
+  if (userID) {
+    switch (action) {
+      case "roles":
+        return handlePostRoles(userID, args)
+    }
+  }
+
+}
 
 export async function GET(req, {params}) {
   if (req.method != "GET") {
@@ -12,10 +24,7 @@ export async function GET(req, {params}) {
       { status: 405 }
     );
   }
-
-  await params
-  const userID = params.userID
-  const action = params.action
+  const {userID, action} = await params
   
   if (userID) {
     switch (action) {
@@ -29,11 +38,40 @@ export async function GET(req, {params}) {
         return handleGetUser(req)
     }
   }
-    return NextResponse.json(
-      { error: `${userID}, ${action}` },
-      { status: 200 }
-    );
+  return NextResponse.json(
+    { error: `${userID}, ${action}` },
+    { status: 200 }
+  );
   
+}
+
+async function handlePostRoles(userID, args) {
+  if (!(
+    args.hasOwnProperty("roles")
+  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
+
+  const roles = args.roles;
+
+  await prisma.UserRole.deleteMany({
+    where: {
+      userId: userID
+    }
+  })
+
+  const roleList = await prisma.role.findMany({select: {id: true, name: true}})
+  const roleMap = {}
+  for (let role of roleList) roleMap[role.name] = role.id 
+
+  for (let role of roles) {
+    await prisma.UserRole.create({
+      data: {
+        userId: userID,
+        roleId: roleMap[role]
+      }
+    })
+  }
+
+  return NextResponse.json({}, {status: 200})
 }
 
 async function handleGetWorkLogs(userID) {
