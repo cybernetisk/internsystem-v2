@@ -27,3 +27,32 @@ export async function GET(req) {
   }
   
 }
+
+export async function POST(req) {
+  const args = await req.json()
+  
+  if (!(
+    args.hasOwnProperty("userId") && 
+    args.hasOwnProperty("workGroupId")
+  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
+
+  const userId = args.userId
+  const workGroupId = args.workGroupId
+
+  try {
+    const res = await prisma.userToWorkGroup.create({
+      data: {
+        userId: userId,
+        workGroupId: workGroupId
+      }
+    })
+
+    if (res)
+      return NextResponse.json({status: 200})
+
+  } catch (error) {
+    console.log("User to workgroup already exist in database")
+    return NextResponse.json({status: 200})
+  }
+
+}

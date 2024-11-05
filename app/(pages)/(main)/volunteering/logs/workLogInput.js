@@ -44,7 +44,7 @@ export default function workLogInput(
 
     if (isInvalid) return;
 
-    const response = await fetch("/api/v2/workLogs", {
+    fetch("/api/v2/workLogs", {
       method: "POST",
       headers: {
         "content-type": "application/json"
@@ -62,24 +62,19 @@ export default function workLogInput(
         setSelectedGroup(null);
         setHours(0);
         setDescription("");
-        setRefresh(data);
+        setRefresh("");
       });
 
-    if (!response.ok) {
-      setRequestResponse("Failed to register work. Please try again.");
-      return;
-    }
-
-    prismaRequest({
-      model: "userToWorkGroup",
-      method: "create",
-      request: {
-        data: {
-          userId: registeredFor.id,
-          workGroupId: selectedGroup.id,
-        },
+    fetch("/api/v2/workGroups", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
       },
-    });
+      body: JSON.stringify({
+        userId: registeredFor.id,
+        workGroupId: selectedGroup.id
+      })
+    })
     
     setRegisteredFor(null);
     setRequestResponse("Work registered.");
