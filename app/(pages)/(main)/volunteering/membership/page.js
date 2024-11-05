@@ -13,7 +13,6 @@ import {
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import CustomTable from "@/app/components/CustomTable";
 import authWrapper from "@/app/middleware/authWrapper";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -93,22 +92,22 @@ function MembershipPage() {
   }, [refresh]);
 
   const addNewMember = async () => {
-    const response = await prismaRequest({
-      model: "userMembership",
-      method: "create",
-      request: {
-        data: {
-          name: newMemberName,
-          email: "",
-          comments: newMemberComment,
-          seller_id: session.data.user.id,
-          semester_id: session.data.semester.id,
-        },
+    fetch("/api/v2/memberships", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
       },
-      callback: (data) => {
-        setRefresh(!refresh);
-      },
-    });
+      body: JSON.stringify({
+        name: newMemberName,
+        email: "",
+        comments: newMemberComment,
+        seller_id: session.data.user.id,
+        semester_id: session.data.semester.id,
+      })
+    }).then(res => {
+      setRefresh(!refresh)
+    })
+
   };
 
   return (

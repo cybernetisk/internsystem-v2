@@ -36,3 +36,28 @@ export async function GET(req) {
   }
   
 }
+
+export async function POST(req) {
+  const args = await req.json()
+  
+  if (!(
+    args.hasOwnProperty("name") &&
+    args.hasOwnProperty("email") &&
+    args.hasOwnProperty("comments") &&
+    args.hasOwnProperty("seller_id") &&
+    args.hasOwnProperty("semester_id")
+  )) return NextResponse.json({error: "Malformed reqeust"}, {status: 400})
+
+  const res = await prisma.UserMembership.create({
+    data: {
+      name: args.name,
+      email: args.email,
+      comments: args.comments,
+      seller_id: args.seller_id,
+      semester_id: args.semester_id
+    }
+  })
+
+  if (res)
+    return NextResponse.json({status: 200})
+}
