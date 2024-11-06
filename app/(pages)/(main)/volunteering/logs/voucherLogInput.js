@@ -30,7 +30,7 @@ export default function voucherLogInput(
 
     if (isInvalid) return;
 
-    const response = await fetch("/api/v2/voucherLogs", {
+    fetch("/api/v2/voucherLogs", {
       method: "POST",
       headers: {
         "content-type": "application/json"
@@ -44,19 +44,16 @@ export default function voucherLogInput(
     }).then(res => {
         setNumVouchers(0);
         setDescriptionVoucher("");
+        if (!res.ok) {
+          setRequestResponse("Failed to use voucher. Please try again.");
+          return
+        }
         setRefresh();
+        setRequestResponse("Voucher used.");
+        setTimeout(() => {
+          setRequestResponse("");
+        }, 5000);
       })
-    
-    if (!response.ok) {
-      setRequestResponse("Failed to use voucher. Please try again.");
-      return;
-    }
-    
-    setRequestResponse("Voucher used.");
-    setTimeout(() => {
-      setRequestResponse("");
-    }, 5000);
-    
   };
 
   return (

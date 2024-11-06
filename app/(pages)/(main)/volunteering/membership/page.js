@@ -105,6 +105,8 @@ function MembershipPage() {
         semester_id: session.data.semester.id,
       })
     }).then(res => {
+      setNewMemberName("")
+      setNewMemberComment("")
       setRefresh(!refresh)
     })
 
