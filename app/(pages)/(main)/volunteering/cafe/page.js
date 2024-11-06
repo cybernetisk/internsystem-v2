@@ -107,7 +107,7 @@ function CafePage() {
   }
   
   const manageShiftClear = async () => {
-    const response = await fetch("/api/v1/data/updateORCreateShift", {
+    const response = await fetch("/api/v2/shifts", {
       method: "post",
       mode: "cors",
       headers: {
@@ -123,7 +123,6 @@ function CafePage() {
     
     if (response.ok) {
       const data = await response.json();
-      // console.log(data);
       setSelectedShift(data.data);
       setRefresh(!refresh);
     }

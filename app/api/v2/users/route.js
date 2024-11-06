@@ -8,7 +8,7 @@ import { mailOptions, transporter } from "@/app/(pages)/auth/email";
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || "";
 
 async function sendVerificationEmail(user, activateToken) {
-  const link = `${NEXTAUTH_URL}/api/v1/activate/${activateToken.token}`;
+  const link = `${NEXTAUTH_URL}/activate/${activateToken.token}`;
   const html = `
   Hello ${user.firstName} ${user.lastName}, You have successfully created a user-account at ${NEXTAUTH_URL}. <br><br>
   

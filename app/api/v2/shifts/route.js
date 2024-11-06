@@ -50,8 +50,7 @@ export async function POST(req) {
     args.hasOwnProperty("selectedDay") &&
     args.hasOwnProperty("shiftManagerId") &&
     args.hasOwnProperty("shiftWorker1Id") &&
-    args.hasOwnProperty("shiftWorker2Id") &&
-    args.hasOwnProperty("comment")
+    args.hasOwnProperty("shiftWorker2Id")
   )) return NextResponse.json({error: "Malformed request"}, {status: 400})
 
   const {

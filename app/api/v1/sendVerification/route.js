@@ -10,7 +10,7 @@ export async function POST(req) {
     
     const args = await req.json();
     const { user, activateToken } = args
-    const link = `${NEXTAUTH_URL}/api/v1/activate/${activateToken.token}`;
+    const link = `/api/v2/activate/${activateToken.token}`;
     const html = `
     Hello ${user.firstName} ${user.lastName}, You have successfully created a user-account at ${NEXTAUTH_URL}. <br><br>
     
