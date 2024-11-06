@@ -1,16 +1,18 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { randomBytes } from "crypto";
+import { auth } from "../../utils/auth";
+
 
 export async function GET(req) {
-  
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
+
+  const authDenied = auth({
+    requiredRoles: [
+      "intern"
+    ]
+  })
+
+  if (authDenied) return authDenied
   
   
   try {
@@ -38,6 +40,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
+
   const args = await req.json()
   
   if (!(
@@ -61,3 +64,4 @@ export async function POST(req) {
   if (res)
     return NextResponse.json({status: 200})
 }
+
