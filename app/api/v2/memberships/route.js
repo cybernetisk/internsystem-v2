@@ -23,15 +23,15 @@ export async function GET(req) {
         }
       });
 
-    return NextResponse.json({ memberships: semester });
+    return authCheck.verify(NextResponse.json({ memberships: semester }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }
@@ -55,6 +55,6 @@ export async function POST(req) {
   })
 
   if (res)
-    return NextResponse.json({status: 200})
+    return authCheck.verify(NextResponse.json({status: 200}))
 }
 

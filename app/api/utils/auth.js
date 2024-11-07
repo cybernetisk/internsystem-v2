@@ -62,5 +62,16 @@ export class Auth {
 
         return this
     }
-    
+    /**
+     * 
+     * @param {NextResponse} res 
+     * @returns {NextResponse}
+     */
+    verify(res) {
+        if (this.failed) return this.response
+
+        res.headers.set("X-Auth-Checked", "true")
+
+        return res
+    }
 }
