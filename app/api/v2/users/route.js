@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { randomBytes } from "crypto";
 import { mailOptions, transporter } from "@/app/(pages)/auth/email";
+import { Auth } from "../../utils/auth";
 
 
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || "";
@@ -81,22 +82,25 @@ async function registerUser(email, firstName, lastName) {
 }
 
 export async function POST(req) {
-  
-  if (req.method != "POST") {
-    return NextResponse.json(
-      { error: `Method '${req.method}' does not match POST` },
-      { status: 405 }
-    );
-  }
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   const args = await req.json();
   const { email, firstName, lastName } = args;
 
-  return await registerUser(email, firstName, lastName);
+  return authCheck.verify(await registerUser(email, firstName, lastName));
   
 }
 
 export async function GET(req) {
+
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
+
   const params = req.nextUrl.searchParams
 
   const queryParams = {}
@@ -104,8 +108,8 @@ export async function GET(req) {
     queryParams.update({where: {active: true}})
   }
   const res = await prisma.user.findMany(queryParams)
-  return NextResponse.json(
+  return authCheck.verify(NextResponse.json(
     {users: res},
     {status: 200}
-  )
+  ));
 }

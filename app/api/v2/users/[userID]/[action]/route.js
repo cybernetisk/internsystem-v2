@@ -1,48 +1,60 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { duration } from "@mui/material";
-import { inc } from "sanity";
+import { Auth } from "@/app/api/utils/auth";
 
 export async function POST(req, {params}) {
+
+  const authCheck = await new Auth(req)
+  .requireRoles(["admin"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
+  
+
   const args = await req.json()
   const {userID, action} = await params
 
   if (userID) {
     switch (action) {
       case "roles":
-        return handlePostRoles(userID, args)
+        return authCheck.verify(handlePostRoles(userID, args))
     }
   }
 
 }
 
 export async function GET(req, {params}) {
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
+
+  const authCheck = await new Auth(req)
+  .requireRoles([])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
+  
   const {userID, action} = await params
   
   if (userID) {
+    let res;
     switch (action) {
       case "roles":
-        return handleGetRoles(userID)
+        res = handleGetRoles(userID)
       case "workLogs":
-        return handleGetWorkLogs(userID)
+        res = handleGetWorkLogs(userID)
       case "recruitInfo":
-        return handleGetRecruitInfo(userID)
+        res = handleGetRecruitInfo(userID)
       default:
-        return handleGetUser(req)
+        res = handleGetUser(userID)
     }
+    return authCheck.verify(await res)
   }
-  return NextResponse.json(
+  return authCheck.verify(NextResponse.json(
     { error: `${userID}, ${action}` },
     { status: 200 }
-  );
+  ));
   
+}
+
+function handleGetUser(userID) {
+  return NextResponse.json({},{status:200})
 }
 
 async function handlePostRoles(userID, args) {

@@ -1,43 +1,44 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { Auth } from "../../utils/auth";
 
 export async function GET(req) {
   
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   
   try {
       const groups = await prisma.WorkGroup.findMany();
 
-    return NextResponse.json({ groups: groups });
+    return authCheck.verify(NextResponse.json({ groups: groups }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }
 
 export async function POST(req) {
+
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+  .requireParams(["userId", "workGroupId"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
+  
+
   const args = await req.json()
   
-  if (!(
-    args.hasOwnProperty("userId") && 
-    args.hasOwnProperty("workGroupId")
-  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
-
-  const userId = args.userId
-  const workGroupId = args.workGroupId
+  const { userId, workGroupId } = args;
 
   try {
     const res = await prisma.userToWorkGroup.create({
@@ -48,11 +49,11 @@ export async function POST(req) {
     })
 
     if (res)
-      return NextResponse.json({status: 200})
+      return authCheck.verify(NextResponse.json({status: 200}))
 
   } catch (error) {
     console.log("User to workgroup already exist in database")
-    return NextResponse.json({status: 200})
+    return authCheck.verify(NextResponse.json({status: 200}))
   }
 
 }

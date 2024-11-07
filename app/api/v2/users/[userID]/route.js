@@ -1,28 +1,36 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { Auth } from "@/app/api/utils/auth";
 
 
 export async function GET(req, {params}) {
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
+
+    const authCheck = await new Auth(req)
+    .requireRoles([])
+  
+    if (authCheck.failed) return authCheck.verify(authCheck.response)
+    
 
   await params
   const userID = params.userID
 
   
-  return NextResponse.json(
+  return authCheck.verify(NextResponse.json(
       { error: `${userID}` },
       { status: 200 }
-    );
+    ));
     
 }
 
 export async function PATCH(req, {params}) {
+
+    const authCheck = await new Auth(req)
+    .requireRoles([])
+  
+    if (authCheck.failed) return authCheck.verify(authCheck.response)
+    
+
     await params
     const userID = params.userID
     const args = await req.json()
@@ -43,10 +51,10 @@ export async function PATCH(req, {params}) {
         }
     }
   
-      return NextResponse.json(
+      return authCheck.verify(NextResponse.json(
             result,
           { status: 200 }
-      );
+      ));
   
 }
 

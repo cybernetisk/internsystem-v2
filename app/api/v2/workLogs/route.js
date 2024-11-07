@@ -1,16 +1,14 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { Auth } from "../../utils/auth";
 
 export async function GET(req) {
-  
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
-  
+
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   try {
     const semester = await prisma.Semester.findFirst({select: {id:true}, orderBy: {year: "desc"}})
@@ -27,30 +25,28 @@ export async function GET(req) {
       }
     });
 
-    return NextResponse.json({ workLogs: workLogs });
+    return authCheck.verify(NextResponse.json({ workLogs: workLogs }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }
 
 export async function POST(req) {
-  const args = await req.json()
 
-  if (!(
-    args.hasOwnProperty("loggedBy") &&
-    args.hasOwnProperty("loggedFor") &&
-    args.hasOwnProperty("workedAt") &&
-    args.hasOwnProperty("duration") &&
-    args.hasOwnProperty("description") &&
-    args.hasOwnProperty("semesterId")
-  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+  .requireParams(["loggedBy", "loggedFor", "workedAt", "duration", "description", "semesterId"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
+  
+  const args = await req.json()
 
   const res = await prisma.workLog.create({
     data: {
@@ -64,5 +60,5 @@ export async function POST(req) {
   })
 
   if (res)
-    return NextResponse.json({status: 200})
+    return authCheck.verify(NextResponse.json({status: 200}))
 }

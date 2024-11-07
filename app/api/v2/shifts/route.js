@@ -2,16 +2,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { getHours } from "date-fns";
+import { Auth } from "../../utils/auth";
+
 
 
 export async function GET(req) {
-  
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   
   try {
@@ -25,33 +24,29 @@ export async function GET(req) {
         }
     })
 
-    return NextResponse.json({ shifts: shifts });
+    return authCheck.verify(NextResponse.json({ shifts: shifts }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }
 
 
-/**
- * @param {*} req
- * @returns {NextResponse}
- */
 export async function POST(req) {
-  const args = await req.json();
 
-  if (!(
-    args.hasOwnProperty("selectedDay") &&
-    args.hasOwnProperty("shiftManagerId") &&
-    args.hasOwnProperty("shiftWorker1Id") &&
-    args.hasOwnProperty("shiftWorker2Id")
-  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+  .requireParams(["selectedDay", "shiftManagerId", "shiftWorker1Id", "shiftWorker2Id"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
+  
+  const args = await req.json();
 
   const {
     selectedDay,
@@ -130,11 +125,11 @@ export async function POST(req) {
       });
     }
 
-    return NextResponse.json({}, {status: 200});
+    return authCheck.verify(NextResponse.json({}, {status: 200}));
   } catch (error) {
     const message = `Error with assigning roles: ${error}`;
 
     console.log(message);
-    return NextResponse.json({ error: message }, { status: 400 });
+    return authCheck.verify(NextResponse.json({ error: message }, { status: 400 }));
   }
 }

@@ -1,16 +1,13 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { Auth } from "../../utils/auth";
 
 export async function GET(req) {
-  
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
-  
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response) 
   
   try {
     const users = await prisma.user.findMany({
@@ -39,15 +36,15 @@ export async function GET(req) {
       return [userIdToId[user.id], userIdToId[user.recruitedById]]
     })
 
-    return NextResponse.json({ nodes: nodes, edges: edges });
+    return authCheck.verify(NextResponse.json({ nodes: nodes, edges: edges }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }

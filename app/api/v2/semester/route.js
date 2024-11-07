@@ -1,16 +1,15 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { Auth } from "../../utils/auth";
+
 
 export async function GET(req) {
   
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
-  
+  const authCheck = await new Auth(req)
+  .requireRoles([])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   try {
       const semester = await prisma.semester.findFirst({
@@ -19,15 +18,15 @@ export async function GET(req) {
         }
       });
 
-    return NextResponse.json({ semester: semester });
+    return authCheck.verify(NextResponse.json({ semester: semester }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }

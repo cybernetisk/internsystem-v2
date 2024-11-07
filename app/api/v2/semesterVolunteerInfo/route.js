@@ -1,17 +1,17 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { Auth } from "../../utils/auth";
+
 
 const VOUCHER_MODIFIER = 0.5
 
 export async function GET(req) {
   
-  if (req.method != "GET") {
-    return NextResponse.json(
-      { error: `Invalid method '${req.method}'` },
-      { status: 405 }
-    );
-  }
+  const authCheck = await new Auth(req)
+  .requireRoles([])
+
+  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   
   try {
@@ -51,21 +51,21 @@ export async function GET(req) {
     }))._sum.amount
     
 
-    return NextResponse.json({ 
+    return authCheck.verify(NextResponse.json({ 
       membershipsPaid: membershipsPaid,
       numberVolunteers: numberVolunteers,
       volunteerHours: totVolunteerHours,
       vouchersEarned: totVolunteerHours * VOUCHER_MODIFIER,
       vouchersUsed: vouchersUsed
-    });
+    }));
   }
   
   catch (error) {
     console.error(error);
-    return NextResponse.json(
+    return authCheck.verify(NextResponse.json(
       { error: `something went wrong: ${error}` },
       { status: 500 }
-    );
+    ));
   }
   
 }
