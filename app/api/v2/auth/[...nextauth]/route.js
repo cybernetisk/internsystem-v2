@@ -44,12 +44,18 @@ export const authOptions = {
         where: {
           email: session.user.email,  
         },
-        include: {
+        select: {
+          firstName: true,
+          lastName: true,
           recruitedByUser: true,
           recruitedUsers: true,
           roles: {
-            include: {
-              role: true,
+            select: {
+              role: {
+                select: {
+                  name: true
+                }
+              },
             },
           },
         },
@@ -70,7 +76,7 @@ export const authOptions = {
         session.user = {
           ...session.user,
           ...cybUser,
-          roles: cybUser.roles.map((e) => e.role),
+          roles: cybUser.roles.map((e) => e.role.name),
           name: `${cybUser.firstName} ${cybUser.lastName ? cybUser.lastName : ""}`
         }
       }

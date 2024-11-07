@@ -1,18 +1,15 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { auth } from "../../utils/auth";
+import { Auth } from "../../utils/auth";
 
 
 export async function GET(req) {
 
-  const authDenied = auth({
-    requiredRoles: [
-      "intern"
-    ]
-  })
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
 
-  if (authDenied) return authDenied
+  if (authCheck.failed) return authCheck.response
   
   
   try {
@@ -41,15 +38,11 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const args = await req.json()
-  
-  if (!(
-    args.hasOwnProperty("name") &&
-    args.hasOwnProperty("email") &&
-    args.hasOwnProperty("comments") &&
-    args.hasOwnProperty("seller_id") &&
-    args.hasOwnProperty("semester_id")
-  )) return NextResponse.json({error: "Malformed reqeust"}, {status: 400})
+  const authCheck = await new Auth(req)
+  .requireRoles(["intern"])
+  .requireParams(["name", "email", "comments", "seller_id", "semester_id"])
+
+  if (authCheck.failed) return authCheck.response
 
   const res = await prisma.UserMembership.create({
     data: {

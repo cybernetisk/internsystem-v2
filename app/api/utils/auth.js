@@ -1,23 +1,66 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../v2/auth/[...nextauth]/route";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
+const NOT_AUTHORIZED = NextResponse.json({error: "Not authorized"}, {status: 403})
+const NOT_SIGNED_IN = NextResponse.json({error: "Not logged in"}, {status: 401})
 
 /**
- * This function takes roles need to access page.
- * Returns either a redirect or error NextResponse if the user is not authenticated
- * Returns null if user should be able to access page
+ * This class is meant to be used in a chain-fassion
+ *  1. Make an instance of the class
+ *  2. Chain together checks
+ *  3. Check the failed attribute to check if the auth-check failed or not
+ *  4. Return the reponse attribute which contain a NextResponse if the checks failed
  * 
- * @param {string[] | null} requiredRoles A list of required roles to access page / route. Leave empty to only require user to be signed in to access page / route
- * @returns {NextResponse | null} Returns null if user is authenticated and a redirect or error if not
+ * @param {NextRequest} req
  */
-export async function auth(requiredRoles = null) {
-    const session = await getServerSession(authOptions)
-
-}
-
-export function authWrapper() {
-    return () => {
-        
+export class Auth {
+    constructor(req) {
+        this.response = null
+        this.failed = false
+        this.req = req
     }
+
+    /**
+     * @param {string[]} requiredRoles List of roles required to access page, leave empty to require user to be logged in
+     * @returns {Auth}
+    */
+    async requireRoles(requiredRoles) {
+        if (this.failed) return this
+
+        this.session ??= await getServerSession(authOptions)
+        // If no roles are required, the user just needs to be logged in which can be checked with the existance of the session object
+        if (requiredRoles.length >= 0 && this.session === null) {
+            this.response = NOT_SIGNED_IN
+            this.failed = true
+            return this
+        }
+
+        // Count the how many of the required roles the user has, if equal to length of requiredRoles, the user has all roles
+        if (requiredRoles.reduce((sum,role) => sum+this.session.user.roles.includes(role), 0) === requiredRoles.length)
+            return this
+
+        this.response = NOT_AUTHORIZED
+        this.failed = true
+
+        return this
+    }
+
+    /**
+     * @param {string[]} params Parameters required to access page
+     * @returns {Auth}
+    */
+    async requireParams(params) {
+        const reqParams = await this.req.json()
+        for (const reqParam of reqParams){
+            if (!params.contains(reqParam)){
+                this.response = MISSING_PARAMS
+                this.failed = true
+                break
+            }
+        }
+
+        return this
+    }
+    
 }

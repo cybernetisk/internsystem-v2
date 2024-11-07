@@ -19,7 +19,7 @@ export default function authWrapper(WrappedComponent, requiredRole="", redirect=
     }
     else if (status == "authenticated" && requiredRole != "") {
       
-      const userRoles = data.user.roles.map((e) => e.name)
+      const userRoles = data.user.roles
       const missingRole = !userRoles.includes(requiredRole)
       
       if (missingRole) {
