@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const NOT_AUTHORIZED = NextResponse.json({error: "Not authorized"}, {status: 403})
 const NOT_SIGNED_IN = NextResponse.json({error: "Not logged in"}, {status: 401})
+const MISSING_PARAMS = NextResponse.json({error: "Malformed request, missing params"}, {status: 400})
 
 /**
  * This class is meant to be used in a chain-fassion
@@ -68,10 +69,13 @@ export class Auth {
      * @returns {NextResponse}
      */
     verify(res) {
-        if (this.failed) return this.response
+        if (this.failed) {
+            const failedRes = this.response.clone()
+            failedRes.headers.set("X-Auth-Checked", "true")
+            return failedRes
+        }
 
         res.headers.set("X-Auth-Checked", "true")
-
         return res
     }
 }
