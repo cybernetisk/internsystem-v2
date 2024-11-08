@@ -276,7 +276,7 @@ function section3(props) {
 }
 
 const AdminRedirectButton = (session, router, buttonProps) => {
-  const userRoles = session.data.user.roles.map((e) => e.name)
+  const userRoles = session.data.user.roles;
   if (!userRoles.includes("admin")) return
   return (
     <Button {...buttonProps} onClick={() => router.push("admin")}>
@@ -286,7 +286,7 @@ const AdminRedirectButton = (session, router, buttonProps) => {
 }
 
 const BoardRedirectButton = (session, router, buttonProps) => {
-  const userRoles = session.data.user.roles.map((e) => e.name);
+  const userRoles = session.data.user.roles;;
   if (!userRoles.includes("board")) return;
   return (
     <Button {...buttonProps} onClick={() => router.push("board")}>
