@@ -45,6 +45,7 @@ export const authOptions = {
           email: session.user.email,  
         },
         select: {
+          id: true,
           firstName: true,
           lastName: true,
           recruitedByUser: true,

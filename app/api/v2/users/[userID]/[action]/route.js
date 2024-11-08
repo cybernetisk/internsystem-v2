@@ -5,8 +5,8 @@ import { Auth } from "@/app/api/utils/auth";
 
 export async function POST(req, {params}) {
 
-  const authCheck = await new Auth(req)
-  .requireRoles(["admin"])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles(["admin"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -24,13 +24,14 @@ export async function POST(req, {params}) {
 }
 
 export async function GET(req, {params}) {
+  const {userID, action} = await params
 
-  const authCheck = await new Auth(req)
-  .requireRoles([])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles([])
+  authCheck.requireOwnership(userID)
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
-  const {userID, action} = await params
   
   if (userID) {
     let res;

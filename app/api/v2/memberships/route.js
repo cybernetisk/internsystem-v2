@@ -6,8 +6,8 @@ import { Auth } from "../../utils/auth";
 
 export async function GET(req) {
 
-  const authCheck = await new Auth(req)
-  .requireRoles(["intern"])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.response
   
@@ -38,11 +38,13 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const authCheck = await new Auth(req)
-  .requireRoles(["intern"])
-  .requireParams(["name", "email", "comments", "seller_id", "semester_id"])
+  const authCheck = new Auth(req.clone())
+  authCheck.requireRoles(["intern"])
+  authCheck.requireParams(["name", "email", "comments", "seller_id", "semester_id"])
 
   if (authCheck.failed) return authCheck.response
+
+  const args = await req.json()
 
   const res = await prisma.UserMembership.create({
     data: {

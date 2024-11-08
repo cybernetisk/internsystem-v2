@@ -8,8 +8,8 @@ const VOUCHER_MODIFIER = 0.5
 
 export async function GET(req) {
   
-  const authCheck = await new Auth(req)
-  .requireRoles([])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles([])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   

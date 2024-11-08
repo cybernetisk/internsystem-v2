@@ -7,8 +7,8 @@ import { Auth } from "../../utils/auth";
 
 
 export async function GET(req) {
-  const authCheck = await new Auth(req)
-  .requireRoles(["intern"])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -40,9 +40,9 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const authCheck = await new Auth(req)
-  .requireRoles(["intern"])
-  .requireParams(["selectedDay", "shiftManagerId", "shiftWorker1Id", "shiftWorker2Id"])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles(["intern"])
+  authCheck.requireParams(["selectedDay", "shiftManagerId", "shiftWorker1Id", "shiftWorker2Id"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   

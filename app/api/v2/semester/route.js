@@ -6,8 +6,8 @@ import { Auth } from "../../utils/auth";
 
 export async function GET(req) {
   
-  const authCheck = await new Auth(req)
-  .requireRoles([])
+  const authCheck = await new Auth(req.clone())
+  authCheck.requireRoles([])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   

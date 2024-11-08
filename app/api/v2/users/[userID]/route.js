@@ -5,28 +5,27 @@ import { Auth } from "@/app/api/utils/auth";
 
 
 export async function GET(req, {params}) {
-
-    const authCheck = await new Auth(req)
-    .requireRoles([])
-  
-    if (authCheck.failed) return authCheck.verify(authCheck.response)
+    await params
+    const userID = params.userID
     
+    const authCheck = await new Auth(req.clone())
+    authCheck.requireRoles([])
 
-  await params
-  const userID = params.userID
-
+    authCheckauthCheck.requireOwnership(userID)
+    
+    if (authCheck.failed) return authCheck.verify(authCheck.response)
   
-  return authCheck.verify(NextResponse.json(
-      { error: `${userID}` },
-      { status: 200 }
+    return authCheck.verify(NextResponse.json(
+        { error: `${userID}` },
+        { status: 200 }
     ));
     
 }
 
 export async function PATCH(req, {params}) {
 
-    const authCheck = await new Auth(req)
-    .requireRoles([])
+    const authCheck = await new Auth(req.clone())
+    authCheck.requireRoles([])
   
     if (authCheck.failed) return authCheck.verify(authCheck.response)
     

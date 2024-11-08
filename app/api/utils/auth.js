@@ -38,8 +38,9 @@ export class Auth {
         }
 
         // Count the how many of the required roles the user has, if equal to length of requiredRoles, the user has all roles
-        if (requiredRoles.reduce((sum,role) => sum+this.session.user.roles.includes(role), 0) === requiredRoles.length)
+        if (requiredRoles.every(role => this.session.user.roles.includes(role))) {
             return this
+        }
 
         this.response = NOT_AUTHORIZED
         this.failed = true
@@ -52,9 +53,11 @@ export class Auth {
      * @returns {Auth}
     */
     async requireParams(params) {
-        const reqParams = await this.req.json()
-        for (const reqParam of reqParams){
-            if (!params.contains(reqParam)){
+        if (this.failed) return this
+
+        const givenParams = await this.req.json()
+        for (const reqParam of params){
+            if (!(reqParam in givenParams)){
                 this.response = MISSING_PARAMS
                 this.failed = true
                 break
@@ -63,6 +66,20 @@ export class Auth {
 
         return this
     }
+
+    async requireOwnership(owner) {
+        if (this.failed) return this
+
+        this.session ??= await getServerSession(authOptions)
+
+        if (this.session.user.id !== owner) {
+            this.failed = true
+            this.response = NOT_AUTHORIZED
+        }
+
+        return this
+    }
+
     /**
      * 
      * @param {NextResponse} res 
