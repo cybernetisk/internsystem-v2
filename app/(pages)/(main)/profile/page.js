@@ -42,7 +42,7 @@ function ProfilePage() {
   );
   
   const email = session.data.user.email;
-  const userRoles = session.data.user.roles.map((e) => e.name);
+  const userRoles = session.data.user.roles;
   const recruiter = session.data.user.recruitedByUser;
   const usersRecruited = session.data.user.recruitedUsers?.length;
   
