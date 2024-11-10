@@ -71,7 +71,7 @@ export class Auth {
     requireOwnership(owner) {
         if (this.failed) return this
     
-
+        if (this.session.user.roles.includes("admin")) return this // Admin buypass on ownership requirement
         if (this.session.user.id === owner) { // Checking to see if userID is equal in stead of checking not null in case this.session is null which would give false positive
             return this
         }
