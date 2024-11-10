@@ -16,20 +16,20 @@ const MISSING_PARAMS = NextResponse.json({error: "Malformed request, missing par
  * @param {NextRequest} req
  */
 export class Auth {
-    constructor(req) {
+    constructor(session, params = null) {
         this.response = null
         this.failed = false
-        this.req = req
+        this.session = session
+        this.params = params
     }
 
     /**
      * @param {string[]} requiredRoles List of roles required to access page, leave empty to require user to be logged in
      * @returns {Auth}
     */
-    async requireRoles(requiredRoles) {
+    requireRoles(requiredRoles) {
         if (this.failed) return this
-
-        this.session ??= await getServerSession(authOptions)
+        
         // If no roles are required, the user just needs to be logged in which can be checked with the existance of the session object
         if (requiredRoles.length >= 0 && this.session === null) {
             this.response = NOT_SIGNED_IN
@@ -51,10 +51,12 @@ export class Auth {
      * @param {string[]} params Parameters required to access page
      * @returns {Auth}
     */
-    async requireParams(params) {
+    requireParams(params) {
+        if (this.params === null) throw new Error("params attribute is required to be set by constructor to use this function")
+            
         if (this.failed) return this
 
-        const givenParams = await this.req.json()
+        const givenParams = this.params
         for (const reqParam of params){
             if (!(reqParam in givenParams)){
                 this.response = MISSING_PARAMS
@@ -66,10 +68,8 @@ export class Auth {
         return this
     }
 
-    async requireOwnership(owner) {
+    requireOwnership(owner) {
         if (this.failed) return this
-
-        this.session ??= await getServerSession(authOptions)
 
         if (this.session.user.id !== owner) {
             this.failed = true

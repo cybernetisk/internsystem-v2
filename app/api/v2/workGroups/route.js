@@ -2,13 +2,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { Auth } from "../../utils/auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
+
 
 export async function GET(req) {
   
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
-
-  console.log(authCheck)
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -31,16 +33,17 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
-  await authCheck.requireParams(["userId", "workGroupId"])
+  const session = await getServerSession(authOptions)
+  const params = await req.json()
+  const authCheck = new Auth(session, params)
+  .requireRoles(["intern"])
+  .requireParams(["userId", "workGroupId"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
 
-  const args = await req.json()
   
-  const { userId, workGroupId } = args;
+  const { userId, workGroupId } = params;
 
   try {
     const res = await prisma.userToWorkGroup.create({

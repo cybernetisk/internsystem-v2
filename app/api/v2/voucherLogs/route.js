@@ -2,12 +2,16 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { Auth } from "../../utils/auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
+
 
 
 export async function GET(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -40,20 +44,21 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
-  await authCheck.requireParams(["loggedFor", "amount", "description", "semesterId"])
+  const session = await getServerSession(authOptions)
+  const params = await req.json()
+  const authCheck = new Auth(session, params)
+  .requireRoles(["intern"])
+  .requireParams(["loggedFor", "amount", "description", "semesterId"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
-  const args = await req.json()
   
   let res = await prisma.voucherLog.create({
     data: {
-      loggedFor: args.loggedFor,
-      amount: args.amount,
-      description: args.description,
-      semesterId: args.semesterId
+      loggedFor: params.loggedFor,
+      amount: params.amount,
+      description: params.description,
+      semesterId: params.semesterId
     }
   })
 

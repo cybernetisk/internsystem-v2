@@ -3,12 +3,17 @@ import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { getHours } from "date-fns";
 import { Auth } from "../../utils/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+
+
 
 
 
 export async function GET(req) {
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -40,13 +45,14 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
-  await authCheck.requireParams(["selectedDay", "shiftManagerId", "shiftWorker1Id", "shiftWorker2Id"])
+  const session = await getServerSession(authOptions)
+  const params = await req.json();
+  const authCheck = new Auth(session, params)
+  .requireRoles(["intern"])
+  .requireParams(["selectedDay", "shiftManagerId", "shiftWorker1Id", "shiftWorker2Id"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
-  const args = await req.json();
 
   const {
     selectedDay,
@@ -54,7 +60,7 @@ export async function POST(req) {
     shiftWorker1Id,
     shiftWorker2Id,
     comment,
-  } = args;
+  } = params;
   
   
   let title;

@@ -2,12 +2,17 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { Auth } from "../../utils/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+
+
 
 
 export async function GET(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.response
   
@@ -38,21 +43,22 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const authCheck = new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
-  await authCheck.requireParams(["name", "email", "comments", "seller_id", "semester_id"])
+  const session = await getServerSession(authOptions)
+  const params = await req.json()
+  const authCheck = new Auth(session, params)
+  .requireRoles(["intern"])
+  .requireParams(["name", "email", "comments", "seller_id", "semester_id"])
 
   if (authCheck.failed) return authCheck.response
 
-  const args = await req.json()
 
   const res = await prisma.UserMembership.create({
     data: {
-      name: args.name,
-      email: args.email,
-      comments: args.comments,
-      seller_id: args.seller_id,
-      semester_id: args.semester_id
+      name: params.name,
+      email: params.email,
+      comments: params.comments,
+      seller_id: params.seller_id,
+      semester_id: params.semester_id
     }
   })
 

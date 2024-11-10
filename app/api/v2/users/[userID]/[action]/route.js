@@ -2,11 +2,16 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { Auth } from "@/app/api/utils/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+
+
 
 export async function POST(req, {params}) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["admin"])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["admin"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -26,9 +31,10 @@ export async function POST(req, {params}) {
 export async function GET(req, {params}) {
   const {userID, action} = await params
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles([])
-  await authCheck.requireOwnership(userID)
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles([])
+  .requireOwnership(userID)
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   

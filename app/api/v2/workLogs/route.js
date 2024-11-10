@@ -2,11 +2,14 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { Auth } from "../../utils/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -40,22 +43,23 @@ export async function GET(req) {
 
 export async function POST(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
-  await authCheck.requireParams(["loggedBy", "loggedFor", "workedAt", "duration", "description", "semesterId"])
+  const session = await getServerSession(authOptions)
+  const params = await req.json()
+  const authCheck = new Auth(session, params)
+  .requireRoles(["intern"])
+  .requireParams(["loggedBy", "loggedFor", "workedAt", "duration", "description", "semesterId"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
-  const args = await req.json()
 
   const res = await prisma.workLog.create({
     data: {
-      loggedBy: args.loggedBy,
-      loggedFor: args.loggedFor,
-      workedAt: args.workedAt,
-      duration: args.duration,
-      description: args.description,
-      semesterId: args.semesterId
+      loggedBy: params.loggedBy,
+      loggedFor: params.loggedFor,
+      workedAt: params.workedAt,
+      duration: params.duration,
+      description: params.description,
+      semesterId: params.semesterId
     }
   })
 

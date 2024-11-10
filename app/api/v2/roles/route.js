@@ -2,11 +2,16 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { Auth } from "../../utils/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+
+
 
 export async function GET(req) {
   
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles([])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles([])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   

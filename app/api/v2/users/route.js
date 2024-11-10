@@ -4,6 +4,10 @@ import prisma from "@/prisma/prismaClient";
 import { randomBytes } from "crypto";
 import { mailOptions, transporter } from "@/app/(pages)/auth/email";
 import { Auth } from "../../utils/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
+
+
 
 
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || "";
@@ -82,9 +86,13 @@ async function registerUser(email, firstName, lastName) {
 }
 
 export async function POST(req) {
-  
-  const args = await req.json();
-  const { email, firstName, lastName } = args;
+
+  const params = req.json()
+
+  const authCheck = new Auth(null, params)
+  .requireParams(["email", "firstName", "lastName"])
+
+  const { email, firstName, lastName } = params;
 
   return authCheck.verify(await registerUser(email, firstName, lastName));
   
@@ -92,8 +100,9 @@ export async function POST(req) {
 
 export async function GET(req) {
 
-  const authCheck = await new Auth(req.clone())
-  await authCheck.requireRoles(["intern"])
+  const session = await getServerSession(authOptions)
+  const authCheck = new Auth(session)
+  .requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
 
