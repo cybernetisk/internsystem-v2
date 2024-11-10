@@ -7,7 +7,7 @@ import { Auth } from "../../utils/auth";
 export async function GET(req) {
 
   const authCheck = await new Auth(req.clone())
-  authCheck.requireRoles(["intern"])
+  await authCheck.requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -41,8 +41,8 @@ export async function GET(req) {
 
 export async function POST(req) {
   const authCheck = await new Auth(req.clone())
-  authCheck.requireRoles(["intern"])
-  authCheck.requireParams(["loggedFor", "amount", "description", "semesterId"])
+  await authCheck.requireRoles(["intern"])
+  await authCheck.requireParams(["loggedFor", "amount", "description", "semesterId"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   

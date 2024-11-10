@@ -82,10 +82,6 @@ async function registerUser(email, firstName, lastName) {
 }
 
 export async function POST(req) {
-  const authCheck = await new Auth(req.clone())
-  authCheck.requireRoles(["intern"])
-
-  if (authCheck.failed) return authCheck.verify(authCheck.response)
   
   const args = await req.json();
   const { email, firstName, lastName } = args;
@@ -97,7 +93,7 @@ export async function POST(req) {
 export async function GET(req) {
 
   const authCheck = await new Auth(req.clone())
-  authCheck.requireRoles(["intern"])
+  await authCheck.requireRoles(["intern"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
 

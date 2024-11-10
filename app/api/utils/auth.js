@@ -37,14 +37,13 @@ export class Auth {
             return this
         }
 
-        // Count the how many of the required roles the user has, if equal to length of requiredRoles, the user has all roles
         if (requiredRoles.every(role => this.session.user.roles.includes(role))) {
             return this
         }
-
+        
         this.response = NOT_AUTHORIZED
         this.failed = true
-
+        
         return this
     }
 

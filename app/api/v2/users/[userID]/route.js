@@ -9,9 +9,9 @@ export async function GET(req, {params}) {
     const userID = params.userID
     
     const authCheck = await new Auth(req.clone())
-    authCheck.requireRoles([])
+    await authCheck.requireRoles([])
 
-    authCheckauthCheck.requireOwnership(userID)
+    authCheckawait authCheck.requireOwnership(userID)
     
     if (authCheck.failed) return authCheck.verify(authCheck.response)
   
@@ -25,7 +25,7 @@ export async function GET(req, {params}) {
 export async function PATCH(req, {params}) {
 
     const authCheck = await new Auth(req.clone())
-    authCheck.requireRoles([])
+    await authCheck.requireRoles([])
   
     if (authCheck.failed) return authCheck.verify(authCheck.response)
     
