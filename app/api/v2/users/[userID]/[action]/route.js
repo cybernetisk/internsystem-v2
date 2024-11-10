@@ -22,6 +22,8 @@ export async function POST(req, {params}) {
   if (userID) {
     switch (action) {
       case "roles":
+        authCheck.requireParams(["roles"])
+        if (authCheck.failed) return authCheck.verify(authCheck.response)
         return authCheck.verify(handlePostRoles(userID, args))
     }
   }
@@ -65,9 +67,6 @@ function handleGetUser(userID) {
 }
 
 async function handlePostRoles(userID, args) {
-  if (!(
-    args.hasOwnProperty("roles")
-  )) return NextResponse.json({error: "Malformed request"}, {status: 400})
 
   const roles = args.roles;
 

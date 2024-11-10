@@ -28,16 +28,17 @@ export async function GET(req, {params}) {
 }
 
 export async function PATCH(req, {params}) {
+    await params
+    const userID = params.userID
 
     const session = await getServerSession(authOptions)
     const authCheck = new Auth(session)
     .requireRoles([])
+    .requireOwnership(userID)
   
     if (authCheck.failed) return authCheck.verify(authCheck.response)
     
 
-    await params
-    const userID = params.userID
     const args = await req.json()
     
     const result = {}
