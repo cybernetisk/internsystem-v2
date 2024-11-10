@@ -11,9 +11,11 @@ const MISSING_PARAMS = NextResponse.json({error: "Malformed request, missing par
  *  1. Make an instance of the class
  *  2. Chain together checks
  *  3. Check the failed attribute to check if the auth-check failed or not
- *  4. Return the reponse attribute which contain a NextResponse if the checks failed
+ *  4. Fetch the reponse attribute which contain a NextResponse if the checks failed
+ *  5. Return response wrapped with this class' verify function to add 'X-Auth-Checked' header to response
  * 
- * @param {NextRequest} req
+ * @param {Object} session 
+ * @param {Object} params (Optional) Must be passed for requireParams function to work   
  */
 export class Auth {
     constructor(session, params = null) {
@@ -24,14 +26,13 @@ export class Auth {
     }
 
     /**
-     * @param {string[]} requiredRoles List of roles required to access page, leave empty to require user to be logged in
+     * @param {string[]} requiredRoles List of roles required to access page, pass empty list to require user to be logged in
      * @returns {Auth}
     */
     requireRoles(requiredRoles) {
         if (this.failed) return this
         
-        // If no roles are required, the user just needs to be logged in which can be checked with the existance of the session object
-        if (requiredRoles.length >= 0 && this.session === null) {
+        if (this.session === null) {
             this.response = NOT_SIGNED_IN
             this.failed = true
             return this
@@ -48,7 +49,7 @@ export class Auth {
     }
 
     /**
-     * @param {string[]} params Parameters required to access page
+     * @param {string[]} params Parameters required to access endpoint
      * @returns {Auth}
     */
     requireParams(params) {
@@ -68,6 +69,11 @@ export class Auth {
         return this
     }
 
+    /**
+     * Require user's id to match the provided owner's id
+     * @param {string} owner The user id of the owner of the page
+     * @returns {Auth}
+     */
     requireOwnership(owner) {
         if (this.failed) return this
     
@@ -82,8 +88,10 @@ export class Auth {
     }
 
     /**
-     * 
-     * @param {NextResponse} res 
+     * Double checks that no auth-checks has failed, and then adds custom verification header to response to show that the request has been run through auth
+     * This double check only ensures data is not returned to the user if a requirement failed. It does not prevent the endpoint for running.
+     * Always check the failed attribute after running a chain before running code for the endpoint
+     * @param {NextResponse} res Response to check and wrap
      * @returns {NextResponse}
      */
     verify(res) {
