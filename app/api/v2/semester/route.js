@@ -12,7 +12,6 @@ export async function GET(req) {
   
   const session = await getServerSession(authOptions)
   const authCheck = new Auth(session)
-  .requireRoles([])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
