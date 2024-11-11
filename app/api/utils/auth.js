@@ -38,6 +38,8 @@ export class Auth {
             return this
         }
 
+        if (this.session.user.roles.includes("admin")) return this;
+
         if (requiredRoles.every(role => this.session.user.roles.includes(role))) {
             return this
         }

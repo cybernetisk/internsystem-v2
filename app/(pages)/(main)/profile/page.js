@@ -69,9 +69,9 @@ function ProfilePage() {
     }
   }, [session])
   
-  const handleUpdateData = async () => {
+  const handleUpdateData = () => {
 
-    await fetch(`/api/v2/users/${session.data.user.id}`, {
+    fetch(`/api/v2/users/${session.data.user.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -80,13 +80,12 @@ function ProfilePage() {
         firstName: firstName,
         lastName: lastName,
       }),
-    });
+    }).then(() => window.location.reload());
 
-    window.location.reload();
   }
   
-  const handleConfirmSelection = async () => {
-    await fetch(`/api/v2/users/${session.data.user.id}`, {
+  const handleConfirmSelection = () => {
+    fetch(`/api/v2/users/${session.data.user.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -94,9 +93,9 @@ function ProfilePage() {
       body: JSON.stringify({
         recruitedById: selectedRecruiter.id,
       }),
-    });
+    }).then(() => window.location.reload());
 
-    window.location.reload()
+    
   }
   
     

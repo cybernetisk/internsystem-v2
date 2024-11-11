@@ -28,7 +28,7 @@ const NavItems = [
   },
 ];
 
-export default async function AppLayout({ children }) {
+export default function AppLayout({ children }) {
   
   const pathname = usePathname();
 

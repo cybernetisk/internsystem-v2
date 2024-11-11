@@ -15,8 +15,7 @@ export async function GET(req, {params}) {
     const session = await getServerSession(authOptions)
     const authCheck = new Auth(session)
     .requireRoles([])
-
-    authCheck.requireOwnership(userID)
+    .requireOwnership(userID)
     
     if (authCheck.failed) return authCheck.verify(authCheck.response)
   
