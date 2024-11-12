@@ -92,10 +92,24 @@ function MembershipPage() {
   }, [refresh]);
 
   const addNewMember = async () => {
+<<<<<<< HEAD
     fetch("/api/v2/memberships", {
       method: "POST",
       headers: {
         "content-type": "application/json"
+=======
+    const response = await prismaRequest({
+      model: "userMembership",
+      method: "create",
+      request: {
+        data: {
+          name: newMemberName,
+          email: "",
+          comment: newMemberComment,
+          seller_id: session.data.user.id,
+          semester_id: session.data.semester.id,
+        },
+>>>>>>> cyb/development
       },
       body: JSON.stringify({
         name: newMemberName,

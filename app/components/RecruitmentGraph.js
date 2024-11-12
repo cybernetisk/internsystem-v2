@@ -23,10 +23,17 @@ const ForceGraph = ({ data }) => {
     const node_radius = 24;
     const arrowPath = "M 4 -2 L 10 1 L 4 4";
     
+<<<<<<< HEAD
     const nodes = data.nodes.map((e) => ({ id: e.id, name: getUserInitials(e) }));
     const edges = data.edges.map((e) => ({
       source: e[0],
       target: e[1],
+=======
+    const nodes = data.nodes.map((e) => ({ ...e, name: getUserInitials(e) }));
+    const links = data.links.map((e) => ({
+      source: e.source.id,
+      target: e.target.id,
+>>>>>>> cyb/development
     }));
 
     // Clear the previous graph
@@ -38,7 +45,11 @@ const ForceGraph = ({ data }) => {
       .force(
         "link",
         d3
+<<<<<<< HEAD
           .forceLink(edges)
+=======
+          .forceLink(links)
+>>>>>>> cyb/development
           .distance(100)
           .id((d) => d.id)
       )
@@ -51,7 +62,11 @@ const ForceGraph = ({ data }) => {
     const link = svg
       .append("g")
       .selectAll("line")
+<<<<<<< HEAD
       .data(edges)
+=======
+      .data(links)
+>>>>>>> cyb/development
       .enter()
       .append("line")
       .attr("marker-end", "url(#arrowhead-not-highlighted)")

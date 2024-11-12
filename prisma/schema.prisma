@@ -287,17 +287,11 @@ model UserMembership {
   user_id           String?   @db.VarChar(50)
   uio_username      String?   @db.VarChar(15)
   date_lifetime     DateTime? @db.DateTime(0)
-  comments          String?   @db.Text
+  comment           String?   @db.Text
   last_edited_by_id Int?
   Semester          Semester  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserMembership_semester")
 
   @@index([semester_id], map: "UserMembership_semester_idx")
-}
-
-model memberLog {
-  id   String  @id
-  name String? @db.VarChar(45)
-  year Int?
 }
 
 model Semester {
