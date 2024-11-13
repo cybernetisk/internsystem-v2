@@ -170,7 +170,7 @@ function validateWorkLogRequest(
   
   // Define an object to store the errors
   const errors = {
-    registeredForError: registeredFor == [],
+    registeredForError: registeredFor.length == 0,
     selectedGroupError: selectedGroup == null,
     selectedDateTimeError: false, // TODO: add semester validation
     hoursError: hours <= 0 || hours > 24,
