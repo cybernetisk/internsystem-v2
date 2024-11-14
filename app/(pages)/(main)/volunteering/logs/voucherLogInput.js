@@ -3,6 +3,7 @@ import { Box, Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/
 import { useState } from "react";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
+import TextFieldWithX from "@/app/components/input/TextFieldWithX";
 
 export default function voucherLogInput(
   session,
@@ -80,12 +81,14 @@ export default function voucherLogInput(
           check={(data) => data.match(/[^0-9]/)}
           error={numVouchersError}
         />
-        <TextField
+        <TextFieldWithX
           label="Description"
+          name="voucherdescription"
+          value={descriptionVoucher}
+          setValue={setDescriptionVoucher}
           size="small"
           multiline
           InputLabelProps={{ shrink: true }}
-          value={descriptionVoucher}
           error={descriptionVoucherError}
           onChange={(e) => setDescriptionVoucher(e.target.value)}
         />

@@ -7,6 +7,7 @@ import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import locale from "date-fns/locale/en-GB";
+import TextFieldWithX from "@/app/components/input/TextFieldWithX";
 
 export default function workLogInput(
   session,
@@ -125,12 +126,14 @@ export default function workLogInput(
           check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
           error={hoursError}
         />
-        <TextField
+        <TextFieldWithX
           label="Description"
+          name="worklogdescription"
+          value={description}
+          setValue={setDescription}
           size="small"
           multiline
           InputLabelProps={{ shrink: true }}
-          value={description}
           onChange={(e) => setDescription(e.target.value)}
           error={descriptionError}
         />
