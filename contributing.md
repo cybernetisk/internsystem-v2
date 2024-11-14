@@ -68,3 +68,13 @@ git pull
 git checkout -b <feature-branch-name>
 git push -u origin <feature-branch-name>
 ```
+
+### Creating a pull-request
+When you have created a feature branch, you probably want the features you implemented to become a part of the codebase. To do this you can use a pull-request. This can be done in a couple different ways.
+One way is to go to your fork of the cyb repo in github, go to the branch you want to make a pull-request for. There should be some sort of contribute/make pull-request button at the top of the page. If you click this, you will be braught to the pull-request page on cyb's repo.
+Another way to get to the pull requests page, is to go to the pull-request tab on cyb's repo and click "new pull request". 
+
+In both of these cases you will need to make sure that you are creating a pull-request between the correct branches. There should be four dropdown boxes: "base-repository", "base", "head-repository" and "compare". If you don't get these four but only "base" and "compare", you need to click the "compare accross forks" link above the dropdowns.
+When you are presented with four dropdowns, you need to make sure the first two, aka. the base-repository and base boxes are set to cybernetisk/internsystem-v2 and developmlent respectivly. For the last two aka. head-repository and compare, you need to be set to your fork of the repo and the feature branch you want to make a pull-request for.
+
+If you are working on a larger feature with many commits, we want you to make a draft-pull-request. You do this in the same way as making a normal pull-request, but you may be prompted at some point if you want to make the pull-request a draft pull-request. Alternativly you can always make a normal pull-request and then later open the pull-request page and click the "Convert to draft" button on the right under the header "Reviewers"
