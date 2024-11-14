@@ -1,6 +1,7 @@
 import {
     TextField,
     InputAdornment,
+    Tooltip,
 } from "@mui/material";
 import { Component } from "react";
 
@@ -19,15 +20,22 @@ export default class TextFieldWithX extends Component {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         InputProps={{
-            endAdornment: (
-            <InputAdornment
-                position="end"
-                onClick={() => {
-                setValue("");
-                document.querySelector(`input[name="${name}"]`).focus();
+          endAdornment: (
+            <Tooltip title="Clear">
+              <InputAdornment
+                  position="end"
+                  onClick={() => {
+                    setValue("");
+                    document.querySelector(`input[name="${name}"]`).focus();
+                  }}
+                sx={{
+                  cursor: 'pointer',
+                  padding: 1.5,
+                  margin: -1.5,
                 }}
-            >✗</InputAdornment>
-            ),
+              >✗</InputAdornment>
+            </Tooltip>
+          ),
         }}
         {...this.props}
         />
