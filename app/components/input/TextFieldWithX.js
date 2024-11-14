@@ -26,7 +26,7 @@ export default class TextFieldWithX extends Component {
                   position="end"
                   onClick={() => {
                     setValue("");
-                    document.querySelector(`input[name="${name}"]`).focus();
+                    document.querySelector(`[name="${name}"]`).focus();
                   }}
                 sx={{
                   cursor: 'pointer',
