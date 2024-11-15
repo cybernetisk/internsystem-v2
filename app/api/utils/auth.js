@@ -26,10 +26,10 @@ export class Auth {
     }
 
     /**
-     * @param {string[]} requiredRoles List of roles required to access page, pass empty list to require user to be logged in
+     * @param {string[]} permittedRoles List of roles that will give access to page, pass empty list to require user to be logged in
      * @returns {Auth}
     */
-    requireRoles(requiredRoles) {
+    requireRoles(permittedRoles) {
         if (this.failed) return this
         
         if (this.session === null) {
@@ -40,7 +40,7 @@ export class Auth {
 
         if (this.session.user.roles.includes("admin")) return this;
 
-        if (requiredRoles.every(role => this.session.user.roles.includes(role))) {
+        if (permittedRoles.some(role => this.session.user.roles.includes(role))) {
             return this
         }
         
