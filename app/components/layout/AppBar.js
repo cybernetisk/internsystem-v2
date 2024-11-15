@@ -84,11 +84,7 @@ export class NavBar extends Component {
             </Grid>
 
             <Grid item sx={{ flexShrink: 1 }}>
-<<<<<<< HEAD
               <SessionProvider basePath="/api/v2/auth">
-=======
-              <SessionProvider>
->>>>>>> cyb/development
                 <LoginButton />
               </SessionProvider>
             </Grid>
