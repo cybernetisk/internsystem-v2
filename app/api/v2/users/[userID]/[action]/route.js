@@ -46,20 +46,19 @@ export async function GET(req, {params}) {
     switch (action) {
       case "roles":
         res = handleGetRoles(userID)
+        break
       case "workLogs":
         res = handleGetWorkLogs(userID)
+        break
       case "recruitInfo":
         res = handleGetRecruitInfo(userID)
+        break
       default:
         res = handleGetUser(userID)
+        break
     }
     return authCheck.verify(await res)
-  }
-  return authCheck.verify(NextResponse.json(
-    { error: `${userID}, ${action}` },
-    { status: 200 }
-  ));
-  
+  }  
 }
 
 function handleGetUser(userID) {
@@ -142,12 +141,16 @@ async function handleGetRoles(userID) {
     roles[role.id] = role.name
   }
 
+
   const userRoles = userRoleIds.roles.map(e => roles[e.roleId])
 
   return NextResponse.json(
     {userRoles: userRoles},
     {status: 200}
   )
+
+
+
 }
 
 async function handleGetRecruitInfo(userID) {
