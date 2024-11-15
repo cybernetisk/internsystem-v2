@@ -305,7 +305,7 @@ function logSettings(logs) {
     <Stack direction="column" spacing={2}>
       <Typography variant="body1">Logs</Typography>
 
-      <CustomTable headers={TABLE_HEADERS_LOGS} data={logs} />
+      <CustomTable defaultFilterBy= {"loggedBy"} headers={TABLE_HEADERS_LOGS} data={logs} />
     </Stack>
   );
 }
