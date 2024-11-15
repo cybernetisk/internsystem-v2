@@ -78,3 +78,26 @@ In both of these cases you will need to make sure that you are creating a pull-r
 When you are presented with four dropdowns, you need to make sure the first two, aka. the base-repository and base boxes are set to cybernetisk/internsystem-v2 and developmlent respectivly. For the last two aka. head-repository and compare, you need to be set to your fork of the repo and the feature branch you want to make a pull-request for.
 
 If you are working on a larger feature with many commits, we want you to make a draft-pull-request. You do this in the same way as making a normal pull-request, but you may be prompted at some point if you want to make the pull-request a draft pull-request. Alternativly you can always make a normal pull-request and then later open the pull-request page and click the "Convert to draft" button on the right under the header "Reviewers"
+
+### Setting up a local database (optional)
+If you want to make changes to the database in you feature, you probbalby don't want to make changes to the same dev database everybody else are using. To work around this you can set up your own instance of the database. The easiest way to do this is to set up a docker container
+First of all you will need to have docker installed. Once it is installed you can create a docker container from the MYSQL image as follows:
+```
+docker run --name cybDatabase -e MYSQL_ROOT_PASSWORD='<Strong password here>' -p 3306:3306 -d mysql:latest 
+```
+
+This should create a docker container running a mysql server on your machine. If you have never run a mysql docker container before, it might take some time for the image to download from dockerhub.
+
+When the container is up and running all you need to do is change som variables in your projects .env.development.local file. Specifically you need to update the following variables
+```
+DATABASE_USER = 'root'
+DATABASE_PASS = '<Your strong database password>'
+DATABASE_SCHEMA = 'public'
+DATABASE_URL = "mysql://${DATABASE_USER}:${DATABASE_PASS}@localhost:3306/${DATABASE_SCHEMA}"
+```
+Note that what has changed in the database URL is only the port number
+
+Last thing you need to change to be done setting up your database is to generate all the tables the application needs. This can be done by running a singe command: 
+```
+npm run prismapush
+```
