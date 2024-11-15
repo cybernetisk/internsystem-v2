@@ -10,7 +10,7 @@ import { authOptions } from "@/app/api/v2/auth/[...nextauth]/route";
 export async function GET(req) {
   const session = await getServerSession(authOptions)
   const authCheck = new Auth(session)
-  .requireRoles(["intern"])
+  .requireRoles([])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response) 
   

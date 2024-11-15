@@ -12,7 +12,7 @@ export async function GET(req) {
 
   const session = await getServerSession(authOptions)
   const authCheck = new Auth(session)
-  .requireRoles(["intern"])
+  .requireRoles([])
 
   if (authCheck.failed) return authCheck.response
   
@@ -46,7 +46,7 @@ export async function POST(req) {
   const session = await getServerSession(authOptions)
   const params = await req.json()
   const authCheck = new Auth(session, params)
-  .requireRoles(["intern"])
+  .requireRoles([])
   .requireParams(["name", "email", "comments", "seller_id", "semester_id"])
 
   if (authCheck.failed) return authCheck.response
