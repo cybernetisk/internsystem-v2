@@ -21,6 +21,16 @@ export async function GET(req) {
             lastName: true,
             id: true,
             recruitedById: true
+        },
+        where: {
+          OR: [
+          {recruitedById: {
+            not: null
+          }},
+          {recruitedUsers: {
+            some: {}
+          }}
+          ]
         }
     });
 
