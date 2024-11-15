@@ -9,14 +9,14 @@ import { authOptions } from "@/app/api/v2/auth/[...nextauth]/route";
 
 export async function POST(req, {params}) {
 
+  const args = await req.json()
   const session = await getServerSession(authOptions)
-  const authCheck = new Auth(session)
+  const authCheck = new Auth(session, args)
   .requireRoles(["admin"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
 
-  const args = await req.json()
   const {userID, action} = await params
 
   if (userID) {
@@ -24,9 +24,10 @@ export async function POST(req, {params}) {
       case "roles":
         authCheck.requireParams(["roles"])
         if (authCheck.failed) return authCheck.verify(authCheck.response)
-        return authCheck.verify(handlePostRoles(userID, args))
+        return authCheck.verify(await handlePostRoles(userID, args))
     }
   }
+
 
 }
 
