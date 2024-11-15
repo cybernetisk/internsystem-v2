@@ -22,10 +22,10 @@ import CustomTable from "@/app/components/CustomTable";
 import { format, parseISO } from "date-fns";
 
 const TABLE_HEADERS_LOGS = [
-  { id: "workedAt", name: "Date", sortBy: "workedAt_num" },
-  { id: "loggedBy", name: "Logged by" },
-  { id: "duration", name: "duration" },
-  { id: "description", name: "Description" },
+  { id: "workedAt", type: "date", flex: 1, name: "Date", sortBy: "workedAt_num" },
+  { id: "loggedBy", type: "string", flex: 1, name: "Logged by" },
+  { id: "duration", type: "string", flex: 1, name: "duration" },
+  { id: "description", type: "string", flex: 1, name: "Description" },
 ];
 
 function AdminPage({ props }) {

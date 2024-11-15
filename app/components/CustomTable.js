@@ -60,6 +60,8 @@ function CustomTable({ headers, data, defaultFilterBy=null }) {
   let header = null;
   if (defaultFilterBy) {
     header = headers.filter(h => h.id == defaultFilterBy)[0];
+  } else {
+    header = headers[0]
   }
   const [sortBy, setSortBy] = useState(() => headers[0]?.sortBy || null);
   const [sortDirection, setSortDirection] = useState("DESC");
@@ -71,7 +73,9 @@ function CustomTable({ headers, data, defaultFilterBy=null }) {
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   
   const [availableFilterOptions, setAvailableFilterOptions] = useState(
-    header.type === "string" || header.type === "boolean" ? filterTableOptions.filter((e) => e.id === "contains") : filterTableOptions.filter((e) => e.id !== "contains")
+    header.type === "string" || header.type === "boolean" 
+    ? filterTableOptions.filter((e) => e.id === "contains") 
+    : filterTableOptions.filter((e) => e.id !== "contains")
   );
   const [selectedFilterOption, setSelectedFilterOption] = useState(availableFilterOptions[0]);
   const [selectedSearchColumn, setSelectedSearchColumn] = useState(header);
