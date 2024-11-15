@@ -3,7 +3,7 @@ import { Box, Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/
 import { useState } from "react";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import prismaRequest from "@/app/middleware/prisma/prismaRequest";
-import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
+import VoucherFeedback from "@/app/components/feedback/voucherFeedback";
 
 export default function voucherLogInput(
   session,
@@ -17,10 +17,12 @@ export default function voucherLogInput(
   const [numVouchersError, setNumVouchersError] = useState(false);
   const [descriptionVoucherError, setDescriptionVoucherError] = useState(false);
 
-  const [requestResponse, setRequestResponse] = useState("");
+  const [requestResponse, setRequestResponse] = useState({
+    message: "",
+    ok: false,
+  });
   
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [severity, setSeverity] = useState("")
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   
   const diff = vouchersEarned - vouchersUsed;
   
@@ -54,20 +56,20 @@ export default function voucherLogInput(
     });
     
     if (!response.ok) {
-      setRequestResponse("Failed to use voucher. Please try again.");
-      setSeverity("error")
-      setSnackbarOpen(true)
+      setRequestResponse({
+        message: "Failed to use voucher. Please try again.",
+        ok: response.ok,
+      });
+      setFeedbackOpen(true)
       return;
     }
     
-    setRequestResponse("Voucher used.");
-    setSeverity("success")
-    setSnackbarOpen(true)
-    setTimeout(() => {
-      setRequestResponse("");
-      setSnackbarOpen(false)
-    }, 5000);
-    
+    console.log("response.ok", response.ok)
+    setRequestResponse({
+      message: `Used ${response.data.amount} voucher(s)`,
+      ok: response.ok,
+    });
+    setFeedbackOpen(true)
   };
 
   return (
@@ -105,12 +107,7 @@ export default function voucherLogInput(
 
       <Typography variant="subtitle1">
         {requestResponse != "" ? (
-          <SnackbarAlert 
-            open={snackbarOpen} 
-            setOpen={setSnackbarOpen} 
-            response={requestResponse}
-            severity={severity}
-          />
+          <VoucherFeedback open={feedbackOpen} setOpen={setFeedbackOpen} response={requestResponse}/>
         ) : (
           <Skeleton
             animation={false}
