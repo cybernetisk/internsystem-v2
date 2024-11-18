@@ -7,6 +7,7 @@ import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import locale from "date-fns/locale/en-GB";
 import { CalendarToday, PunchClock } from "@mui/icons-material";
+import TextFieldWithX from "@/app/components/input/TextFieldWithX";
 
 export default function workLogInput(
   session,
@@ -177,12 +178,14 @@ export default function workLogInput(
             </Fab>
           </Tooltip>
         </Stack>
-        <TextField
+        <TextFieldWithX
           label="Description"
+          name="worklogdescription"
+          value={description}
+          setValue={setDescription}
           size="small"
           multiline
           InputLabelProps={{ shrink: true }}
-          value={description}
           onChange={(e) => setDescription(e.target.value)}
           error={descriptionError}
         />
