@@ -23,7 +23,7 @@ export async function GET(req) {
           lifetime: true,
           honorary: true,
           name: true,
-          comments: true,
+          comment: true,
           date_joined: true
         }
       });
@@ -56,7 +56,7 @@ export async function POST(req) {
     data: {
       name: params.name,
       email: params.email,
-      comments: params.comments,
+      comment: params.comments,
       seller_id: params.seller_id,
       semester_id: params.semester_id
     }
