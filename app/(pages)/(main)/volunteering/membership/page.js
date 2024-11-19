@@ -44,7 +44,7 @@ const MEMBERSHIP_TABLE_HEADERS = [
     flex: 3,
   },
   {
-    id: "comments",
+    id: "comment",
     type: "string",
     name: "Comment",
     flex: 2,
