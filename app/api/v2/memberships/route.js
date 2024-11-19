@@ -25,6 +25,12 @@ export async function GET(req) {
           name: true,
           comment: true,
           date_joined: true
+        },
+        where: {
+          OR: [
+            {semester_id: session.semester.id},
+            {lifetime: true}
+          ]
         }
       });
 
