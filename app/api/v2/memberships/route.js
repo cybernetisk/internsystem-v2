@@ -51,7 +51,7 @@ export async function POST(req) {
   const params = await req.json()
   const authCheck = new Auth(session, params)
   .requireRoles([])
-  .requireParams(["name", "email", "comments", "seller_id", "semester_id"])
+  .requireParams(["name", "email", "comment", "seller_id", "semester_id"])
 
   if (authCheck.failed) return authCheck.response
 
@@ -60,7 +60,7 @@ export async function POST(req) {
     data: {
       name: params.name,
       email: params.email,
-      comment: params.comments,
+      comment: params.comment,
       seller_id: params.seller_id,
       semester_id: params.semester_id
     }
