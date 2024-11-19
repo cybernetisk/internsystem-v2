@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../v2/auth/[...nextauth]/route";
+import { authOptions } from "../utils/authOptions";
 import { NextRequest, NextResponse } from "next/server";
 
 const NOT_AUTHORIZED = NextResponse.json({error: "Not authorized"}, {status: 403})

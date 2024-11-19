@@ -4,7 +4,7 @@ import prisma from "@/prisma/prismaClient";
 import { getHours } from "date-fns";
 import { Auth } from "../../utils/auth";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/v2/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/utils/authOptions";
 
 
 
