@@ -38,6 +38,8 @@ export class Auth {
             return this
         }
 
+        if (permittedRoles.length === 0) return this
+
         if (this.session.user.roles.includes("admin")) return this;
 
         if (permittedRoles.some(role => this.session.user.roles.includes(role))) {
