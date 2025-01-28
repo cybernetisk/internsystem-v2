@@ -1,11 +1,9 @@
 
-
-import NextAuth from "next-auth";
 import Email from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/prisma/prismaClient";
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     Email({
       server: {
@@ -16,77 +14,82 @@ const handler = NextAuth({
           pass: process.env.NODEMAILER_NOREPLY_PASSWORD,
         },
       },
-      from: process.env.NODEMAILER_NOREPLY_USER
+      from: process.env.NODEMAILER_NOREPLY_USER,
     }),
   ],
   callbacks: {
     async signIn({ user }) {
-      
       const cybUser = await prisma.user.findFirst({
         where: {
-          email: user.email
-        }
-      })
-      
+          email: user.email,
+        },
+      });
+
       if (!cybUser) {
-        throw "No user found"
+        throw "No user found";
       }
-      
+
       if (!cybUser.active) {
-        throw "Email has not been verified"
+        throw "Email has not been verified";
       }
-      
-      return true
+
+      return true;
     },
     async session({ session }) {
-      
       const cybUser = await prisma.user.findFirst({
         where: {
-          email: session.user.email,  
+          email: session.user.email,
         },
-        include: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
           recruitedByUser: true,
           recruitedUsers: true,
           roles: {
-            include: {
-              role: true,
+            select: {
+              role: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
         },
       });
-      
+
       const semesters = await prisma.semester.findMany({
         orderBy: {
-          id: "desc"
+          id: "desc",
         },
         take: 1,
-      })
+      });
       const currentSemester = await semesters[0];
-      
+
       if (cybUser) {
-        session.user.name = `${cybUser.firstName} ${cybUser.lastName}`
+        session.user.name = `${cybUser.firstName} ${cybUser.lastName}`;
         delete session.user.name;
-        
+
         session.user = {
           ...session.user,
           ...cybUser,
-          roles: cybUser.roles.map((e) => e.role),
-          name: `${cybUser.firstName} ${cybUser.lastName ? cybUser.lastName : ""}`
-        }
+          roles: cybUser.roles.map((e) => e.role.name),
+          name: `${cybUser.firstName} ${
+            cybUser.lastName ? cybUser.lastName : ""
+          }`,
+        };
       }
-      
+
       // console.log(currentSemester);
       if (currentSemester) {
         session.semester = currentSemester;
       }
-      
-      return session
-    }
+
+      return session;
+    },
   },
   pages: {
-    signIn: "/auth/signIn"
+    signIn: "/auth/signIn",
   },
   adapter: PrismaAdapter(prisma),
-});
-
-export { handler as GET, handler as POST };
+};

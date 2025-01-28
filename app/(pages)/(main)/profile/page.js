@@ -14,14 +14,10 @@ import {
 } from "@mui/material";
 import { PageHeader } from "@/app/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
-import prismaRequest from "@/app/middleware/prisma/prismaRequest"
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import CustomTable from "@/app/components/CustomTable";
 import { signOut, useSession } from "next-auth/react"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { format, parseISO } from "date-fns";
-import { getInitials } from "@/app/components/calendar/schedulerUtils";
 
 const RECRUIT_TABLE_HEADERS = [
   { id: "workedAt", name: "work date", sortBy: "workedAt_num", flex: 2 },
@@ -46,61 +42,22 @@ function ProfilePage() {
   );
   
   const email = session.data.user.email;
-  const userRoles = session.data.user.roles.map((e) => e.name);
+  const userRoles = session.data.user.roles;
   const recruiter = session.data.user.recruitedByUser;
   const usersRecruited = session.data.user.recruitedUsers?.length;
   
   useEffect(() => {
     if (!recruiter) {
-      prismaRequest({
-        model: "user",
-        method: "find",
-        callback: (data) => setUsers(data.data),
-      });
+      fetch("/api/v2/users")
+      .then(res => res.json())
+      .then(data => setUsers(data.users))
     }
-    prismaRequest({
-      model: "user",
-      method: "find",
-      request: {
-        where: {
-          recruitedById: session.data.user.id,
-        },
-        include: {
-          LoggedForUser: {
-            include: {
-              LoggedForUser: true,
-              LoggedByUser: true,
-            },
-          },
-        },
-      },
-      callback: (data) => {
-        let newLogs = [];
 
-        data.data.forEach((e) => {
-          e.LoggedForUser.forEach((f) => {
-            const p1 = f.LoggedByUser;
-            const p2 = f.LoggedForUser;
-            const p1name = p1 ? `${p1.firstName} ${p1.lastName}` : "";
-            const p2name = p2 ? `${p2.firstName} ${p2.lastName}` : "";
-            ;
-            newLogs.push({
-              ...f,
-              loggedBy: getInitials(p1name),
-              loggedFor: getInitials(p2name),
-              workedAt_num: parseISO(f.workedAt).getTime(),
-              workedAt: format(
-                parseISO(f.workedAt),
-                "dd.MM HH:mm"
-              ).toLowerCase(),
-            });
-          });
-        });
-
-        setRecruitHours(newLogs.reduce((sum, next) => sum += next.duration, 0))
-        setRecruitLogs(newLogs);
-      },
-    });
+    fetch(`/api/v2/users/${session.data.user.id}/recruitInfo`)
+    .then(res => res.json())
+    .then(data => {
+      setRecruitHours(data.recruitHours)
+    })
   }, []);
   
   // queries database for user data
@@ -112,37 +69,33 @@ function ProfilePage() {
     }
   }, [session])
   
-  const handleUpdateData = async () => {
-    await prismaRequest({
-      model: "user",
-      method: "update",
-      request: {
-        where: {
-          email: session.data.user.email
-        },
-        data: {
-          firstName: firstName,
-          lastName: lastName,
-        }
-      }
-    });
-    window.location.reload();
+  const handleUpdateData = () => {
+
+    fetch(`/api/v2/users/${session.data.user.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        firstName: firstName,
+        lastName: lastName,
+      }),
+    }).then(() => window.location.reload());
+
   }
   
-  const handleConfirmSelection = async () => {
-    await prismaRequest({
-      model: "user",
-      method: "update",
-      request: {
-        where: {
-          email: session.data.user.email,
-        },
-        data: {
-          recruitedById: selectedRecruiter.id,
-        },
+  const handleConfirmSelection = () => {
+    fetch(`/api/v2/users/${session.data.user.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
       },
-    });
-    window.location.reload()
+      body: JSON.stringify({
+        recruitedById: selectedRecruiter.id,
+      }),
+    }).then(() => window.location.reload());
+
+    
   }
   
     
@@ -322,7 +275,7 @@ function section3(props) {
 }
 
 const AdminRedirectButton = (session, router, buttonProps) => {
-  const userRoles = session.data.user.roles.map((e) => e.name)
+  const userRoles = session.data.user.roles;
   if (!userRoles.includes("admin")) return
   return (
     <Button {...buttonProps} onClick={() => router.push("admin")}>
@@ -332,7 +285,7 @@ const AdminRedirectButton = (session, router, buttonProps) => {
 }
 
 const BoardRedirectButton = (session, router, buttonProps) => {
-  const userRoles = session.data.user.roles.map((e) => e.name);
+  const userRoles = session.data.user.roles;;
   if (!userRoles.includes("board")) return;
   return (
     <Button {...buttonProps} onClick={() => router.push("board")}>

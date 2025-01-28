@@ -1,7 +1,6 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { PageBuilderSkeleton } from "../components/sanity/PageBuilder";
 
 export default function authWrapper(WrappedComponent, requiredRole="", redirect="/unauthorized") {
@@ -20,7 +19,7 @@ export default function authWrapper(WrappedComponent, requiredRole="", redirect=
     }
     else if (status == "authenticated" && requiredRole != "") {
       
-      const userRoles = data.user.roles.map((e) => e.name)
+      const userRoles = data.user.roles
       const missingRole = !userRoles.includes(requiredRole)
       
       if (missingRole) {

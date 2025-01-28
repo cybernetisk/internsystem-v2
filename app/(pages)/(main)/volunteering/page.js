@@ -17,7 +17,6 @@ import {
 } from "@/app/components/sanity/PageBuilder";
 import { useEffect, useState } from "react";
 import { cybTheme } from "@/app/components/themeCYB";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import Link from "next/link";
 import { sanityClient } from "@/sanity/client";
 
@@ -50,11 +49,13 @@ async function sanityFetch(setPages) {
 function VolunteeringPage(params) {
 
   const [paidMemberships, setPaidMemberships] = useState([]);
-  const [voucherLogs, setVoucherLogs] = useState([]);
-  const [workLogs, setWorkLogs] = useState([]);
   const [semester, setSemester] = useState(null);
   const [pages, setPages] = useState(null);
-  const [numVolunteers, setNumVolunteers] = useState(null);
+  const [numVolunteers, setNumVolunteers] = useState(0);
+  const [volunteerHours, setVolunteerHours] = useState(0);
+  const [vouchersEarned, setVouchersEarned] = useState(0);
+  const [vouchersUsed, setVouchersUsed] = useState(0);
+
   
   useEffect(() => {
     sanityFetch(setPages);
@@ -63,67 +64,33 @@ function VolunteeringPage(params) {
   
   useEffect(() => {
     
-    prismaRequest({
-      model: "semester",
-      method: "find",
-      request: {
-        orderBy: {
-          id: "desc"
-        }
-      },
-      callback: (data) => {
-        if (data.length == 0) return;
-        setSemester(data.data[0])
-      }
+    fetch("/api/v2/semester")
+    .then(res => res.json())
+    .then(data => {
+      setSemester(data.semester)
     });
     
-    prismaRequest({
-      model: "workLog",
-      method: "find",
-      callback: (data) => setWorkLogs(data.data)
-    });
-    
-    prismaRequest({
-      model: "voucherLog",
-      method: "find",
-      callback: (data) => setVoucherLogs(data.data),
-    });
-    
-    prismaRequest({
-      model: "userToWorkGroup",
-      method: "find",
-      callback: (data) => {
-        if (data.length == 0) return;
-        setNumVolunteers(data.data);
-      }
+    fetch("/api/v2/semesterVolunteerInfo")
+    .then(res => res.json())
+    .then(data => {
+      setPaidMemberships(data.membershipsPaid)
+      setNumVolunteers(data.numberVolunteers)
+      setVolunteerHours(data.volunteerHours)
+      setVouchersEarned(data.vouchersEarned)
+      setVouchersUsed(data.vouchersUsed)
+
     })
     
   }, [])
   
   // Semester-based data
-  useEffect(() => {
-    if (semester == null) return;
-    
-    prismaRequest({
-      model: "userMembership",
-      method: "find",
-      request: {
-        where: {
-          semester_id: semester.id,
-        },
-      },
-      callback: (data) => setPaidMemberships(data.data),
-    });
-    
-  }, [semester])
-  
   return (
     <Box>
       <PageHeader text="Volunteering" variant="h4" />
 
       <Grid container direction="row" spacing={4}>
         <Grid item md={2.5} xs={12}>
-          {createNavigation(semester, paidMemberships, workLogs, voucherLogs, numVolunteers)}
+          {createNavigation(semester, paidMemberships, vouchersEarned, vouchersUsed, numVolunteers, volunteerHours)}
         </Grid>
 
         <Grid item md xs={12}>
@@ -149,17 +116,9 @@ function VolunteeringPage(params) {
   );
 }
 
-function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numVolunteers) {
+function createNavigation(semester, paidMemberships, vouchersEarned, vouchersUsed, numVolunteers, volunteerHours) {
   
-  const buttonGroup1 = createButtons(BUTTON_CONTENT_1);
-  
-  const currentSemester = semester != undefined ? semester.semester + " " + semester.year : null
-  const membershipsPaid = paidMemberships.length.toLocaleString();
-  const totalWorkHours = workLogs.length != 0 ? workLogs.reduce((tot, cur) => tot += cur.duration,0) : 0;
-  const TWHString = totalWorkHours.toLocaleString();
-  const totalVouchersUsed = voucherLogs.length != 0 ? voucherLogs.reduce((tot, cur) => tot += cur.amount,0) : 0;
-  const totalNumVolunteers = numVolunteers ? numVolunteers.length : 0;
-  
+  const buttonGroup1 = createButtons(BUTTON_CONTENT_1);  
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item md={2} xs>
@@ -174,14 +133,12 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numV
       <Grid item xs alignContent="start">
         <Card elevation={3}>
           <CardContent>
-            {currentSemester ? (
-              <>
+            {semester ? (
                 <PageHeader
-                  text={currentSemester}
+                  text={semester.semester + " " + semester.year}
                   variant="body1"
                   gutter={false}
                 />
-              </>
             ) : (
               <PageHeaderSkeleton variant={"body1"} gutter={false} />
             )}
@@ -189,21 +146,21 @@ function createNavigation(semester, paidMemberships, workLogs, voucherLogs, numV
             <Stack spacing={4} direction="column">
               <Box>
                 <Typography variant="body1">Memberships paid</Typography>
-                <Typography variant="body1">{membershipsPaid}</Typography>
+                <Typography variant="body1">{paidMemberships}</Typography>
               </Box>
               <Box>
                 <Typography variant="body1">Number volunteers</Typography>
-                <Typography variant="body1">{totalNumVolunteers}</Typography>
+                <Typography variant="body1">{numVolunteers}</Typography>
               </Box>
               <Box>
                 <Typography variant="body1">Total volunteer hours</Typography>
-                <Typography variant="body1">{TWHString}</Typography>
+                <Typography variant="body1">{volunteerHours.toLocaleString()}</Typography>
               </Box>
               <Box>
                 <Typography variant="body1">Total vouchers used</Typography>
                 <Typography variant="body1">
-                  {totalVouchersUsed.toFixed(1)} /{" "}
-                  {(totalWorkHours * 0.5).toLocaleString()}
+                  {Number(vouchersUsed).toFixed(1)} /{" "}
+                  {vouchersEarned.toLocaleString()}
                 </Typography>
               </Box>
             </Stack>

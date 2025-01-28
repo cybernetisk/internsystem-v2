@@ -1,8 +1,8 @@
 
-import { redirect } from "next/navigation";
 import prisma from "@/prisma/prismaClient";
+import { NextResponse } from "next/server";
 
-export async function GET(request, {params}) {
+export async function GET(req, {params}) {
   
   const {token} = params
   
@@ -45,5 +45,5 @@ export async function GET(request, {params}) {
     }
   })
   
-  redirect("/auth/signIn")
+  return NextResponse.redirect(new URL("/auth/signIn", req.url))
 }

@@ -4,16 +4,18 @@ import { Component } from "react";
 
 export default class CustomNumberInput extends Component {
   render() {
-    const { label, value, setValue, check, error } = this.props;
+    const { label, value, setValue, check, error, className } = this.props;
 
     return (
       <TextField
+        className={className}
         label={label}
         size="small"
         InputLabelProps={{ shrink: true }}
         value={value}
         error={error}
         onFocus={(e) => e.target.select()}
+        fullWidth
         onBlur={(e) => {
           let value = check(e.target.value) ? 0 : e.target.value;
           if (value === "") value = 0;

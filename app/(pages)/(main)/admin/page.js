@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import authWrapper from "@/app/middleware/authWrapper";
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
 import Link from "next/link";
@@ -23,14 +22,15 @@ import CustomTable from "@/app/components/CustomTable";
 import { format, parseISO } from "date-fns";
 
 const TABLE_HEADERS_LOGS = [
-  { id: "workedAt", name: "Date", sortBy: "workedAt_num" },
-  { id: "loggedBy", name: "Logged by" },
-  { id: "duration", name: "duration" },
-  { id: "description", name: "Description" },
+  { id: "workedAt", type: "date", flex: 1, name: "Date", sortBy: "workedAt_num" },
+  { id: "loggedBy", type: "string", flex: 1, name: "Logged by" },
+  { id: "duration", type: "string", flex: 1, name: "duration" },
+  { id: "description", type: "string", flex: 1, name: "Description" },
 ];
 
-function AdminPage(params) {
-  
+function AdminPage({ props }) {
+
+
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
@@ -44,68 +44,65 @@ function AdminPage(params) {
   const [roleChangeResponse, setRoleChangeResponse] = useState("");
 
   useEffect(() => {
-    
-    prismaRequest({
-      model: "role",
-      method: "find",
-      callback: (data) => setRoles(data.data),
-    });
+    fetch("/api/v2/roles")
+    .then(res => res.json())
+    .then(roles => {
+      setRoles(roles.roles)
+    })
 
-    prismaRequest({
-      model: "user",
-      method: "find",
-      request: {
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
-        },
-      },
-      callback: (data) => {
-        const users = data.data.map((e) => {
-          return {
-            ...e,
-            name: `${e.firstName} ${e.lastName ? e.lastName : ""}`,
-          };
-        })
-        setUsers(users)
-      },
-    });
+    fetch("/api/v2/users")
+    .then(res => res.json())
+    .then((data) => {
+      const users = data.users.map((e) => {
+        return {
+          ...e,
+          name: `${e.firstName} ${e.lastName ? e.lastName : ""}`,
+        };
+      })
+      setUsers(users)
+    })
   }, []);
   
   useEffect(() => {
-    if (selectedUser && showLogSettings) {      
-      prismaRequest({
-        model: "workLog",
-        method: "find",
-        request: {
-          where: { loggedFor: selectedUser.id },
-          include: { LoggedByUser: true },
-        },
-        callback: (data) => {
-          const newLogs = data.data.map((e) => {
-            const user = e.LoggedByUser;
-            const name = user ? `${user.firstName} ${user.lastName}` : null;
-            return {
-              ...e,
-              loggedBy: name,
-              workedAt_num: parseISO(e.workedAt).getTime(),
-              workedAt: format(
-                parseISO(e.workedAt),
-                "dd MMM 'kl.'HH:mm"
-              ).toLowerCase(),
-            };
-          });
-          
-          setLogs(newLogs);
-        }
+    if (selectedUser && showLogSettings) {    
+      fetch(`/api/v2/users/${selectedUser.id}/workLogs`)
+      .then(res => res.json())
+      .then(data => {
+        const newLogs = data.workLogs.map((e) => {
+          const user = e.LoggedByUser;
+          const name = user ? `${user.firstName} ${user.lastName}` : null;
+          return {
+            ...e,
+            loggedBy: name,
+            workedAt_num: parseISO(e.workedAt).getTime(),
+            workedAt: format(
+              parseISO(e.workedAt),
+              "dd MMM 'kl.'HH:mm"
+            ).toLowerCase(),
+          };
+        });
         
-      });
+        setLogs(newLogs);
+      })
     }
     
   }, [selectedUser, showLogSettings])
+
+  function handleChangeUser(user)  {
+    setSelectedUser(user);
+  
+    if (user !== null) {
+
+      fetch(`/api/v2/users/${user.id}/roles`)
+      .then(res => res.json())
+      .then(data => {
+        setAssignedRoles(data.userRoles)
+        setAvailableRoles(roles.filter(e => !data.userRoles.includes(e)))
+        if (roleChangeResponse !== "") setRoleChangeResponse("");
+      })
+      
+    }
+  }  
 
   return (
     <Box>
@@ -120,30 +117,7 @@ function AdminPage(params) {
                 <CustomAutoComplete
                   label="Select user"
                   value={selectedUser}
-                  callback={(data) => {
-                    setSelectedUser(data);
-
-                    if (data !== null) {
-                      const roleIds =
-                        data.roles.length !== 0
-                          ? data.roles.map((e) => e.role.id)
-                          : [];
-                      const newAvailableRoles = roles.filter(
-                        (e) => !roleIds.includes(e.id) && e.id !== "hihih"
-                      );
-
-                      const newAssignedRoles = data.roles
-                        .filter((e) => e.role.id !== "hihih")
-                        .map((e) => e.role);
-
-                      console.log(newAvailableRoles, newAssignedRoles);
-
-                      setAvailableRoles(newAvailableRoles);
-                      setAssignedRoles(newAssignedRoles);
-
-                      if (roleChangeResponse !== "") setRoleChangeResponse("");
-                    }
-                  }}
+                  callback={handleChangeUser}
                   data={users}
                   dataLabel="name"
                   subDataLabel="email"
@@ -206,6 +180,7 @@ function AdminPage(params) {
   );
 }
 
+
 function roleSettings(
   selectedUser,
   availableRoles,
@@ -217,7 +192,7 @@ function roleSettings(
 ) {
   
   const handleSave = async () => {
-    const response = await fetch("/api/data/setRoles", {
+    const response = await fetch(`/api/v2/users/${selectedUser.id}/roles`, {
       method: "post",
       mode: "cors",
       headers: {
@@ -270,7 +245,7 @@ function roleSettings(
                             "&:hover": { color: cybTheme.palette.primary.main },
                           }}
                         >
-                          {e.name}
+                          {e}
                         </Typography>
                       </Link>
                     );
@@ -304,7 +279,7 @@ function roleSettings(
                             "&:hover": { color: cybTheme.palette.primary.main },
                           }}
                         >
-                          {e.name}
+                          {e}
                         </Typography>
                       </Link>
                     );
@@ -330,7 +305,7 @@ function logSettings(logs) {
     <Stack direction="column" spacing={2}>
       <Typography variant="body1">Logs</Typography>
 
-      <CustomTable headers={TABLE_HEADERS_LOGS} data={logs} />
+      <CustomTable defaultFilterBy= {"loggedBy"} headers={TABLE_HEADERS_LOGS} data={logs} />
     </Stack>
   );
 }

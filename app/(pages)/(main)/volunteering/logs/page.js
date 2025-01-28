@@ -16,7 +16,6 @@ import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import { getUserInitials, getUserName } from "@/app/components/textUtil";
 import { cybTheme } from "@/app/components/themeCYB";
 import authWrapper from "@/app/middleware/authWrapper";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import CustomTable from "@/app/components/CustomTable";
 import worklogInput from "./workLogInput";
 import voucherLogInput from "./voucherLogInput";
@@ -51,60 +50,37 @@ function LogsPage() {
   const session = useSession();
   
   useEffect(() => {
-    prismaRequest({
-      model: "user",
-      method: "find",
-      request: {
-        where: {
-          active: true,
-        },
-      },
-      callback: (data) =>
-        setUsers(
-          data.data.map((e) => ({
-            ...e,
-            name: `${e.firstName} ${e.lastName}`
-          }))
-        ),
-    });
+    fetch("/api/v2/users")
+    .then(res => res.json())
+    .then(data => {
+      setUsers(
+        data.users.map((e) => ({
+          ...e,
+          name: `${e.firstName} ${e.lastName}`
+        }))
+      )
+    })
 
-    prismaRequest({
-      model: "workGroup",
-      method: "find",
-      callback: (data) => setWorkGroups(data.data),
-    });
+    fetch("/api/v2/workGroups")
+    .then(res => res.json())
+    .then(groups => {
+      setWorkGroups(groups.groups)
+    })
   }, []);
 
   useEffect(() => {
-    prismaRequest({
-      model: "workLog",
-      method: "find",
-      request: {
-        include: {
-          LoggedByUser: true,
-          LoggedForUser: true,
-        },
-        where: {
-          semesterId: session.data.semester.id,
-        },
-      },
-      callback: (data) => handleWorkLogs(data.data, session, setWorkLogs, setVouchersEarned)
-    });
+    fetch("/api/v2/workLogs")
+    .then(res => res.json())
+    .then(resData => {
+      handleWorkLogs(resData.workLogs, session, setWorkLogs, setVouchersEarned)
+    })
     
-    prismaRequest({
-      model: "voucherLog",
-      method: "find",
-      request: {
-        include: {
-          LoggedForUser: true,
-        },
-        where: {
-          semesterId: session.data.semester.id,
-        },
-      },
-      callback: (data) => handleVoucherLogs(data.data, session, setVoucherLogs, setVouchersUsed)
-    });
-  }, [refresh]);
+    fetch("/api/v2/voucherLogs")
+    .then(res => res.json())
+    .then(voucherLog => {
+      handleVoucherLogs(voucherLog.voucherLogs, session, setVoucherLogs, setVouchersUsed)
+    })
+  }, [refresh])
   
   const worklogInputLayout = worklogInput(
     session,

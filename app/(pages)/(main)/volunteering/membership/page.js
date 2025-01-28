@@ -13,7 +13,6 @@ import {
 import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import CustomTable from "@/app/components/CustomTable";
 import authWrapper from "@/app/middleware/authWrapper";
-import prismaRequest from "@/app/middleware/prisma/prismaRequest";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -64,28 +63,12 @@ function MembershipPage() {
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    prismaRequest({
-      model: "userMembership",
-      method: "find",
-      request: {
-        where: {
-          OR: [
-            {
-              semester_id: session.data.semester.id,
-            },
-            {
-              honorary: true,
-            },
-            {
-              lifetime: true,
-            },
-          ],
-        },
-      },
-      callback: (data) => {
+    fetch("/api/v2/memberships").then(res => {
+      res.json().then((data) => {
+        console.log(data)
         if (data.length == 0) return;
 
-        const newMembershipData = data.data.map((e) => {
+        const newMembershipData = data.memberships.map((e) => {
           return {
             ...e,
             date_joined_num: parseISO(e.date_joined).getTime(),
@@ -96,7 +79,7 @@ function MembershipPage() {
           };
         });
 
-        const newNumSpecialMembers = data.data.filter((e) => {
+        const newNumSpecialMembers = data.memberships.filter((e) => {
           return e.honorary || e.lifetime;
         }).length;
 
@@ -104,27 +87,29 @@ function MembershipPage() {
         setTableData(newMembershipData);
 
         setNumSpecialMembers(newNumSpecialMembers);
-      },
-    });
+      })
+    })
   }, [refresh]);
 
   const addNewMember = async () => {
-    const response = await prismaRequest({
-      model: "userMembership",
-      method: "create",
-      request: {
-        data: {
-          name: newMemberName,
-          email: "",
-          comment: newMemberComment,
-          seller_id: session.data.user.id,
-          semester_id: session.data.semester.id,
-        },
+    fetch("/api/v2/memberships", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
       },
-      callback: (data) => {
-        setRefresh(!refresh);
-      },
-    });
+      body: JSON.stringify({
+        name: newMemberName,
+        email: "",
+        comment: newMemberComment,
+        seller_id: session.data.user.id,
+        semester_id: session.data.semester.id,
+      })
+    }).then(res => {
+      setNewMemberName("")
+      setNewMemberComment("")
+      setRefresh(!refresh)
+    })
+
   };
 
   return (

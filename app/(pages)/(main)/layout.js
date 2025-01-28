@@ -11,7 +11,7 @@ import {
   ThemeProvider,
   Paper,
 } from "@mui/material";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { NavBar } from "@/app/components/layout/AppBar";
 import { cybTheme } from "@/app/components/themeCYB";
@@ -61,7 +61,10 @@ export default function AppLayout({ children }) {
               }}
             >
               <Container sx={{ mb: 3 }}>
-                <SessionProvider>{children}</SessionProvider>
+                <SessionProvider 
+                basePath="/api/v2/auth"
+                refetchOnWindowFocus={false}
+                >{children}</SessionProvider>
               </Container>
             </Container>
           </Box>
