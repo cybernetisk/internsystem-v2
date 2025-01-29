@@ -95,7 +95,7 @@ Xb4KOXTMAESdMAAAAYZGJ0dW5uZWxAaW50ZXJuc3lzdGVtLXYyAQID
 -----END OPENSSH PRIVATE KEY-----
 ```
 
-7. In a separate terminal, connect to the databse using an ssh-tunnel: `ssh -L 3307:localhost:3306 -i ~/.ssh/dbtunnel dbtunnel@158.39.200.46 -N`
+7. In a separate terminal, connect to the databse using an ssh-tunnel: `ssh -L 3307:localhost:3306 -i ~/.ssh/dbtunnel_ssh dbtunnel@158.39.200.46 -N`
 
 8. Generate database adapter client: `npx prisma generate`
 
