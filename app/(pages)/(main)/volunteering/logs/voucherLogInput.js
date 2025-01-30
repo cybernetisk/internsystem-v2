@@ -22,18 +22,13 @@ export default function voucherLogInput(
   
   const diff = vouchersEarned - vouchersUsed;
   const diffLastSemester = vouchersEarnedLastSemester - vouchersUsedLastSemester;
-  console.log(diff, diffLastSemester);
-  console.log(vouchersEarned, vouchersUsed);
-  console.log(vouchersEarnedLastSemester, vouchersUsedLastSemester);
   
   const handleClick = async () => {
 
     let vouchersLeft = numVouchers;
     if (startOfSemester && diffLastSemester > 0) {
       vouchersLeft = await handleUseLastSemVouchers();
-      console.log(vouchersLeft);
     }
-    console.log(vouchersLeft);
 
     if (vouchersLeft <= 0) return;
 
@@ -59,17 +54,17 @@ export default function voucherLogInput(
         semesterId: session.data.semester.id,
       })
     }).then(res => {
-        setNumVouchers(0);
-        setDescriptionVoucher("");
-        if (!res.ok) {
-          setRequestResponse("Failed to use voucher. Please try again.");
-          return
-        }
-        setRefresh();
-        setRequestResponse("Voucher used.");
-        setTimeout(() => {
-          setRequestResponse("");
-        }, 5000);
+      setDescriptionVoucher("");
+      if (!res.ok) {
+        setRequestResponse("Failed to use voucher. Please try again.");
+        return
+      }
+      setRefresh();
+      setRequestResponse(numVouchers.toString() + " vouchers used.");
+      setNumVouchers(0);
+      setTimeout(() => {
+        setRequestResponse("");
+      }, 7000);
       })
   };
 
@@ -102,7 +97,17 @@ export default function voucherLogInput(
       setRequestResponse("Failed to use last semester vouchers. Please try again.");
       return numVouchers;
     }
-    setRefresh()
+    
+    if (vouchersToUse === numVouchers) {
+      setDescriptionVoucher("");
+      setRequestResponse(numVouchers.toString() + " vouchers used.");
+      setNumVouchers(0);
+      setRefresh()
+      setTimeout(() => {
+        setRequestResponse("");
+      }, 7000);
+      return 0;
+    }
     return numVouchers - vouchersToUse;
   }
     
@@ -160,7 +165,7 @@ function lastSemesterVoucherCount(vouchersEarned, startOfSemester) {
   if (!startOfSemester) return null;
   return (
     <div>
-      <Typography variant="body2">Vouchers remaining last semester: </Typography>
+      <Typography variant="body2">Vouchers remaining from last semester: </Typography>
       <Typography variant="body2">{vouchersEarned.toFixed(1)}</Typography>
     </div>
   )
