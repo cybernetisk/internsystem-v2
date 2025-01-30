@@ -7,7 +7,10 @@ export default function voucherLogInput(
   session,
   vouchersEarned,
   vouchersUsed,
-  setRefresh
+  setRefresh,
+  vouchersEarnedLastSemester,
+  vouchersUsedLastSemester,
+  startOfSemester
 ) {
   const [numVouchers, setNumVouchers] = useState(0);
   const [descriptionVoucher, setDescriptionVoucher] = useState("");
@@ -18,12 +21,26 @@ export default function voucherLogInput(
   const [requestResponse, setRequestResponse] = useState("");
   
   const diff = vouchersEarned - vouchersUsed;
+  const diffLastSemester = vouchersEarnedLastSemester - vouchersUsedLastSemester;
+  console.log(diff, diffLastSemester);
+  console.log(vouchersEarned, vouchersUsed);
+  console.log(vouchersEarnedLastSemester, vouchersUsedLastSemester);
   
   const handleClick = async () => {
+
+    let vouchersLeft = numVouchers;
+    if (startOfSemester && diffLastSemester > 0) {
+      vouchersLeft = await handleUseLastSemVouchers();
+      console.log(vouchersLeft);
+    }
+    console.log(vouchersLeft);
+
+    if (vouchersLeft <= 0) return;
+
     const isInvalid = validateVoucherLogRequest(
-      numVouchers,
+      vouchersLeft,
       descriptionVoucher,
-      vouchersEarned,
+      diff,
       setNumVouchersError,
       setDescriptionVoucherError
     );
@@ -37,7 +54,7 @@ export default function voucherLogInput(
       },
       body: JSON.stringify({
         loggedFor: session.data.user.id,
-        amount: numVouchers,
+        amount: vouchersLeft,
         description: descriptionVoucher,
         semesterId: session.data.semester.id,
       })
@@ -56,12 +73,47 @@ export default function voucherLogInput(
       })
   };
 
+  async function handleUseLastSemVouchers() {
+    const isInvalid = validateVoucherLogRequest(
+      numVouchers,
+      descriptionVoucher,
+      diff + diffLastSemester,
+      setNumVouchersError,
+      setDescriptionVoucherError
+    );
+    if (isInvalid) return numVouchers;
+
+    const vouchersToUse = Math.min(numVouchers, diffLastSemester);
+
+    const res = await fetch("/api/v2/voucherLogs", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        loggedFor: session.data.user.id,
+        amount: vouchersToUse,
+        description: descriptionVoucher,
+        semesterId: session.data.semester.id - 1,
+      })
+    });
+
+    if (!res.ok) {
+      setRequestResponse("Failed to use last semester vouchers. Please try again.");
+      return numVouchers;
+    }
+    setRefresh()
+    return numVouchers - vouchersToUse;
+  }
+    
+
   return (
     <Stack direction="column" spacing={1}>
       <Stack direction="column" spacing={2}>
         <Stack direction="column">
           <Typography variant="body2">Vouchers remaining: </Typography>
           <Typography variant="body2">{diff.toFixed(1)}</Typography>
+          {lastSemesterVoucherCount(diffLastSemester, startOfSemester)}
 
           <Stack alignItems="end" width="100%">
             <Typography variant="caption">25kr / voucher</Typography>
@@ -102,6 +154,16 @@ export default function voucherLogInput(
       </Typography>
     </Stack>
   );
+}
+
+function lastSemesterVoucherCount(vouchersEarned, startOfSemester) {
+  if (!startOfSemester) return null;
+  return (
+    <div>
+      <Typography variant="body2">Vouchers remaining last semester: </Typography>
+      <Typography variant="body2">{vouchersEarned.toFixed(1)}</Typography>
+    </div>
+  )
 }
 
 function validateVoucherLogRequest(
