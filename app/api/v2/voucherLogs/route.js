@@ -11,7 +11,6 @@ export async function GET(req) {
 
   const params = req.nextUrl.searchParams
   let semesterId = Number(params.get("semesterId"));
-  console.log("params", params.get("semesterId"))
 
   const session = await getServerSession(authOptions)
   const authCheck = new Auth(session)
