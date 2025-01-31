@@ -59,9 +59,9 @@ export default function voucherLogInput(
         setRequestResponse("Failed to use voucher. Please try again.");
         return
       }
-      setRefresh();
       setRequestResponse(numVouchers.toString() + " vouchers used.");
       setNumVouchers(0);
+      setRefresh();
       setTimeout(() => {
         setRequestResponse("");
       }, 7000);
