@@ -40,14 +40,34 @@ function LogsPage() {
   const [workGroups, setWorkGroups] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [voucherLogs, setVoucherLogs] = useState([]);
+  const [lastSemVoucherLogs, setLastSemVoucherLogs] = useState([]);
 
   const [mode, setMode] = useState(false);
   const [vouchersEarned, setVouchersEarned] = useState(0);
+  const [vouchersEarnedLastSemester, setVouchersEarnedLastSemester] = useState(0);
   const [vouchersUsed, setVouchersUsed] = useState(0);
+  const [vouchersUsedLastSemester, setVouchersUsedLastSemester] = useState(0);
 
   const [refresh, setRefresh] = useState(false);
 
   const session = useSession();
+
+  let startOfSemester = false;
+  let lastSemester;
+
+  const dateTime = new Date();
+  const deadline = new Date();
+  deadline.setDate(16);
+  deadline.setMonth(1);
+
+  if (dateTime < deadline) {
+    startOfSemester = true;
+    lastSemester = {
+      id: session.data.semester.id - 1,
+      vouchersEarned: 0,
+      vouchersUsed: 0,
+    }
+  }
   
   useEffect(() => {
     fetch("/api/v2/users")
@@ -80,6 +100,20 @@ function LogsPage() {
     .then(voucherLog => {
       handleVoucherLogs(voucherLog.voucherLogs, session, setVoucherLogs, setVouchersUsed)
     })
+
+    if (startOfSemester) {
+      fetch("/api/v2/workLogs?semesterId=" + lastSemester.id)
+      .then(res => res.json())
+      .then(resData => {
+        handleLastSemesterWorkLogs(resData.workLogs, session, setVouchersEarnedLastSemester)
+      })
+
+      fetch("/api/v2/voucherLogs?semesterId=" + lastSemester.id)
+      .then(res => res.json())
+      .then(voucherLog => {
+        handleLastSemesterVoucherLogs(voucherLog.voucherLogs, session, setLastSemVoucherLogs, setVouchersUsedLastSemester)
+      })
+    }
   }, [refresh])
   
   const worklogInputLayout = worklogInput(
@@ -93,7 +127,10 @@ function LogsPage() {
     session,
     vouchersEarned,
     vouchersUsed,
-    setRefresh
+    setRefresh,
+    vouchersEarnedLastSemester,
+    vouchersUsedLastSemester,
+    startOfSemester
   );
   
   const inputLayout = mode ? worklogInputLayout : voucherLogInputLayout;
@@ -101,7 +138,7 @@ function LogsPage() {
     <CustomTable
       key={mode ? "workLogTable" : "voucherLogTable"}
       headers={mode ? WORK_TABLE_HEADERS : VOUCHER_TABLE_HEADERS}
-      data={mode ? workLogs : voucherLogs}
+      data={mode ? workLogs : voucherLogs.concat(lastSemVoucherLogs)}
       defaultFilterBy="loggedFor"
     />
   );
@@ -175,6 +212,20 @@ function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
   setVouchersEarned(newVouchersEarned);
 }
 
+function handleLastSemesterWorkLogs(logs, session, setVouchersEarnedLastSemester) {
+
+  const newVouchersEarned = logs
+    .filter((e) => {
+      const person = e.LoggedForUser;
+      return person && person.id == session.data.user.id;
+    })
+    .reduce((total, e) => {
+      return (total += e.duration * 0.5);
+    }, 0.0);
+    
+  setVouchersEarnedLastSemester(newVouchersEarned);
+}
+
 function handleVoucherLogs(logs, session, setVoucherLogs, setVouchersUsed) {
 
   const newVoucherLogs = logs.map((log) => ({
@@ -194,8 +245,35 @@ function handleVoucherLogs(logs, session, setVoucherLogs, setVouchersUsed) {
       return (total += e.amount);
     }, 0.0);
 
-  setVouchersUsed(parseFloat(newVouchersUsed));
   setVoucherLogs(newVoucherLogs);
+  setVouchersUsed(parseFloat(newVouchersUsed));
+}
+
+function handleLastSemesterVoucherLogs(logs, session, setLastSemVoucherLogs, setVouchersUsedLastSemester) {
+  
+  let newVoucherLogs = logs.map((log) => ({
+      ...log,
+      loggedFor: getUserName(log.LoggedForUser),
+      usedAt_num: parseISO(log.usedAt).getTime(),
+      usedAt_label: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase(),
+    }))
+  newVoucherLogs = newVoucherLogs.filter((e) => {
+      const year = new Date(e.usedAt).getFullYear();
+      return year == new Date().getFullYear();
+    });
+  
+  const newVouchersUsed = logs
+    .filter((e) => {
+      const person = e.LoggedForUser;
+      const personId = person.id;
+      return personId == session.data.user.id;
+    })
+    .reduce((total, e) => {
+      return (total += e.amount);
+    }, 0.0);
+
+  setLastSemVoucherLogs(newVoucherLogs);
+  setVouchersUsedLastSemester(parseFloat(newVouchersUsed));
 }
 
 export default authWrapper(LogsPage);
