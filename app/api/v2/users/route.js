@@ -87,7 +87,7 @@ async function registerUser(email, firstName, lastName) {
 
 export async function POST(req) {
 
-  const params = req.json()
+  const params = await req.json()
 
   const authCheck = new Auth(null, params)
   .requireParams(["email", "firstName", "lastName"])
