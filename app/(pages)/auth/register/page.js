@@ -185,10 +185,8 @@ async function createUser(firstName, lastName, email, debug) {
   if (!response.ok) {
     return { ok: false, error: responseBody.error };
   }
-
-  const data = await response.json();
   
-  if (debug) console.log("createUser:", data);
+  if (debug) console.log("createUser:", responseBody);
   
   return { ok: true };
 }
