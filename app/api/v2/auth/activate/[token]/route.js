@@ -1,5 +1,6 @@
 
 import prisma from "@/prisma/prismaClient";
+import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 
 export async function GET(req, {params}) {
@@ -44,6 +45,6 @@ export async function GET(req, {params}) {
       activatedAt: new Date()
     }
   })
-  
-  return NextResponse.redirect(new URL("/auth/signIn", req.url))
+
+  redirect("/auth/signIn")
 }
