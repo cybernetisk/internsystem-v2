@@ -65,7 +65,7 @@ export default function workLogInput(
         setSelectedGroup(null);
         setHours(0);
         setDescription("");
-        setRefresh("");
+        setRefresh();
       });
 
     fetch("/api/v2/workGroups", {
