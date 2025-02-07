@@ -40,17 +40,25 @@ export async function POST(req) {
     })).buffer;
 
     const numVouchersToLog = (params.duration / 2) + voucherBuffer; // TODO: Update to make vouchers per hour ajustable and not hardcoded
-
+    
     const loggedDate = new Date();
-    const expirationDate = new Date(2025, 12, 31); // TODO: Set expiration date to end of semester
     const workLogId = workLogEntry.id;
+
+    const voucherExpirationDate = (await transaction.Semester.findFirst({
+      select: {
+        voucherExpirationDate: true
+      },
+      orderBy:{
+        id: 'desc'
+      }
+    })).voucherExpirationDate
 
     const voucherData = [];
     for (let i = 0; i < numVouchersToLog; i++) {
       voucherData.push({
         userId: params.loggedFor,
         loggedDate: loggedDate,
-        expirationDate: expirationDate,
+        expirationDate: voucherExpirationDate,
         workLogEntryId: workLogId
       })
     }
