@@ -1,7 +1,7 @@
 # Guidelines for contributing to the project
 ## Using git
 Git can be used in many different ways. The way we use it in cyb is as follows:
-The main repo has three branches.
+The main repo has two branches.
 
 ### Main
 This branch is meant to represent the production state of the code. This is the branch from witch the production server will pull the source code and should therefore never have untested code.
