@@ -20,7 +20,7 @@ export async function GET(req) {
       _count: true,
       where: {
         userId: session.id,
-        used: false,
+        usedAt: null,
         expirationDate: {
           gt: new Date()
         }

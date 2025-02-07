@@ -43,9 +43,6 @@ function LogsPage() {
   const [voucherAmount, setVoucherAmount] = useState(0);
 
   const [mode, setMode] = useState(false);
-  const [vouchersEarned, setVouchersEarned] = useState(0);
-  const [vouchersUsed, setVouchersUsed] = useState(0);
-
   const [refresh, setRefresh] = useState(false);
 
   const session = useSession();
@@ -73,7 +70,7 @@ function LogsPage() {
     fetch("/api/v2/work")
       .then(res => res.json())
       .then(resData => {
-        handleWorkLogs(resData.workLogs, session, setWorkLogs, setVouchersEarned)
+        handleWorkLogs(resData.workLogs, session, setWorkLogs)
       })
 
     fetch("/api/v2/vouchers")
@@ -150,7 +147,7 @@ function LogsPage() {
   );
 }
 
-function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
+function handleWorkLogs(logs, session, setWorkLogs) {
 
   const newWorkLogs = logs.map((log) => ({
     ...log,
@@ -170,7 +167,6 @@ function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
     }, 0.0);
 
   setWorkLogs(newWorkLogs);
-  setVouchersEarned(newVouchersEarned);
 }
 
 export default authWrapper(LogsPage);

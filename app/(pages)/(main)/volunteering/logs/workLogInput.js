@@ -47,7 +47,7 @@ export default function workLogInput(
 
     if (isInvalid) return;
 
-    fetch("/api/v2/workLogs", {
+    fetch("/api/v2/work ", {
       method: "POST",
       headers: {
         "content-type": "application/json"

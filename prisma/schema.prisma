@@ -245,7 +245,7 @@ model ActivateToken {
 
 model Voucher {
   id             String   @id @default(cuid())
-  usedAt         DateTime
+  usedAt         DateTime?
   workLogEntryId String
   loggedDate     DateTime @db.Timestamp(0)
   expirationDate DateTime @db.Timestamp(0)

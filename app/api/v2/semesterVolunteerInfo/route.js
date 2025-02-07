@@ -7,9 +7,6 @@ import { authOptions } from "@/app/api/utils/authOptions";
 
 
 
-
-const VOUCHER_MODIFIER = 0.5
-
 export async function GET(req) {
   
   const session = await getServerSession(authOptions)
@@ -48,18 +45,24 @@ export async function GET(req) {
       }
     }))._sum.duration
 
-    const vouchersUsed = (await prisma.VoucherLog.aggregate({
-      _sum: {
-        amount: true
+
+    const vouchersUsed = (await prisma.Voucher.count({
+      where: {
+        usedAt: {not: null}
       }
-    }))._sum.amount
-    
+    }));
+
+    const vouchersEarned = (await prisma.Voucher.count({
+      select:{
+        id: true
+      }
+    }));
 
     return authCheck.verify(NextResponse.json({ 
       membershipsPaid: membershipsPaid,
       numberVolunteers: numberVolunteers,
-      volunteerHours: totVolunteerHours,
-      vouchersEarned: totVolunteerHours * VOUCHER_MODIFIER,
+      volunteerHours: totVolunteerHours ? totVolunteerHours : 0,
+      vouchersEarned: vouchersEarned,
       vouchersUsed: vouchersUsed
     }));
   }
