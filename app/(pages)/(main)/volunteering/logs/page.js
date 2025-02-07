@@ -21,18 +21,18 @@ import worklogInput from "./workLogInput";
 import voucherLogInput from "./voucherLogInput";
 
 const WORK_TABLE_HEADERS = [
-  { id: "workedAt_label", type: "date",     name: "work date",    flex: 2, sortBy: "workedAt_num" },
-  { id: "duration",       type: "number",   name: "duration",     flex: 1 },
-  { id: "description",    type: "string",   name: "description",  flex: 3 },
-  { id: "loggedBy",       type: "string",   name: "log by",       flex: 2 },
-  { id: "loggedFor",      type: "string",   name: "log for",      flex: 2 },
+  { id: "workedAt_label", type: "date", name: "work date", flex: 2, sortBy: "workedAt_num" },
+  { id: "duration", type: "number", name: "duration", flex: 1 },
+  { id: "description", type: "string", name: "description", flex: 3 },
+  { id: "loggedBy", type: "string", name: "log by", flex: 2 },
+  { id: "loggedFor", type: "string", name: "log for", flex: 2 },
 ];
 
 const VOUCHER_TABLE_HEADERS = [
-  { id: "usedAt_label",   type: "date",     name: "usage date",   flex: 2, sortBy: "usedAt_num" },
-  { id: "amount",         type: "number",   name: "vouchers",     flex: 2 },
-  { id: "description",    type: "string",   name: "description",  flex: 4 },
-  { id: "loggedFor",      type: "string",   name: "log for",      flex: 2 },
+  { id: "usedAt_label", type: "date", name: "usage date", flex: 2, sortBy: "usedAt_num" },
+  { id: "amount", type: "number", name: "vouchers", flex: 2 },
+  { id: "description", type: "string", name: "description", flex: 4 },
+  { id: "loggedFor", type: "string", name: "log for", flex: 2 },
 ];
 
 function LogsPage() {
@@ -40,6 +40,7 @@ function LogsPage() {
   const [workGroups, setWorkGroups] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [voucherLogs, setVoucherLogs] = useState([]);
+  const [voucherAmount, setVoucherAmount] = useState(0);
 
   const [mode, setMode] = useState(false);
   const [vouchersEarned, setVouchersEarned] = useState(0);
@@ -48,54 +49,53 @@ function LogsPage() {
   const [refresh, setRefresh] = useState(false);
 
   const session = useSession();
-  
+
   useEffect(() => {
     fetch("/api/v2/users")
-    .then(res => res.json())
-    .then(data => {
-      setUsers(
-        data.users.map((e) => ({
-          ...e,
-          name: `${e.firstName} ${e.lastName}`
-        }))
-      )
-    })
+      .then(res => res.json())
+      .then(data => {
+        setUsers(
+          data.users.map((e) => ({
+            ...e,
+            name: `${e.firstName} ${e.lastName}`
+          }))
+        )
+      })
 
     fetch("/api/v2/workGroups")
-    .then(res => res.json())
-    .then(groups => {
-      setWorkGroups(groups.groups)
-    })
+      .then(res => res.json())
+      .then(groups => {
+        setWorkGroups(groups.groups)
+      })
   }, []);
 
   useEffect(() => {
-    fetch("/api/v2/workLogs")
-    .then(res => res.json())
-    .then(resData => {
-      handleWorkLogs(resData.workLogs, session, setWorkLogs, setVouchersEarned)
-    })
-    
-    fetch("/api/v2/voucherLogs")
-    .then(res => res.json())
-    .then(voucherLog => {
-      handleVoucherLogs(voucherLog.voucherLogs, session, setVoucherLogs, setVouchersUsed)
-    })
+    fetch("/api/v2/work")
+      .then(res => res.json())
+      .then(resData => {
+        handleWorkLogs(resData.workLogs, session, setWorkLogs, setVouchersEarned)
+      })
+
+    fetch("/api/v2/vouchers")
+      .then(res => res.json())
+      .then(res => {
+        setVoucherAmount(res.voucherAmount)
+      })
   }, [refresh])
-  
+
   const worklogInputLayout = worklogInput(
     session,
     users,
     workGroups,
     setRefresh
   );
-  
+
   const voucherLogInputLayout = voucherLogInput(
     session,
-    vouchersEarned,
-    vouchersUsed,
+    voucherAmount,
     setRefresh
   );
-  
+
   const inputLayout = mode ? worklogInputLayout : voucherLogInputLayout;
   const tableLayout = (
     <CustomTable
@@ -105,15 +105,13 @@ function LogsPage() {
       defaultFilterBy="loggedFor"
     />
   );
-  
-  const registerButtonText = `Register ${
-    useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Work"
-  }`;
-  
-  const useButtonText = `Use ${
-    useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Voucher"
-  }`;
-  
+
+  const registerButtonText = `Register ${useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Work"
+    }`;
+
+  const useButtonText = `Use ${useMediaQuery(cybTheme.breakpoints.down("md")) ? "" : "Voucher"
+    }`;
+
   return (
     <Box>
       <PageHeader text="Logs" />
@@ -153,7 +151,7 @@ function LogsPage() {
 }
 
 function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
-  
+
   const newWorkLogs = logs.map((log) => ({
     ...log,
     loggedBy: getUserName(log.LoggedByUser),
@@ -170,32 +168,9 @@ function handleWorkLogs(logs, session, setWorkLogs, setVouchersEarned) {
     .reduce((total, e) => {
       return (total += e.duration * 0.5);
     }, 0.0);
-    
+
   setWorkLogs(newWorkLogs);
   setVouchersEarned(newVouchersEarned);
-}
-
-function handleVoucherLogs(logs, session, setVoucherLogs, setVouchersUsed) {
-
-  const newVoucherLogs = logs.map((log) => ({
-    ...log,
-    loggedFor: getUserName(log.LoggedForUser),
-    usedAt_num: parseISO(log.usedAt).getTime(),
-    usedAt_label: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase(),
-  }));
-  
-  const newVouchersUsed = logs
-    .filter((e) => {
-      const person = e.LoggedForUser;
-      const personId = person.id;
-      return personId == session.data.user.id;
-    })
-    .reduce((total, e) => {
-      return (total += e.amount);
-    }, 0.0);
-
-  setVouchersUsed(parseFloat(newVouchersUsed));
-  setVoucherLogs(newVoucherLogs);
 }
 
 export default authWrapper(LogsPage);

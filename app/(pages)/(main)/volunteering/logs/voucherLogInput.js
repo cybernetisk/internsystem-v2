@@ -5,45 +5,42 @@ import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 
 export default function voucherLogInput(
   session,
-  vouchersEarned,
-  vouchersUsed,
+  voucherAmount,
   setRefresh
 ) {
-  const [numVouchers, setNumVouchers] = useState(0);
+  const [numVouchersToUse, setNumVouchersToUse] = useState(0);
   const [descriptionVoucher, setDescriptionVoucher] = useState("");
 
   const [numVouchersError, setNumVouchersError] = useState(false);
   const [descriptionVoucherError, setDescriptionVoucherError] = useState(false);
 
   const [requestResponse, setRequestResponse] = useState("");
-  
-  const diff = vouchersEarned - vouchersUsed;
-  
+    
   const handleClick = async () => {
     const isInvalid = validateVoucherLogRequest(
-      numVouchers,
+      numVouchersToUse,
       descriptionVoucher,
-      vouchersEarned,
+      voucherAmount,
       setNumVouchersError,
       setDescriptionVoucherError
     );
 
     if (isInvalid) return;
 
-    fetch("/api/v2/voucherLogs", {
+    fetch("/api/v2/voucher", {
       method: "POST",
       headers: {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        loggedFor: session.data.user.id,
-        amount: numVouchers,
+        action: "use",
+        amount: numVouchersToUse,
         description: descriptionVoucher,
-        semesterId: session.data.semester.id,
       })
     }).then(res => {
-        setNumVouchers(0);
+        setNumVouchersToUse(0);
         setDescriptionVoucher("");
+        
         if (!res.ok) {
           setRequestResponse("Failed to use voucher. Please try again.");
           return
@@ -61,7 +58,7 @@ export default function voucherLogInput(
       <Stack direction="column" spacing={2}>
         <Stack direction="column">
           <Typography variant="body2">Vouchers remaining: </Typography>
-          <Typography variant="body2">{diff.toFixed(1)}</Typography>
+          <Typography variant="body2">{voucherAmount.toFixed(1)}</Typography>
 
           <Stack alignItems="end" width="100%">
             <Typography variant="caption">25kr / voucher</Typography>
@@ -70,8 +67,8 @@ export default function voucherLogInput(
 
         <CustomNumberInput
           label={"Vouchers to use"}
-          value={numVouchers}
-          setValue={setNumVouchers}
+          value={numVouchersToUse}
+          setValue={setNumVouchersToUse}
           check={(data) => data.match(/[^0-9]/)}
           error={numVouchersError}
         />
@@ -105,16 +102,16 @@ export default function voucherLogInput(
 }
 
 function validateVoucherLogRequest(
-  numVouchers,
+  numVouchersToUse,
   descriptionVoucher,
-  vouchersEarned,
+  voucherAmount,
   setNumVouchersError,
   setDescriptionVoucherError
 ) {
   
   // Define an object to store the errors
   const errors = {
-    numVouchersError: numVouchers <= 0 || numVouchers > vouchersEarned,
+    numVouchersError: voucherAmount-numVouchersToUse < 0,
     descriptionVoucherError: descriptionVoucher.length === 0,
   };
 
