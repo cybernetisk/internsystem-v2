@@ -21,6 +21,10 @@ This is more or less the tools used to create the website.
 * DNS provider: Cloudflare
 * VPS: NREC
 
+
+## How to contribute?
+See [contributing](CONTRIBUTING.md) for more information. This also provides a guide to set up a local docker container for your own instance of the cyb database.
+
 ## How to run a local dev instance
 
 A development database and environment file have been developed so that volunteers may test the website locally.
