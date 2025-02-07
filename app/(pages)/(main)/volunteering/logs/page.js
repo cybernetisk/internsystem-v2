@@ -88,6 +88,20 @@ function LogsPage() {
       .then(res => {
         setVoucherAmount(res.voucherAmount)
     })
+
+    if (startOfSemester) {
+      fetch("/api/v2/workLogs?semesterId=" + lastSemester.id)
+      .then(res => res.json())
+      .then(resData => {
+        handleLastSemesterWorkLogs(resData.workLogs, session, setVouchersEarnedLastSemester)
+      })
+
+      fetch("/api/v2/voucherLogs?semesterId=" + lastSemester.id)
+      .then(res => res.json())
+      .then(voucherLog => {
+        handleLastSemesterVoucherLogs(voucherLog.voucherLogs, session, setLastSemVoucherLogs, setVouchersUsedLastSemester)
+      })
+    }
   }, [refresh])
 
   const worklogInputLayout = worklogInput(
@@ -108,7 +122,7 @@ function LogsPage() {
     <CustomTable
       key={mode ? "workLogTable" : "voucherLogTable"}
       headers={mode ? WORK_TABLE_HEADERS : VOUCHER_TABLE_HEADERS}
-      data={mode ? workLogs : voucherLogs}
+      data={mode ? workLogs : voucherLogs.concat(lastSemVoucherLogs)}
       defaultFilterBy="loggedFor"
     />
   );
