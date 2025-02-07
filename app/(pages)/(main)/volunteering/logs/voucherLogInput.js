@@ -26,7 +26,7 @@ export default function voucherLogInput(
   const handleClick = async () => {
 
     let vouchersLeft = numVouchers;
-    if (startOfSemester && diffLastSemester > 0) {
+    if (startOfSemester && diffLastSemester >= 1) {
       vouchersLeft = await handleUseLastSemVouchers();
     }
 
@@ -78,7 +78,7 @@ export default function voucherLogInput(
     );
     if (isInvalid) return numVouchers;
 
-    const vouchersToUse = Math.min(numVouchers, diffLastSemester);
+    const vouchersToUse = Math.min(numVouchers, Math.floor(diffLastSemester));
 
     const res = await fetch("/api/v2/voucherLogs", {
       method: "POST",
