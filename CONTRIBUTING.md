@@ -98,6 +98,10 @@ Once you are presented with four dropdowns, you'll need to make sure the first t
 
 If you are working on a larger feature with many commits, we want you to make a draft-pull-request while working on the feature. You do this in the same way as making a normal pull-request, but you may be prompted at some point if you want to make the pull-request a draft pull-request. Alternativly you can always make a normal pull-request and then later open the pull-request page and click the "Convert to draft" button on the right under the header "Reviewers"
 
+
+### Illustration of git setup
+![](gitSetup.png)
+
 ### Setting up a local database (optional)
 If you want to make changes to the database in you feature, you probably don't want to make changes to the same dev database everybody else are using. To work around this you can set up your own instance of the database. The easiest way to do this is to set up a docker container
 First of all you will need to have docker installed. Once it is installed you can create a docker container from the MYSQL image as follows:
