@@ -29,7 +29,7 @@ const WORK_TABLE_HEADERS = [
 ];
 
 const VOUCHER_TABLE_HEADERS = [
-  { id: "usedAt_label", type: "date", name: "usage date", flex: 2, sortBy: "usedAt_num" },
+  { id: "usedAt", type: "date", name: "usage date", flex: 2, sortBy: "usedAt_num" },
   { id: "amount", type: "number", name: "vouchers", flex: 2 },
   { id: "description", type: "string", name: "description", flex: 4 },
   { id: "loggedFor", type: "string", name: "log for", flex: 2 },
@@ -73,11 +73,21 @@ function LogsPage() {
         handleWorkLogs(resData.workLogs, session, setWorkLogs)
       })
 
-    fetch("/api/v2/vouchers")
+    fetch("/api/v2/vouchers?action=logs")
+      .then(res => res.json())
+      .then(res => {
+        res = res.map(log => ({
+          ...log,
+          usedAt: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase()
+        }))
+        setVoucherLogs(res)
+      })
+
+    fetch("/api/v2/vouchers?action=amount")
       .then(res => res.json())
       .then(res => {
         setVoucherAmount(res.voucherAmount)
-      })
+    })
   }, [refresh])
 
   const worklogInputLayout = worklogInput(
@@ -156,15 +166,6 @@ function handleWorkLogs(logs, session, setWorkLogs) {
     workedAt_num: parseISO(log.workedAt).getTime(),
     workedAt_label: format(parseISO(log.workedAt), "dd.MM HH:mm").toLowerCase(),
   }));
-
-  const newVouchersEarned = logs
-    .filter((e) => {
-      const person = e.LoggedForUser;
-      return person && person.id == session.data.user.id;
-    })
-    .reduce((total, e) => {
-      return (total += e.duration * 0.5);
-    }, 0.0);
 
   setWorkLogs(newWorkLogs);
 }

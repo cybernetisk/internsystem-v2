@@ -27,7 +27,7 @@ export default function voucherLogInput(
 
     if (isInvalid) return;
 
-    fetch("/api/v2/voucher", {
+    fetch("/api/v2/vouchers", {
       method: "POST",
       headers: {
         "content-type": "application/json"
@@ -36,6 +36,7 @@ export default function voucherLogInput(
         action: "use",
         amount: numVouchersToUse,
         description: descriptionVoucher,
+        userId: session.data.user.id
       })
     }).then(res => {
         setNumVouchersToUse(0);
