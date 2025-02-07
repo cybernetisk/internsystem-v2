@@ -9,16 +9,21 @@ import { getServerSession } from "next-auth";
 
 export async function GET(req) {
 
+  const params = req.nextUrl.searchParams
+  let semesterId = Number(params.get("semesterId"));
+
   const session = await getServerSession(authOptions)
   const authCheck = new Auth(session)
   .requireRoles([])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
-  
-  
   try {
-    const semester = await prisma.Semester.findFirst({select: {id:true}, orderBy: {year: "desc"}})
+    if (!semesterId) {
+      const semester = await prisma.Semester.findFirst({select: {id:true}, orderBy: {year: "desc"}});
+      semesterId = semester.id;
+    }
+    
     const voucherLogs = await prisma.voucherLog.findMany({
       select: {
         LoggedForUser: {select: {firstName: true, lastName: true, id: true}},
@@ -27,7 +32,7 @@ export async function GET(req) {
         description: true
       },
       where: {
-        semesterId: semester.id,
+        semesterId: semesterId,
       }
     });
 
