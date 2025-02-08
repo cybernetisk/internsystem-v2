@@ -18,7 +18,7 @@ export default function voucherLogInput(
     
   const handleClick = async () => {
 
-    let vouchersLeft = numVouchers;
+    let vouchersLeft = numVouchersToUse;
 
     if (vouchersLeft <= 0) return;
 

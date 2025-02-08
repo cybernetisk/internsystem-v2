@@ -56,7 +56,7 @@ export async function GET(req) {
       select:{
         id: true
       }
-    }));
+    })).id;
 
     return authCheck.verify(NextResponse.json({ 
       membershipsPaid: membershipsPaid,
