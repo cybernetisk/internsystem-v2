@@ -154,13 +154,13 @@ function createNavigation(semester, paidMemberships, vouchersEarned, vouchersUse
               </Box>
               <Box>
                 <Typography variant="body1">Total volunteer hours</Typography>
-                <Typography variant="body1">{volunteerHours}</Typography>
+                <Typography variant="body1">{volunteerHours.toLocaleString()}</Typography>
               </Box>
               <Box>
                 <Typography variant="body1">Total vouchers used</Typography>
                 <Typography variant="body1">
-                  {vouchersUsed} /{" "}
-                  {vouchersEarned}
+                  {Number(vouchersUsed).toFixed(1)} /{" "}
+                  {vouchersEarned.toLocaleString()}
                 </Typography>
               </Box>
             </Stack>

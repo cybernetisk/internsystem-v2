@@ -5,9 +5,27 @@ import { randomBytes } from "crypto";
 import { mailOptions, transporter } from "@/app/(pages)/auth/email";
 import { Auth } from "../../utils/auth";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/v2/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/utils/authOptions";
 
 
+const errors = {
+  missingFields: NextResponse.json(
+    { error: "Missing required fields" }
+    , { status: 400 }
+  ),
+  userExists: NextResponse.json(
+    { error: "User already exists" }, 
+    { status: 400 }
+  ),
+  userCreateError: NextResponse.json(
+    { error: "Could not create user" }, 
+    { status: 400 }
+  ),
+  emailError: NextResponse.json(
+    { error: "Could not send verification email" }, 
+    { status: 400 }
+  ),
+};
 
 
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || "";
@@ -63,31 +81,35 @@ async function createUser(email, firstName, lastName) {
 
 async function registerUser(email, firstName, lastName) {
   if (!email || !firstName || !lastName) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return errors.missingFields;
   }
 
-    const userRes = await createUser(email, firstName, lastName)
-    if (!userRes)
-      return NextResponse.json({ ok: false, error: "Could not create user" }, {status: 400});
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (user) {
+    return errors.userExists;
+  };
 
-    const {newUser, activateToken} = userRes
+  const userRes = await createUser(email, firstName, lastName);
+  if (!userRes)
+    return errors.userCreateError;
 
-    const res = await sendVerificationEmail(newUser, activateToken)
-    if (res.success) {
-      return NextResponse.json({ok: true}, {status: 200})
-    } 
+  const { newUser, activateToken } = userRes;
 
-    return NextResponse.json({ ok: false, error: "Could not send verification email" }, {status: 400});
- 
-  
+  const res = await sendVerificationEmail(newUser, activateToken);
+  if (res.success) {
+    return NextResponse.json({ ok: true }, { status: 200 });
+  }
+
+  return errors.emailError;
 }
 
 export async function POST(req) {
 
-  const params = req.json()
+  const params = await req.json()
 
   const authCheck = new Auth(null, params)
   .requireParams(["email", "firstName", "lastName"])
