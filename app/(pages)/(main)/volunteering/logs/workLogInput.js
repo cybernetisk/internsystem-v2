@@ -1,28 +1,33 @@
-
-import { Button, Fab, Skeleton, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import {
+  Button,
+  Fab,
+  Skeleton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
+import CustomMultiAutoComplete from "@/app/components/input/CustomMultiAutocomplete";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import locale from "date-fns/locale/en-GB";
 import { CalendarToday, PunchClock } from "@mui/icons-material";
 import TextFieldWithX from "@/app/components/input/TextFieldWithX";
 
-export default function workLogInput(
-  session,
-  users,
-  workGroups,
-  setRefresh
-) {
-  const [registeredFor, setRegisteredFor] = useState(null);
+export default function workLogInput(session, users, workGroups, setRefresh) {
+  const [registeredFor, setRegisteredFor] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   const [endDateTime, setEndDateTime] = useState(new Date());
   const [hours, setHours] = useState(0);
   const [description, setDescription] = useState("");
   const [shouldInputHours, setShouldInputHours] = useState(false);
-  const [endInputMethodTooltip, setEndInputMethodTooltip] = useState("Change to 'End of work'");
+  const [endInputMethodTooltip, setEndInputMethodTooltip] = useState(
+    "Change to 'End of work'"
+  );
 
   const [registeredForError, setRegisteredForError] = useState(false);
   const [selectedGroupError, setSelectedGroupError] = useState(false);
@@ -48,39 +53,39 @@ export default function workLogInput(
 
     if (isInvalid) return;
 
-    fetch("/api/v2/workLogs", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        loggedBy: session.data.user.id,
-        loggedFor: registeredFor.id,
-        workedAt: selectedDateTime.toISOString(),
-        duration: hours,
-        description: description,
-        semesterId: session.data.semester.id,
-      }),
-      }).then(res => {
-        setRegisteredFor(null);
-        setSelectedGroup(null);
-        setHours(0);
-        setDescription("");
-        setRefresh();
+    for (let user of registeredFor) {
+      fetch("/api/v2/workLogs", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          loggedBy: session.data.user.id,
+          loggedFor: user.id,
+          workedAt: selectedDateTime.toISOString(),
+          duration: hours,
+          description: description,
+          semesterId: session.data.semester.id,
+        }),
       });
 
-    fetch("/api/v2/workGroups", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        userId: registeredFor.id,
-        workGroupId: selectedGroup.id
-      })
-    })
-    
-    setRegisteredFor(null);
+      fetch("/api/v2/workGroups", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          workGroupId: selectedGroup.id,
+        }),
+      });
+    }
+    setRegisteredFor([]);
+    setSelectedGroup(null);
+    setHours(0);
+    setDescription("");
+    setRefresh("");
+
     setRequestResponse("Work registered.");
     setTimeout(() => {
       setRequestResponse("");
@@ -90,13 +95,16 @@ export default function workLogInput(
   const switchEndInputMethod = () => {
     if (!shouldInputHours) {
       setShouldInputHours(true);
-      document.querySelector(".endDateTime").setAttribute("style", "display: inline");
+      document
+        .querySelector(".endDateTime")
+        .setAttribute("style", "display: inline");
       document.querySelector(".hours").setAttribute("style", "display: none");
       setEndInputMethodTooltip("Change to 'Hours worked'");
-
     } else {
       setShouldInputHours(false);
-      document.querySelector(".endDateTime").setAttribute("style", "display: none");
+      document
+        .querySelector(".endDateTime")
+        .setAttribute("style", "display: none");
       document.querySelector(".hours").setAttribute("style", "display: inline");
       setEndInputMethodTooltip("Change to 'End of work'");
     }
@@ -104,8 +112,8 @@ export default function workLogInput(
 
   return (
     <Stack direction="column" spacing={1}>
-      <Stack  direction="column" spacing={2}>
-        <CustomAutoComplete
+      <Stack direction="column" spacing={2}>
+        <CustomMultiAutoComplete
           label="Registered for"
           dataLabel="name"
           subDataLabel="email"
@@ -122,7 +130,10 @@ export default function workLogInput(
           callback={setSelectedGroup}
           error={selectedGroupError}
         />
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+        <LocalizationProvider
+          dateAdapter={AdapterDateFns}
+          adapterLocale={locale}
+        >
           <DateTimePicker
             label="Start of work"
             defaultValue={selectedDateTime}
@@ -130,13 +141,13 @@ export default function workLogInput(
             ampm={false}
             disableOpenPicker
             onChange={(e) => setSelectedDateTime(e)}
-            />
+          />
         </LocalizationProvider>
-        <Stack
-          direction="row"
-          alignItems={"stretch"}
-        >
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={locale}>
+        <Stack direction="row" alignItems={"stretch"}>
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={locale}
+          >
             <DateTimePicker
               className="endDateTime"
               sx={{ display: "none" }}
@@ -148,7 +159,9 @@ export default function workLogInput(
               onChange={(e) => {
                 if (e < selectedDateTime) return; // Prevent endDateTime from being before startDateTime
                 setEndDateTime(e);
-                setHours(Math.round(((e - selectedDateTime) / 3600000) * 10) / 10) // Update hours
+                setHours(
+                  Math.round(((e - selectedDateTime) / 3600000) * 10) / 10
+                ); // Update hours
               }}
             />
           </LocalizationProvider>
@@ -156,13 +169,15 @@ export default function workLogInput(
             className="hours"
             label="Hours worked"
             value={hours}
-            setValue={(value) => {setHours(value);}}
+            setValue={(value) => {
+              setHours(value);
+            }}
             check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
             error={hoursError}
           />
           <Tooltip
             className="endInputMethodTooltip"
-            title={ endInputMethodTooltip }
+            title={endInputMethodTooltip}
           >
             <Fab
               className="endInputMethodChangeButton"
@@ -171,10 +186,12 @@ export default function workLogInput(
               style={{
                 marginLeft: "10px",
                 padding: "10px",
-               }}
-              onClick={() => {switchEndInputMethod();}}
+              }}
+              onClick={() => {
+                switchEndInputMethod();
+              }}
             >
-              { shouldInputHours ? <PunchClock /> : <CalendarToday /> }
+              {shouldInputHours ? <PunchClock /> : <CalendarToday />}
             </Fab>
           </Tooltip>
         </Stack>
@@ -220,10 +237,9 @@ function validateWorkLogRequest(
   setHoursError,
   setDescriptionError
 ) {
-  
   // Define an object to store the errors
   const errors = {
-    registeredForError: registeredFor == null,
+    registeredForError: registeredFor.length == 0,
     selectedGroupError: selectedGroup == null,
     selectedDateTimeError: false, // TODO: add semester validation
     hoursError: Number.isNaN(hours) || hours <= 0 || hours > 24,
