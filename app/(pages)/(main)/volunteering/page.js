@@ -21,11 +21,11 @@ import Link from "next/link";
 import { sanityClient } from "@/sanity/client";
 
 const BUTTON_CONTENT_1 = [
-  // { title: "Economy", path: "volunteering/economy" },
   // { title: "Café shifts", path: "/volunteering/cafe" },
   { title: "Vouchers", path: "/volunteering/logs" },
   { title: "Membership", path: "/volunteering/membership" },
   { title: "Website content", path: "/studio" },
+  { title: "Traditions", path: "volunteering/traditions" },
 ];
 
 async function sanityFetch(setPages) {
