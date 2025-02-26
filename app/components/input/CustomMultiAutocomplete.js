@@ -24,8 +24,12 @@ export default class CustomMultiAutoComplete extends Component {
       displayValue = value
     }
     
-    const maxSuggestions = data ? Math.min(data.length, 10) : 10;
-    const filterOptions = createFilterOptions();
+    const maxSuggestions = 10;
+
+    const filterOptions = createFilterOptions({
+      stringify: (option) => option.email + option.name,
+      limit: maxSuggestions,
+    });
     
     return (
       <Autocomplete
@@ -47,24 +51,7 @@ export default class CustomMultiAutoComplete extends Component {
         }}
         
         // when looking for an item
-        filterOptions={(options, state) => {
-          let newOptions = filterOptions(options, state).slice(
-            0,
-            maxSuggestions
-          );
-
-          if (allowAdding && state.inputValue != "") {
-            let item = {
-              [dataLabel]: `Add "${state.inputValue}"`,
-              inputValue: state.inputValue,
-              newOption: true,
-            };
-
-            newOptions.push(item);
-          }
-
-          return newOptions;
-        }}
+        filterOptions={filterOptions}
         
         // when matching value with dropdown item
         isOptionEqualToValue={(option, value) => {
