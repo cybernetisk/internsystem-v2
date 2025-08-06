@@ -80,7 +80,7 @@ export async function GET(req) {
       case "logs":
         return authCheck.verify(await getVoucherLogs());
       case "amount":
-        return authCheck.verify(await getVoucherAmount(session.id));
+        return authCheck.verify(await getVoucherAmount(session.user.id));
       default:
         return authCheck.verify(NextResponse.json({error: "Invalid action type"}, {status: 400}))
     }

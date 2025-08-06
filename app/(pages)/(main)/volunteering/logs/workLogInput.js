@@ -53,25 +53,20 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
 
     if (isInvalid) return;
 
-    fetch("/api/v2/work ", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        loggedBy: session.data.user.id,
-        loggedFor: registeredFor.id,
-        workedAt: selectedDateTime.toISOString(),
-        duration: hours,
-        description: description,
-        semesterId: session.data.semester.id,
-      }),
-      }).then(res => {
-        setRegisteredFor(null);
-        setSelectedGroup(null);
-        setHours(0);
-        setDescription("");
-        setRefresh();
+    for (let user of registeredFor) {
+      fetch("/api/v2/work", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          loggedBy: session.data.user.id,
+          loggedFor: user.id,
+          workedAt: selectedDateTime.toISOString(),
+          duration: hours,
+          description: description,
+          semesterId: session.data.semester.id,
+        }),
       });
 
       fetch("/api/v2/workGroups", {
