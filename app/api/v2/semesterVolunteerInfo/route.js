@@ -23,7 +23,7 @@ export async function GET(req) {
       orderBy: {
         id: "desc"
       }
-    })).id
+    }))?.id
 
     const membershipsPaid = (await prisma.UserMembership.aggregate({
         where: {
@@ -37,7 +37,7 @@ export async function GET(req) {
       select: {
         loggedFor: true,
       }
-    })).length
+    }))?.length
 
     const totVolunteerHours = (await prisma.workLog.aggregate({
       _sum: {
@@ -56,7 +56,7 @@ export async function GET(req) {
       select:{
         id: true
       }
-    })).id;
+    }))?.id;
 
     return authCheck.verify(NextResponse.json({ 
       membershipsPaid: membershipsPaid,

@@ -37,9 +37,9 @@ export async function POST(req) {
       where: {
         userId: params.loggedFor
       }
-    })).buffer;
+    }))?.buffer;
 
-    const numVouchersToLog = (params.duration / 2) + voucherBuffer; // TODO: Update to make vouchers per hour ajustable and not hardcoded
+    const numVouchersToLog = (params.duration / 2) + (voucherBuffer??0); // TODO: Update to make vouchers per hour ajustable and not hardcoded
     
     const loggedDate = new Date();
     const workLogId = workLogEntry.id;
@@ -54,7 +54,7 @@ export async function POST(req) {
     })).voucherExpirationDate
 
     const voucherData = [];
-    for (let i = 0; i < numVouchersToLog; i++) {
+    for (let i = 0; i < Math.floor(numVouchersToLog); i++) {
       voucherData.push({
         userId: params.loggedFor,
         loggedDate: loggedDate,

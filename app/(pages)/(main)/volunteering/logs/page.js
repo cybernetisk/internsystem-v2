@@ -78,7 +78,8 @@ function LogsPage() {
       .then(res => {
         res = res.map(log => ({
           ...log,
-          usedAt: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase()
+          usedAt: format(parseISO(log.usedAt), "dd.MM HH:mm").toLowerCase(),
+          usedAt_num: parseISO(log.usedAt).getTime()
         }))
         setVoucherLogs(res)
       })
