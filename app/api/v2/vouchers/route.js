@@ -19,7 +19,16 @@ async function getVoucherAmount(userId) {
       }
     }))._count;
 
-    return NextResponse.json({ voucherAmount: availableVouchers });
+    const voucherBuffer = (await prisma.VoucherBuffer.findFirst({
+      select: {
+        buffer: true
+      },
+      where: {
+        userId: userId
+      }
+    }))?.buffer;
+
+    return NextResponse.json({ voucherAmount: availableVouchers + (voucherBuffer??0) });
   }
 
   catch (error) {

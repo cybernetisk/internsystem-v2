@@ -95,7 +95,7 @@ export async function GET(req) {
   if (authCheck.failed) return authCheck.verify(authCheck.response)
 
   try {
-    const semester = await prisma.Semester.findFirst({ select: { id: true }, orderBy: { year: "desc" } })
+    const semester = await prisma.Semester.findFirst({ select: { id: true }, orderBy: { id: "desc" } })
     const workLogs = await prisma.WorkLog.findMany({
       select: {
         LoggedByUser: { select: { firstName: true, lastName: true, id: true } },
