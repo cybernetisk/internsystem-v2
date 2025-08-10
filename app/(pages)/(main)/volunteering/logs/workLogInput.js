@@ -54,7 +54,7 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
     if (isInvalid) return;
 
     for (let user of registeredFor) {
-      fetch("/api/v2/workLogs", {
+      fetch("/api/v2/work", {
         method: "POST",
         headers: {
           "content-type": "application/json",

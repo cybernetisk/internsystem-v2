@@ -6,120 +6,66 @@ import TextFieldWithX from "@/app/components/input/TextFieldWithX";
 
 export default function voucherLogInput(
   session,
-  vouchersEarned,
-  vouchersUsed,
-  setRefresh,
-  vouchersEarnedLastSemester,
-  vouchersUsedLastSemester,
-  startOfSemester
+  voucherAmount,
+  setRefresh
 ) {
-  const [numVouchers, setNumVouchers] = useState(0);
+  const [numVouchersToUse, setNumVouchersToUse] = useState(0);
   const [descriptionVoucher, setDescriptionVoucher] = useState("");
 
   const [numVouchersError, setNumVouchersError] = useState(false);
   const [descriptionVoucherError, setDescriptionVoucherError] = useState(false);
 
   const [requestResponse, setRequestResponse] = useState("");
-  
-  const diff = vouchersEarned - vouchersUsed;
-  const diffLastSemester = vouchersEarnedLastSemester - vouchersUsedLastSemester;
-  
+    
   const handleClick = async () => {
 
-    let vouchersLeft = numVouchers;
-    if (startOfSemester && diffLastSemester >= 1) {
-      vouchersLeft = await handleUseLastSemVouchers();
-    }
+    let vouchersLeft = numVouchersToUse;
 
     if (vouchersLeft <= 0) return;
 
     const isInvalid = validateVoucherLogRequest(
-      vouchersLeft,
+      numVouchersToUse,
       descriptionVoucher,
-      diff,
+      voucherAmount,
       setNumVouchersError,
       setDescriptionVoucherError
     );
 
     if (isInvalid) return;
 
-    fetch("/api/v2/voucherLogs", {
+    fetch("/api/v2/vouchers", {
       method: "POST",
       headers: {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        loggedFor: session.data.user.id,
-        amount: vouchersLeft,
+        action: "use",
+        amount: numVouchersToUse,
         description: descriptionVoucher,
-        semesterId: session.data.semester.id,
+        userId: session.data.user.id
       })
     }).then(res => {
-      setDescriptionVoucher("");
-      if (!res.ok) {
-        setRequestResponse("Failed to use voucher. Please try again.");
-        return
-      }
-      setRequestResponse(numVouchers.toString() + " vouchers used.");
-      setNumVouchers(0);
-      setRefresh();
-      setTimeout(() => {
-        setRequestResponse("");
-      }, 7000);
+        setNumVouchersToUse(0);
+        setDescriptionVoucher("");
+        
+        if (!res.ok) {
+          setRequestResponse("Failed to use voucher. Please try again.");
+          return
+        }
+        setRefresh();
+        setRequestResponse("Voucher used.");
+        setTimeout(() => {
+          setRequestResponse("");
+        }, 5000);
       })
-  };
-
-  async function handleUseLastSemVouchers() {
-    const isInvalid = validateVoucherLogRequest(
-      numVouchers,
-      descriptionVoucher,
-      diff + diffLastSemester,
-      setNumVouchersError,
-      setDescriptionVoucherError
-    );
-    if (isInvalid) return numVouchers;
-
-    const vouchersToUse = Math.min(numVouchers, Math.floor(diffLastSemester));
-
-    const res = await fetch("/api/v2/voucherLogs", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        loggedFor: session.data.user.id,
-        amount: vouchersToUse,
-        description: descriptionVoucher,
-        semesterId: session.data.semester.id - 1,
-      })
-    });
-
-    if (!res.ok) {
-      setRequestResponse("Failed to use last semester vouchers. Please try again.");
-      return numVouchers;
-    }
-    
-    if (vouchersToUse === numVouchers) {
-      setDescriptionVoucher("");
-      setRequestResponse(numVouchers.toString() + " vouchers used.");
-      setNumVouchers(0);
-      setRefresh()
-      setTimeout(() => {
-        setRequestResponse("");
-      }, 7000);
-      return 0;
-    }
-    return numVouchers - vouchersToUse;
-  }
-    
+  };    
 
   return (
     <Stack direction="column" spacing={1}>
       <Stack direction="column" spacing={2}>
         <Stack direction="column">
           <Typography variant="body2">Vouchers remaining: </Typography>
-          <Typography variant="body2">{diff.toFixed(1)}</Typography>
-          {lastSemesterVoucherCount(diffLastSemester, startOfSemester)}
+          <Typography variant="body2">{voucherAmount.toFixed(1)}</Typography>
 
           <Stack alignItems="end" width="100%">
             <Typography variant="caption">25kr / voucher</Typography>
@@ -128,8 +74,8 @@ export default function voucherLogInput(
 
         <CustomNumberInput
           label={"Vouchers to use"}
-          value={numVouchers}
-          setValue={setNumVouchers}
+          value={numVouchersToUse}
+          setValue={setNumVouchersToUse}
           check={(data) => data.match(/[^0-9]/)}
           error={numVouchersError}
         />
@@ -175,16 +121,16 @@ function lastSemesterVoucherCount(vouchersEarned, startOfSemester) {
 }
 
 function validateVoucherLogRequest(
-  numVouchers,
+  numVouchersToUse,
   descriptionVoucher,
-  vouchersEarned,
+  voucherAmount,
   setNumVouchersError,
   setDescriptionVoucherError
 ) {
   
   // Define an object to store the errors
   const errors = {
-    numVouchersError: numVouchers <= 0 || numVouchers > vouchersEarned,
+    numVouchersError: voucherAmount-numVouchersToUse < 0,
     descriptionVoucherError: descriptionVoucher.length === 0,
   };
 

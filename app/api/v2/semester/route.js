@@ -18,7 +18,7 @@ export async function GET(req) {
   try {
       const semester = await prisma.semester.findFirst({
         orderBy: {
-            year: "desc"
+            id: "desc"
         }
       });
 
