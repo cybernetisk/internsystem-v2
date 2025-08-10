@@ -47,6 +47,8 @@ model User {
   VoucherLog                             VoucherLog[]
   loggedByUser                           WorkLog[]         @relation("WorkLog_loggedByToUser")
   LoggedForUser                          WorkLog[]         @relation("WorkLog_loggedForToUser")
+  Voucher                                Voucher[]
+  VoucherBuffer                          VoucherBuffer[]
 
   @@index([recruitedById], map: "recruitedById_idx")
 }
@@ -241,15 +243,35 @@ model ActivateToken {
   @@index([userId], map: "ActivateToken_userId_fkey")
 }
 
+model Voucher {
+  id             String   @id @default(cuid())
+  usedAt         DateTime?
+  workLogEntryId String
+  loggedDate     DateTime @db.Timestamp(0)
+  expirationDate DateTime @db.Timestamp(0)
+  userId         String
+  workLogEntry   WorkLog  @relation(fields: [workLogEntryId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([workLogEntryId], map: "Voucher_workLogEntryId_fkey")
+  @@index([userId], map: "Voucher_userId_fkey")
+}
+
+model VoucherBuffer {
+  userId String @id
+  buffer Float  @default(0)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model VoucherLog {
-  id              String   @id @default(cuid())
-  loggedFor       String?
-  usedAt          DateTime @default(now()) @db.Timestamp(0)
-  amount          Int
-  description     String   @db.VarChar(120)
-  semesterId      Int
-  Semester        Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
-  LoggedForUser   User?    @relation(fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor0")
+  id            String   @id @default(cuid())
+  loggedFor     String?
+  usedAt        DateTime @default(now()) @db.Timestamp(0)
+  amount        Int
+  description   String   @db.VarChar(120)
+  semesterId    Int
+  Semester      Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
+  LoggedForUser User?    @relation(fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor0")
 
   @@index([id], map: "logID_idx")
   @@index([loggedFor], map: "loggedFor_idx")
@@ -268,6 +290,7 @@ model WorkLog {
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
   LoggedByUser  User?     @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onUpdate: NoAction, map: "loggedBy")
   LoggedForUser User?     @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor")
+  Voucher       Voucher[]
 
   @@index([id], map: "logID_idx")
   @@index([loggedBy], map: "loggedBy_idx")
@@ -295,12 +318,16 @@ model UserMembership {
 }
 
 model Semester {
-  id             Int              @id
-  semester       String?          @db.VarChar(45)
-  year           Int?
-  UserMembership UserMembership[]
-  VoucherLog     VoucherLog[]
-  WorkLog        WorkLog[]
+  id                    Int              @id
+  semester              String?          @db.VarChar(45)
+  year                  Int?
+  semesterTitle         String
+  semesterStart         DateTime
+  semesterEnd           DateTime
+  voucherExpirationDate DateTime
+  UserMembership        UserMembership[]
+  VoucherLog            VoucherLog[]
+  WorkLog               WorkLog[]
 }
 
 model UserToWorkGroup {
