@@ -8,15 +8,15 @@ This branch is meant to represent the production state of the code. This is the 
 All commits to this branch should be squash-merge commits from the [Development](#development) branch
 
 ### Development
-The development branch is where the action happens. This is will be the base of your new feature branches and will also be the branch your pull-requests go to. This is a living and breathing branch and hopefully has frequent commits and merges. Because of this, you should try to keep all feature branches up to date with this branch while developing.
-To make sure you always make new feature-branches from the most up-to-date development branch, we recomend setting up the cyb github repo as a remote in your local clone of your fork.
+The development branch is where the action happens. This will be the base of your new feature branches and will also be the branch your pull-requests go to. This is a living and breathing branch and hopefully has frequent commits and merges. Because of this, you should try to keep all feature branches up to date with this branch while developing.
+To make sure you always make new feature-branches from the most up-to-date development branch, we recommend setting up the cyb GitHub repo as a remote in your local clone of your fork.
 This is further described in the [Getting Started](#getting-started) section
 
 ## Getting started
-Note that you'll probably only need to do these first steps once, so if you don't undersand what's happening and what stuff is doing, no worries and if you have questions about something, or issues setting up your environment, don't hesitate to ask.
+Note that you'll probably only need to do these first steps once, so if you don't understand what's happening and what stuff is doing, no worries and if you have questions about something, or issues setting up your environment, don't hesitate to ask.
 
 ### Forking the repo
-To get started contributing, make a fork of the cyb repo. If you're new to git and github, forking is a feature in github, where you make your own personal copy of a repo. Here you have both read and write access and you can make whatever changes you want without affecting cyb's repo. To get your changes applied to cyb's repo you need to make a pull-request, but more on that later.
+To get started contributing, make a fork of the cyb repo. If you're new to git and GitHub, forking is a feature in GitHub, where you make your own personal copy of a repo. Here you have both read and write access and you can make whatever changes you want without affecting cyb's repo. To get your changes applied to cyb's repo you need to make a pull-request, but more on that later.
 
 ### Making a local clone of your fork
 When you're done making the fork, you can "download" a clone of the repo to your local machine. This can be done though the git CLI with the following command:
@@ -37,14 +37,14 @@ You can check that the remote was added successfully by running:
 ```
 git remote
 ```
-You should see "cyb" listed along with "origin", which is the name of your remote fork on gihub that you made earlier.
+You should see "cyb" listed along with "origin", which is the name of your remote fork on GitHub that you made earlier.
 
 Now we need to set up your local development branch and set it to track cyb/development
 First you'll need to fetch the branches from cyb by running
 ```
 git fetch cyb
 ```
-Now you can finaly set up your local development branch with the command:
+Now you can finally set up your local development branch with the command:
 ```
 git checkout -b development --track cyb/development
 ```
@@ -71,32 +71,32 @@ Here is an explanation of the commands:
 
 #### git checkout development
 With this command you move to the development branch on you local computer. This will remove all code and changes you have made on you feature branches, but don't worry, running `git checkout <name-of-your-feature-branch-here>` will let you quickly go back to your feature-code.
-Note that this step might cause an error if you have changes on the featurebranch that is not committed. To remedy this, commit your changes if you want them to be a part of the commit history, alternativly if you don't want to commit either because the code is not ready or you want to discard the changes, you may either:
+Note that this step might cause an error if you have changes on the feature branch that is not committed. To remedy this, commit your changes if you want them to be a part of the commit history, alternatively if you don't want to commit either because the code is not ready or you want to discard the changes, you may either:
 Run a `git stash` to remove the changes you've made, but only temporarily until you run `git stash pop`. This will store your changes in a "stash" until you are ready to continue your work. Or:
-You can run `git reset --hard`, but be carefull running this one as it will permenently delete the changes that are not commited.
+You can run `git reset --hard`, but be careful running this one as it will permanently delete the changes that are not commited.
 
 #### git pull
 This will simply get the changes that has been pushed to the development branch on the cyb repo. This is because you sat your development branch to track the cyb remote development branch. You do this to keep your local codebase up to date with the newest changes to the cyb repo, making integrating your pull-requests 10x easier for the repo maintainers.
-Note that running this command should result in a fast forward merge and if you encounter a merge conflict, this is probably because you have made changes to your local development branch (which is thouroughly not recomended). If you encounter a merge conflict here you can make a new branch from your current local development branch, switch back to your development branch and then do a `git reset --hard <commit-hash-of-cyb-head>`. The commit hash of cyb head can be found by running `git log` while on the development branch.
+Note that running this command should result in a fast-forward merge and if you encounter a merge conflict, this is probably because you have made changes to your local development branch (which is highly discouraged). If you encounter a merge conflict here you can make a new branch from your current local development branch, switch back to your development branch and then do a `git reset --hard <commit-hash-of-cyb-head>`. The commit hash of cyb head can be found by running `git log` while on the development branch.
 
 #### git checkout -b <feature-branch-name>
-Given that you have successfully updated your development branch with the last command, this command should create a new branch with the name you provide. Use good descriptive names on your branches to make it clear what the content of the branch is. Note that this will not make a branch on you github repo, only your local repo. This will be adressed in the next step.
+Given that you have successfully updated your development branch with the last command, this command should create a new branch with the name you provide. Use good descriptive names on your branches to make it clear what the content of the branch is. Note that this will not make a branch on your GitHub repo, only your local repo. This will be addressed in the next step.
 
 #### git push -u origin <feature-branch-name>
-This command will take the state of the branch you are on, pressumably your new feature branch, and push it to a branch on your github repo with the name you provide. It is recomended that this name is the same as the name for your local branch to avoid confusion when handling the branches later on. If the branch does not exist on the remote repo (on github) it will be created and any changes on the local repo will be pushed to the new remote branch.
+This command will take the state of the branch you are on, presumably your new feature branch, and push it to a branch on your GitHub repo with the name you provide. It is recommended that this name is the same as the name for your local branch to avoid confusion when handling the branches later on. If the branch does not exist on the remote repo (on GitHub) it will be created and any changes on the local repo will be pushed to the new remote branch.
 
-#### Now you have created a feature branch!
-Now you have created a feature branch. While working on the code for the feature, remember to commit often and provide descriptive and short commit messages for the changes made in the commit. When you want to upload the code changes to your github repo, just run `git push` and the code will be sent on its way. This is not the same as making a pull-request tho. See [Creating a pull-request](#creating-a-pull-request) for more info on publishing your code to the cyb repo.
+#### You have now created a feature branch!
+You have now created a feature branch. While working on the code for the feature, remember to commit often and provide descriptive and short commit messages for the changes made in the commit. When you want to upload the code changes to your GitHub repo, just run `git push` and the code will be sent on its way. This is not the same as making a pull-request tho. See [Creating a pull-request](#creating-a-pull-request) for more info on publishing your code to the cyb repo.
 
 ### Creating a pull-request
 When you have created a feature branch, you probably want the features you implemented to become a part of the codebase. To do this you can use a pull-request. This can be done in a couple different ways.
-One way is to go to your fork of the cyb repo in github, go to the branch you want to make a pull-request for. There should be some sort of contribute/make pull-request button at the top of the page. If you click this, you will be braught to the pull-request page on cyb's repo.
+One way is to go to your fork of the cyb repo in GitHub, go to the branch you want to make a pull-request for. There should be some sort of contribute/make pull-request button at the top of the page. If you click this, you will be brought to the pull-request page on cyb's repo.
 Another path to the pull requests page, is to go to the pull-request tab on cyb's repo and click "new pull request". 
 
-In both of these cases you will need to make sure that you are creating a pull-request between the correct branches. There should be four dropdown boxes: "base-repository", "base", "head-repository" and "compare". If you don't get these four but only "base" and "compare", you need to click the "compare accross forks" link above the dropdowns.
-Once you are presented with four dropdowns, you'll need to make sure the first two, the base-repository and base boxes, are set to cybernetisk/internsystem-v2 and developmlent respectivly. For the last two, head-repository and compare, you'll need to set them to your fork of the repo and the feature branch you want to make a pull-request for.
+In both of these cases you will need to make sure that you are creating a pull-request between the correct branches. There should be four dropdown boxes: "base-repository", "base", "head-repository" and "compare". If you don't get these four but only "base" and "compare", you need to click the "compare across forks" link above the dropdowns.
+Once you are presented with four dropdowns, you'll need to make sure the first two, the base-repository and base boxes, are set to cybernetisk/internsystem-v2 and development respectively. For the last two, head-repository and compare, you'll need to set them to your fork of the repo and the feature branch you want to make a pull-request for.
 
-If you are working on a larger feature with many commits, we want you to make a draft-pull-request while working on the feature. You do this in the same way as making a normal pull-request, but you may be prompted at some point if you want to make the pull-request a draft pull-request. Alternativly you can always make a normal pull-request and then later open the pull-request page and click the "Convert to draft" button on the right under the header "Reviewers"
+If you are working on a larger feature with many commits, we want you to make a draft-pull-request while working on the feature. You do this in the same way as making a normal pull-request, but you may be prompted at some point if you want to make the pull-request a draft pull-request. Alternatively you can always make a normal pull-request and then later open the pull-request page and click the "Convert to draft" button on the right under the header "Reviewers"
 
 
 ### Illustration of git setup
@@ -120,7 +120,7 @@ DATABASE_URL = "mysql://${DATABASE_USER}:${DATABASE_PASS}@localhost:3306/${DATAB
 ```
 Note that the only difference in the DATABASE_URL between using the dev database and your own database is only the port number, so make sure it is correct before continuing
 
-Last thing you need to change to be done setting up your database is to generate all the tables the application needs. This can be done by running a singe command while standing in the project directory: 
+Last thing you need to change to be done setting up your database is to generate all the tables the application needs. This can be done by running a single command while standing in the project directory: 
 ```
 npm run prismapush
 ```
