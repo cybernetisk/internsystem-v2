@@ -53,13 +53,15 @@ export default function registerPage() {
   }
   
 
-  const CheckedTextField = (title, textValue, textCallback) => {
-  
+  const CheckedTextField = (title, textValue, textCallback, inputType) => {
+    inputType = inputType ?? "text"
+
     return (
       <Grid item>
         <TextField
           fullWidth
           required
+          type={inputType}
           variant="filled"
           label={title}
           value={textValue}
@@ -87,7 +89,7 @@ export default function registerPage() {
 
         {CheckedTextField("First name", firstName, setFirstName)}
         {CheckedTextField("Last name", lastName, setLastName)}
-        {CheckedTextField("Email", email, setEmail)}
+        {CheckedTextField("Email", email, setEmail, "email")}
 
         <Grid item>
           <Button
