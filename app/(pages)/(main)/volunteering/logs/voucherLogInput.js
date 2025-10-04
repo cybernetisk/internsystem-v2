@@ -3,6 +3,7 @@ import { Box, Button, Grid, Skeleton, Stack, TextField, Typography } from "@mui/
 import { useState } from "react";
 import CustomNumberInput from "@/app/components/input/CustomNumberInput";
 import TextFieldWithX from "@/app/components/input/TextFieldWithX";
+import voucherRecipt from "./voucherRecipt";
 
 export default function voucherLogInput(
   session,
@@ -16,7 +17,10 @@ export default function voucherLogInput(
   const [descriptionVoucherError, setDescriptionVoucherError] = useState(false);
 
   const [requestResponse, setRequestResponse] = useState("");
-    
+  const [showRecipt, setShowRecipt] = useState(false);  
+  const [lastNumberOfVouchersUsed, setlastNumberOfVouchersUsed] = useState();
+  
+
   const handleClick = async () => {
 
     let vouchersLeft = numVouchersToUse;
@@ -44,7 +48,7 @@ export default function voucherLogInput(
         description: descriptionVoucher,
         userId: session.data.user.id
       })
-    }).then(res => {
+    }).then(async res => {
         setNumVouchersToUse(0);
         setDescriptionVoucher("");
         
@@ -53,10 +57,10 @@ export default function voucherLogInput(
           return
         }
         setRefresh();
-        setRequestResponse("Voucher used.");
-        setTimeout(() => {
-          setRequestResponse("");
-        }, 5000);
+        const data = await res.json()
+        setlastNumberOfVouchersUsed(data.amount);
+        setDescriptionVoucher(data.description);
+        setShowRecipt(true);
       })
   };    
 
@@ -96,8 +100,8 @@ export default function voucherLogInput(
       </Stack>
 
       <Typography variant="subtitle1">
-        {requestResponse != "" ? (
-          requestResponse
+        {showRecipt ? (
+          voucherRecipt(showRecipt, setShowRecipt, lastNumberOfVouchersUsed, descriptionVoucher)
         ) : (
           <Skeleton
             animation={false}

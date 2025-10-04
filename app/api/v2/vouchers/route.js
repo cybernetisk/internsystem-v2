@@ -166,5 +166,5 @@ export async function POST(req) {
   })
 
   if (success)
-    return authCheck.verify(NextResponse.json({ status: 200 }, { status: 200 }))
+    return authCheck.verify(NextResponse.json({ status: 200, amount: amount, description: params.description }, { status: 200 }))
 }
