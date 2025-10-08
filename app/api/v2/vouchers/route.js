@@ -114,7 +114,7 @@ export async function POST(req) {
 
   const amount = params.amount;
 
-  const success = await prisma.$transaction(async transaction => {
+  const error = await prisma.$transaction(async transaction => {
     const voucherIds = (await transaction.Voucher.findMany({
       select: {
         id: true
@@ -131,6 +131,10 @@ export async function POST(req) {
       },
       take: amount
     })).map(voucher => voucher.id)
+
+    if (voucherIds.length != amount) {
+      return "Not enough vouchers"
+    }
 
     await transaction.Voucher.updateMany({
       where: {
@@ -162,9 +166,11 @@ export async function POST(req) {
     })
 
 
-    return true
+    return null; // No error in transaction
   })
 
-  if (success)
+  if (!error)
     return authCheck.verify(NextResponse.json({ status: 200, amount: amount, description: params.description }, { status: 200 }))
+  else
+    return authCheck.verify(NextResponse.json({ status: 400, error: error }, { status: 400 }))
 }
