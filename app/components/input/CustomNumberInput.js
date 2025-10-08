@@ -4,7 +4,7 @@ import { Component } from "react";
 
 export default class CustomNumberInput extends Component {
   render() {
-    const { label, value, setValue, check, error, className } = this.props;
+    const { label, value, setValue, check, error, className, errorMessage, onChange } = this.props;
 
     return (
       <TextField
@@ -14,6 +14,7 @@ export default class CustomNumberInput extends Component {
         InputLabelProps={{ shrink: true }}
         value={value}
         error={error}
+        helperText={errorMessage}
         onFocus={(e) => e.target.select()}
         fullWidth
         onBlur={(e) => {
@@ -29,6 +30,8 @@ export default class CustomNumberInput extends Component {
             if (check(value)) return;
           }
           setValue(value);
+
+          onChange()
         }}
       />
     );

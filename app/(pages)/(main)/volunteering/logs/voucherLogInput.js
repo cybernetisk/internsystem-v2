@@ -14,25 +14,23 @@ export default function voucherLogInput(
   const [descriptionVoucher, setDescriptionVoucher] = useState("");
 
   const [numVouchersError, setNumVouchersError] = useState(false);
+  const [voucherErrorMessage, setVoucherErrorMessage] = useState("")
+  const [descErrorMessage, setDescErrorMessage] = useState("")
   const [descriptionVoucherError, setDescriptionVoucherError] = useState(false);
 
-  const [requestResponse, setRequestResponse] = useState("");
   const [showRecipt, setShowRecipt] = useState(false);  
   const [lastNumberOfVouchersUsed, setlastNumberOfVouchersUsed] = useState();
   
 
   const handleClick = async () => {
-
-    let vouchersLeft = numVouchersToUse;
-
-    if (vouchersLeft <= 0) return;
-
     const isInvalid = validateVoucherLogRequest(
       numVouchersToUse,
       descriptionVoucher,
       voucherAmount,
       setNumVouchersError,
-      setDescriptionVoucherError
+      setDescriptionVoucherError,
+      setVoucherErrorMessage,
+      setDescErrorMessage
     );
 
     if (isInvalid) return;
@@ -53,7 +51,7 @@ export default function voucherLogInput(
         setDescriptionVoucher("");
         
         if (!res.ok) {
-          setRequestResponse("Failed to use voucher. Please try again.");
+          setVoucherErrorMessage("Error while trying to use vouchers")
           return
         }
         setRefresh();
@@ -82,6 +80,11 @@ export default function voucherLogInput(
           setValue={setNumVouchersToUse}
           check={(data) => data.match(/[^0-9]/)}
           error={numVouchersError}
+          errorMessage={voucherErrorMessage}
+          onChange={() => {
+            setVoucherErrorMessage("");
+            setNumVouchersError(false)
+          }}
         />
         <TextFieldWithX
           label="Description"
@@ -92,7 +95,14 @@ export default function voucherLogInput(
           multiline
           InputLabelProps={{ shrink: true }}
           error={descriptionVoucherError}
-          onChange={(e) => setDescriptionVoucher(e.target.value)}
+          helperText={descErrorMessage}
+          onChange={(e) => {
+            setDescriptionVoucher(e.target.value); 
+            setVoucherErrorMessage("")
+            setDescErrorMessage("")
+            setDescriptionVoucherError(false)
+          }
+          }
         />
         <Button variant="outlined" onClick={handleClick}>
           Use voucher
@@ -129,16 +139,22 @@ function validateVoucherLogRequest(
   descriptionVoucher,
   voucherAmount,
   setNumVouchersError,
-  setDescriptionVoucherError
+  setDescriptionVoucherError,
+  setErrorMessage,
+  setDescErrorMessage
 ) {
   
   // Define an object to store the errors
   const errors = {
-    numVouchersError: voucherAmount-numVouchersToUse < 0,
+    numVouchersError: voucherAmount-numVouchersToUse < 0 || numVouchersToUse <= 0,
     descriptionVoucherError: descriptionVoucher.length === 0,
   };
 
   // Update the error states using the setters
+  if (errors.numVouchersError)
+    setErrorMessage(numVouchersToUse <= 0 ? "You must have more than one voucher" : "Not enough vouchers")
+  if (errors.descriptionVoucherError)
+    setDescErrorMessage("Please describe the purchase")
   setNumVouchersError(errors.numVouchersError);
   setDescriptionVoucherError(errors.descriptionVoucherError);
 

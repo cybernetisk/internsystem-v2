@@ -7,7 +7,7 @@ import { Component } from "react";
 
 export default class TextFieldWithX extends Component {
   render() {
-    const { label, name, value, setValue} = this.props;
+    const { label, name, value, setValue } = this.props;
 
     return (
       <TextField

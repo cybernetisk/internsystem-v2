@@ -1,5 +1,4 @@
 import { Modal, Box, Typography, Button, SvgIcon } from "@mui/material";
-import { borderRadius, display, height } from "@mui/system";
 
 export default function voucherRecipt(showRecipt, setShowRecipt, vouchersUsed, description) {
     const style = {
