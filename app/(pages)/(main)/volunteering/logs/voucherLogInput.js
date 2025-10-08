@@ -51,7 +51,11 @@ export default function voucherLogInput(
         setDescriptionVoucher("");
         
         if (!res.ok) {
-          setVoucherErrorMessage("Error while trying to use vouchers")
+          const data = await res.json()
+          if ("error" in data)
+            setVoucherErrorMessage(data.error)
+          else
+            setVoucherErrorMessage("Error while trying to use vouchers")
           return
         }
         setRefresh();
