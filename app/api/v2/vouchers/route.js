@@ -114,6 +114,14 @@ export async function POST(req) {
 
   const amount = params.amount;
 
+  const desc = params.description;
+
+  if (!desc)
+    return authCheck.verify(NextResponse.json({ status: 400, error: "Missing description" }, { status: 400 }))
+
+  if (desc.length === 0 || desc.length > 120 ) 
+    return authCheck.verify(NextResponse.json({ status: 400, error: "Invalid description length " + desc.length }, { status: 400 }))
+
   const error = await prisma.$transaction(async transaction => {
     const voucherIds = (await transaction.Voucher.findMany({
       select: {

@@ -151,14 +151,14 @@ function validateVoucherLogRequest(
   // Define an object to store the errors
   const errors = {
     numVouchersError: voucherAmount-numVouchersToUse < 0 || numVouchersToUse <= 0,
-    descriptionVoucherError: descriptionVoucher.length === 0,
+    descriptionVoucherError: descriptionVoucher.length === 0 || descriptionVoucher.length > 120,
   };
 
   // Update the error states using the setters
   if (errors.numVouchersError)
     setErrorMessage(numVouchersToUse <= 0 ? "You must have more than one voucher" : "Not enough vouchers")
   if (errors.descriptionVoucherError)
-    setDescErrorMessage("Please describe the purchase")
+    setDescErrorMessage(`Please describe the purchase (1-120 characters. You had ${descriptionVoucher.length})`)
   setNumVouchersError(errors.numVouchersError);
   setDescriptionVoucherError(errors.descriptionVoucherError);
 
