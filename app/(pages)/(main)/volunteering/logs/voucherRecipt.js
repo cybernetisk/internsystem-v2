@@ -14,7 +14,7 @@ export default function voucherRecipt(showRecipt, setShowRecipt, vouchersUsed, d
         borderRadius: '10px',
         boxShadow: 24,
         display: "grid",
-        gridTemplateRows: '1fr .5fr 1rem 1fr 1fr',
+        gridTemplateRows: '1fr .5fr auto auto 1fr',
         alignItems: 'center',
         justifyItems: 'center'
     };
@@ -32,10 +32,10 @@ export default function voucherRecipt(showRecipt, setShowRecipt, vouchersUsed, d
                 <Typography id="modal-modal-title" variant="h2" component="h2" sx={{alignSelf:"end", textAlign: "center"}}>
                     {vouchersUsed}
                 </Typography>
-                <Typography>
+                <Typography sx={{maxWidth:"80%"}}>
                     {description}
                 </Typography>
-                <SvgIcon sx={{width: "100%", height: "100%", paddingTop: "10%"}}>
+                <SvgIcon sx={{width: "100%", height: "100%", paddingTop: "10%", maxHeight: "150px"}}>
                     <svg enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="#000">
                         <g>
                             <path d="M0,0h24v24H0V0z" fill="none"/>
@@ -48,7 +48,7 @@ export default function voucherRecipt(showRecipt, setShowRecipt, vouchersUsed, d
                         </g>
                     </svg>
                 </SvgIcon>
-                <Button variant="text" sx={{width: "70%", height: 50, bgcolor: "#333"}} onClick={closeModal}>
+                <Button variant="text" sx={{width: "70%", height: 50, bgcolor: "#333", marginBottom: "10px"}} onClick={closeModal}>
                     Confim
                 </Button>
             </Box>
