@@ -5,7 +5,7 @@
 
 CYB has previously had a separate volunteer system and website, both of which were maintained by the IT group (previously X-group). After the old volunteer system unfortunately stopped being maintained and (eventually) stop functioning, CYB lost access to tools for logging volunteer hours, tracking the stock in Escape, and managing membership. 
 
-After a grueling semester of google sheets and paper logs, we have finally gotten the new system live! Previously the volunteer system and the main CYB website have been separate, but in an attempt to make the main website more appealing, the two have been merged into a single resource.
+After a grueling semester of Google sheets and paper logs, we have finally gotten the new system live! Previously the volunteer system and the main CYB website have been separate, but in an attempt to make the main website more appealing, the two have been merged into a single resource.
 
 Visit the website at [cyb.no](https://cyb.no)
 
@@ -99,7 +99,7 @@ Xb4KOXTMAESdMAAAAYZGJ0dW5uZWxAaW50ZXJuc3lzdGVtLXYyAQID
 -----END OPENSSH PRIVATE KEY-----
 ```
 
-7. In a separate terminal, connect to the databse using an ssh-tunnel: `ssh -L 3307:localhost:3306 -i ~/.ssh/dbtunnel_ssh dbtunnel@158.39.200.46 -N`
+7. In a separate terminal, connect to the database using an ssh-tunnel: `ssh -L 3307:localhost:3306 -i ~/.ssh/dbtunnel_ssh dbtunnel@158.39.200.46 -N`
 
 8. Generate database adapter client: `npx prisma generate`
 
