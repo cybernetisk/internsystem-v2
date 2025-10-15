@@ -114,7 +114,15 @@ export async function POST(req) {
 
   const amount = params.amount;
 
-  const success = await prisma.$transaction(async transaction => {
+  const desc = params.description;
+
+  if (!desc)
+    return authCheck.verify(NextResponse.json({ status: 400, error: "Missing description" }, { status: 400 }))
+
+  if (desc.length === 0 || desc.length > 120 ) 
+    return authCheck.verify(NextResponse.json({ status: 400, error: "Invalid description length " + desc.length }, { status: 400 }))
+
+  const error = await prisma.$transaction(async transaction => {
     const voucherIds = (await transaction.Voucher.findMany({
       select: {
         id: true
@@ -131,6 +139,10 @@ export async function POST(req) {
       },
       take: amount
     })).map(voucher => voucher.id)
+
+    if (voucherIds.length != amount) {
+      return "Not enough vouchers"
+    }
 
     await transaction.Voucher.updateMany({
       where: {
@@ -162,9 +174,11 @@ export async function POST(req) {
     })
 
 
-    return true
+    return null; // No error in transaction
   })
 
-  if (success)
-    return authCheck.verify(NextResponse.json({ status: 200 }, { status: 200 }))
+  if (!error)
+    return authCheck.verify(NextResponse.json({ status: 200, amount: amount, description: params.description }, { status: 200 }))
+  else
+    return authCheck.verify(NextResponse.json({ status: 400, error: error }, { status: 400 }))
 }
