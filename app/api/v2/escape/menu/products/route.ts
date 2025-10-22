@@ -2,10 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { MenuProduct, Prisma } from "@prisma/client";
 import prismaClient from "@/prisma/prismaClient";
+import { authOptions } from "@/app/api/utils/authOptions";
+import { getServerSession } from "next-auth";
+import { Auth } from "@/app/api/utils/auth";
 
 export async function PATCH(
     req: NextRequest
 ) {
+    const session = await getServerSession(authOptions);
+    const authCheck = new Auth(session)
+        .requireRoles([]);
+
+    if (authCheck.failed) return authCheck.response;
+
+
     const product: MenuProduct = await req.json();
 
     const newProduct = await prismaClient.menuProduct.update({
@@ -22,6 +32,13 @@ export async function PATCH(
 export async function POST(
     req: NextRequest
 ) {
+    const session = await getServerSession(authOptions);
+    const authCheck = new Auth(session)
+        .requireRoles([]);
+
+    if (authCheck.failed) return authCheck.response;
+
+
     const product: MenuProductCreate = await req.json();
 
     await prisma.menuProduct.create({
