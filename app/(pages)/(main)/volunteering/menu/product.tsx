@@ -1,6 +1,6 @@
 import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { Button, Input, Stack } from "@mui/material";
+import { Box, Button, Grid, Input, Stack } from "@mui/material";
 
 function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
     return fetch("/api/v2/escape/menu/products", {
@@ -33,41 +33,46 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
 
     return (
 
-        <Stack
-            direction="row"
-            spacing={ 2 }
-            justifyContent="space-between"
-        >
+        <>
+            <Grid item xs={ 2 }>
+                <Input
+                    type="text"
+                    value={ productName }
+                    onChange={ e => setProductName(e.target.value) }
+                ></Input>
+            </Grid>
 
-            <Input
-                type="text"
-                value={ productName }
-                onChange={ e => setProductName(e.target.value) }
-            ></Input>
-            <Input
-                type="number"
-                value={ productPrice }
-                onChange={ e => setProductPrice(Number(e.target.value)) }
-            ></Input>
 
-            <Input
-                type="number"
-                value={ productVolume }
-                onChange={ e => setProductVolume(Number(e.target.value)) }
-            ></Input>
+            <Grid item xs={ 2 }>
+                <Input
+                    type="number"
+                    value={ productPrice }
+                    onChange={ e => setProductPrice(Number(e.target.value)) }
+                ></Input>
+            </Grid>
 
-            <Button
-                disabled={ !hasBeenUpdated }
-                onClick={ () => updateProduct(product, {
-                    name: productName,
-                    price: productPrice,
-                    volume: productVolume
-                }).then(() => {
-                    setHasBeenUpdated(false)
-                    props.onUpdate()
-                }) }
+            <Grid item xs={ 2 }>
+                <Input
+                    type="number"
+                    value={ productVolume }
+                    onChange={ e => setProductVolume(Number(e.target.value)) }
+                ></Input>
+            </Grid>
 
-            >Update</Button>
-        </Stack>
+            <Grid item xs={ 1 }>
+                <Button
+                    disabled={ !hasBeenUpdated }
+                    onClick={ () => updateProduct(product, {
+                        name: productName,
+                        price: productPrice,
+                        volume: productVolume
+                    }).then(() => {
+                        setHasBeenUpdated(false)
+                        props.onUpdate()
+                    }) }
+
+                >Update</Button>
+            </Grid>
+        </>
     )
 }

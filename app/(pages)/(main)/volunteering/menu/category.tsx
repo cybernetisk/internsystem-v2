@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Input, Stack, Typography } from "@mui/material";
+import { Button, Grid, Input, Stack, Typography } from "@mui/material";
 import {
     MenuCategoryCreate,
     MenuCategoryWithProducts,
@@ -83,22 +83,30 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
                 </Stack>
             }
 
+            <Grid container columns={ 8 }>
 
-            <Stack justifyContent="space-between" direction="row">
-                <Typography variant="h5">Name</Typography>
-                <Typography variant="h5">Price</Typography>
-                <Typography variant="h5">Volume (cL)</Typography>
-                <Typography variant="h5"></Typography>
-            </Stack>
+                <Grid item xs={ 2 }>
+                    <Typography variant="h5">Name</Typography>
+                </Grid>
+                <Grid item xs={ 2 }>
+                    <Typography variant="h5">Price</Typography>
+                </Grid>
+                <Grid item xs={ 2 }>
+                    <Typography variant="h5">Volume (cL)</Typography>
+                </Grid>
+                <Grid item xs={ 2 }>
+                    <div></div>
+                </Grid>
 
-            {
-                props.category.menu_products.map((item) => (
-                        <Product product={ item } key={ item.id } onUpdate={ props.onUpdate }></Product>
+                {
+                    props.category.menu_products.map((item) => (
+                            <Product product={ item } key={ item.id } onUpdate={ props.onUpdate }></Product>
+                        )
                     )
-                )
-            }
+                }
 
-            <NewProduct onUpdate={ props.onUpdate } categoryId={ props.category.id }></NewProduct>
+                <NewProduct onUpdate={ props.onUpdate } categoryId={ props.category.id }></NewProduct>
+            </Grid>
         </Stack>
     )
 }
@@ -138,49 +146,53 @@ function NewProduct(props: { onUpdate: () => void, categoryId: number | null }) 
     let [productVolume, setProductVolume] = useState<number | null>(null);
 
     return (
-        <Stack
-            direction="row"
-            spacing={ 2 }
-            justifyContent="space-between"
-        >
+        <>
+            <Grid item xs={ 2 }>
+                <Input
+                    type="text"
+                    value={ productName }
+                    onChange={ e => setProductName(e.target.value) }
+                    placeholder="Name"
+                ></Input>
+            </Grid>
 
-            <Input
-                type="text"
-                value={ productName }
-                onChange={ e => setProductName(e.target.value) }
-                placeholder="Name"
-            ></Input>
-            <Input
-                type="number"
-                value={ productPrice ?? "" }
-                onChange={ e => setProductPrice(Number(e.target.value)) }
-                placeholder="Price"
-            ></Input>
+            <Grid item xs={ 2 }>
+                <Input
+                    type="number"
+                    value={ productPrice ?? "" }
+                    onChange={ e => setProductPrice(Number(e.target.value)) }
+                    placeholder="Price"
+                ></Input>
+            </Grid>
 
-            <Input
-                type="number"
-                value={ productVolume ?? "" }
-                onChange={ e => setProductVolume(Number(e.target.value)) }
-                placeholder="Volume"
-            ></Input>
+            <Grid item xs={ 2 }>
+                <Input
+                    type="number"
+                    value={ productVolume ?? "" }
+                    onChange={ e => setProductVolume(Number(e.target.value)) }
+                    placeholder="Volume"
+                ></Input>
+            </Grid>
 
-            <Button
-                onClick={ () => createProduct({
-                    name: productName,
-                    price: productPrice,
-                    volume: productVolume,
-                    priceVolunteer: 0,
-                    glutenfree: 0,
-                    category_id: props.categoryId
-                }).then(() => {
-                    setProductVolume(null);
-                    setProductPrice(null)
-                    setProductName("");
-                    props.onUpdate();
-                }) }
+            <Grid item xs={ 1 }>
+                <Button
+                    onClick={ () => createProduct({
+                        name: productName,
+                        price: productPrice,
+                        volume: productVolume,
+                        priceVolunteer: 0,
+                        glutenfree: 0,
+                        category_id: props.categoryId
+                    }).then(() => {
+                        setProductVolume(null);
+                        setProductPrice(null)
+                        setProductName("");
+                        props.onUpdate();
+                    }) }
 
-            >Create</Button>
-        </Stack>
+                >Create</Button>
+            </Grid>
+        </>
     );
 }
 
