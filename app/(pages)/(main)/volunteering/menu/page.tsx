@@ -8,8 +8,11 @@ import {
     MenuProductCreate
 } from "@/app/api/v2/escape/menu/products/route";
 import { MenuCategory, MenuProduct } from "@prisma/client";
+import authWrapper from "@/app/middleware/authWrapper";
 
-export default function menu() {
+export default authWrapper(MenuEditPage);
+
+function MenuEditPage() {
     const [menuCategories, setMenuCategories] = useState<MenuCategoryWithProducts[]>([]);
 
     useEffect(() => {
@@ -302,3 +305,4 @@ async function fetchMenu(): Promise<MenuCategoryWithProducts[]> {
     const menu = await fetch("/api/v2/escape/menu/products");
     return await menu.json();
 }
+
