@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { Prisma } from "@prisma/client";
+import { MenuProduct, Prisma } from "@prisma/client";
 import prismaClient from "@/prisma/prismaClient";
 
 export async function PATCH(
@@ -35,8 +35,4 @@ const menuCategoryWithProducts = Prisma.validator<Prisma.MenuCategoryDefaultArgs
 export type MenuCategoryWithProducts = Prisma.MenuCategoryGetPayload<typeof menuCategoryWithProducts>
 
 export type MenuProductCreate = Prisma.MenuProductCreateArgs["data"]
-
-const menuProduct = Prisma.validator<Prisma.MenuProductDefaultArgs>()({});
-export type MenuProduct = Prisma.MenuProductGetPayload<typeof menuProduct>;
-
 export type MenuCategoryCreate = Prisma.MenuCategoryCreateArgs["data"]
