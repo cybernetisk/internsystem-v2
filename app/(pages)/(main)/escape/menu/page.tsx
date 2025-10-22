@@ -9,7 +9,7 @@ export default function menu() {
     const [menuCategories, setMenuCategories] = useState<MenuCategoryWithProducts[]>([]);
 
     useEffect(() => {
-        fetch("/api/v2/escape/menu/products")
+        fetch("/api/v2/escape/menu")
             .then(res => res.json())
             .then(categories => setMenuCategories(categories))
     }, []);

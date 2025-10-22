@@ -302,7 +302,7 @@ function NewCategory(props: { onUpdate: () => void }) {
 }
 
 async function fetchMenu(): Promise<MenuCategoryWithProducts[]> {
-    const menu = await fetch("/api/v2/escape/menu/products");
+    const menu = await fetch("/api/v2/escape/menu");
     return await menu.json();
 }
 
