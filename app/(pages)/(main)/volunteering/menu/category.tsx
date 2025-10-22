@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button, Grid, Input, Stack, Typography } from "@mui/material";
+import { Button, Grid, Input, Stack, TextField, Typography } from "@mui/material";
 import { MenuCategoryCreate, MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
 import { MenuCategory } from "@prisma/client";
 
 import { NewProduct, Product } from "@/app/(pages)/(main)/volunteering/menu/product";
+import { styled } from "@mui/system";
 
 function updateCategory(category: MenuCategoryWithProducts, newAttributes: Partial<MenuCategory>): Promise<Response> {
 
@@ -26,6 +27,12 @@ function createCategory(category: MenuCategoryCreate): Promise<Response> {
     });
 }
 
+const LargeTextField = styled(TextField)({
+    "& .MuiOutlinedInput-input": {
+        fontSize: "3.75rem",
+    }
+})
+
 export function Category(props: { category: MenuCategoryWithProducts, onUpdate: () => void }) {
 
     let [categoryName, setCategoryName] = useState<string>(props.category.name);
@@ -33,6 +40,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
     let [isFirst, setIsFirst] = useState<boolean>(true);
 
+    const categoryNameInvalid: boolean = categoryName.trim() === "";
 
     useEffect(() => {
         if (isFirst) {
@@ -48,22 +56,22 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
             {
 
                 <Stack direction="row" justifyContent="space-between">
-                    <Input
+                    <LargeTextField
                         type="text"
                         value={ categoryName }
                         onChange={ (e) => {
                             setCategoryName(e.target.value)
                         } }
 
-                        style={
-                            {
-                                fontSize: "3.75rem"
-                            }
-                        }
+                        required
+                        label="Category Name"
+                        placeholder="Category Name"
+                        error={ categoryNameInvalid }
+                        helperText={ categoryNameInvalid ? "Name must not be empty" : "" }
 
-                    ></Input>
+                    ></LargeTextField>
                     <Button
-                        disabled={ !hasBeenUpdated }
+                        disabled={ !hasBeenUpdated || categoryNameInvalid }
                         onClick={ () => {
                             updateCategory(
                                 props.category,
@@ -110,18 +118,29 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
 export function NewCategory(props: { onUpdate: () => void }) {
     let [categoryName, setCategoryName] = useState<string>("");
 
+
+    const invalid = categoryName.trim() === "";
     return (
-        <Stack justifyContent="space-between">
-            <Input
+        <Stack justifyContent="space-between" spacing={ 2 }>
+            <Typography variant="h3">New Category</Typography>
+
+            <TextField
                 type="text"
                 value={ categoryName }
-                placeholder="New Category"
+                placeholder="Category Name"
+                label="Category Name"
                 onChange={ (e) => setCategoryName(e.target.value) }
                 style={ {fontSize: "3.75rem"} }
 
-            ></Input>
+                required
+                error={ invalid }
+                helperText={ invalid ? "Name must not be empty" : "" }
+            ></TextField>
 
             <Button
+
+                disabled={ invalid }
+
                 onClick={ () => createCategory(
                     {name: categoryName}
                 ).then(() => {
