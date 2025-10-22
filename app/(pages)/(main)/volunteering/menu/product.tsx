@@ -1,6 +1,6 @@
 import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { Button, Grid, Input } from "@mui/material";
+import { Button, Grid, Input, TextField } from "@mui/material";
 import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
 
 function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
@@ -14,14 +14,12 @@ function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>
 }
 
 export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
-    const product = props.product;
-
-    let [productName, setProductName] = useState<string>(product.name);
-    let [productPrice, setProductPrice] = useState<number>(product.price);
-    let [productVolume, setProductVolume] = useState<number>(product.volume);
-
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
     let [isFirst, setIsFirst] = useState<boolean>(true);
+
+    let [valid, setValid] = useState<boolean>(false);
+    let [newProduct, setNewProduct] = useState<ProductInputs>(props.product);
+
 
     useEffect(() => {
         if (isFirst) {
@@ -30,46 +28,23 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
         }
 
         setHasBeenUpdated(true);
-    }, [productName, productPrice, productVolume]);
+    }, [newProduct]);
 
     return (
 
         <>
-            <Grid item xs={ 2 }>
-                <Input
-                    type="text"
-                    value={ productName }
-                    onChange={ e => setProductName(e.target.value) }
-                ></Input>
-            </Grid>
-
-
-            <Grid item xs={ 2 }>
-                <Input
-                    type="number"
-                    value={ productPrice }
-                    onChange={ e => setProductPrice(Number(e.target.value)) }
-                ></Input>
-            </Grid>
-
-            <Grid item xs={ 2 }>
-                <Input
-                    type="number"
-                    value={ productVolume }
-                    onChange={ e => setProductVolume(Number(e.target.value)) }
-                ></Input>
-            </Grid>
+            <ProductInputs product={ newProduct } onUpdate={ value => {
+                console.log(value)
+                setValid(value.valid);
+                setNewProduct(value.product);
+            } }></ProductInputs>
 
             <Grid item xs={ 1 }>
                 <Button
-                    disabled={ !hasBeenUpdated }
-                    onClick={ () => updateProduct(product, {
-                        name: productName,
-                        price: productPrice,
-                        volume: productVolume
-                    }).then(() => {
-                        setHasBeenUpdated(false)
-                        props.onUpdate()
+                    disabled={ !valid || !hasBeenUpdated }
+                    onClick={ () => updateProduct(props.product, newProduct).then(() => {
+                        setHasBeenUpdated(false);
+                        props.onUpdate();
                     }) }
 
                 >Update</Button>
@@ -78,60 +53,130 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
     )
 }
 
-export function NewProduct(props: { onUpdate: () => void, categoryId: number | null }) {
-    let [productName, setProductName] = useState<string>("");
-    let [productPrice, setProductPrice] = useState<number | null>(null);
-    let [productVolume, setProductVolume] = useState<number | null>(null);
+type ProductInputs = {
+    name: string,
+    price: number,
+    volume: number,
+};
+
+function ProductInputs(
+    props: {
+
+        product: ProductInputs,
+        onUpdate: (value: {
+            product: ProductInputs
+            valid: boolean
+        }) => void,
+
+        validateInputs?: boolean
+    }
+) {
+    const validateInputs = props.validateInputs ?? true;
+
+    const nameValid = props.product.name.trim() !== "";
+    const priceValid = props.product.price > 0;
+    const volumeValid = props.product.volume > 0;
+
+    const valid = nameValid && priceValid && volumeValid;
 
     return (
         <>
             <Grid item xs={ 2 }>
-                <Input
+                <TextField
                     type="text"
-                    value={ productName }
-                    onChange={ e => setProductName(e.target.value) }
-                    placeholder="Name"
-                ></Input>
+                    value={ props.product.name }
+                    onChange={ e => props.onUpdate({valid, product: {...props.product, name: e.target.value}}) }
+
+                    label="Product Name"
+                    placeholder="Product Name"
+
+
+                    error={ !nameValid && validateInputs }
+                    helperText={ !nameValid && validateInputs ? "Name must be set" : "" }
+                ></TextField>
+            </Grid>
+
+
+            <Grid item xs={ 2 }>
+                <TextField
+                    type="number"
+                    value={ props.product.price }
+                    onChange={ e => props.onUpdate({
+                        valid,
+                        product: {...props.product, price: Number(e.target.value)}
+                    }) }
+
+                    placeholder="Product Price"
+                    label="Product Price"
+                    error={ !priceValid && validateInputs }
+                    helperText={ !priceValid && validateInputs ? "Price must be greater than 0" : "" }
+                ></TextField>
             </Grid>
 
             <Grid item xs={ 2 }>
-                <Input
+                <TextField
                     type="number"
-                    value={ productPrice ?? "" }
-                    onChange={ e => setProductPrice(Number(e.target.value)) }
-                    placeholder="Price"
-                ></Input>
-            </Grid>
+                    value={ props.product.volume }
+                    onChange={ e => props.onUpdate({
+                        valid,
+                        product: {...props.product, volume: Number(e.target.value)}
+                    }) }
 
-            <Grid item xs={ 2 }>
-                <Input
-                    type="number"
-                    value={ productVolume ?? "" }
-                    onChange={ e => setProductVolume(Number(e.target.value)) }
-                    placeholder="Volume"
-                ></Input>
+                    label="Volume (cL)"
+                    placeholder="Volume (cL)"
+
+                    error={ !volumeValid && validateInputs }
+                    helperText={ !volumeValid && validateInputs ? "Volume must be greater than 0" : "" }
+                ></TextField>
             </Grid>
+        </>)
+}
+
+export function NewProduct(props: { onUpdate: () => void, categoryId: number | null }) {
+    const initialState = {
+        name: "",
+        price: 0,
+        volume: 0,
+    };
+
+    let [newProduct, setNewProduct] = useState<ProductInputs>(initialState);
+
+    let [isFirst, setIsFirst] = useState<boolean>(true);
+    let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
+    useEffect(() => {
+        if (isFirst) {
+            setIsFirst(false);
+            return;
+        }
+
+        setHasBeenUpdated(true);
+    }, [newProduct]);
+
+
+    return (
+        <>
+            <ProductInputs validateInputs={ hasBeenUpdated } product={ newProduct } onUpdate={ (value) => {
+                setNewProduct(value.product);
+
+            } }/>
 
             <Grid item xs={ 1 }>
                 <Button
                     onClick={ () => createProduct({
-                        name: productName,
-                        price: productPrice,
-                        volume: productVolume,
+                        ...newProduct,
                         priceVolunteer: 0,
                         glutenfree: 0,
                         category_id: props.categoryId
                     }).then(() => {
-                        setProductVolume(null);
-                        setProductPrice(null)
-                        setProductName("");
+                        setNewProduct(initialState);
                         props.onUpdate();
                     }) }
 
                 >Create</Button>
             </Grid>
         </>
-    );
+    )
+        ;
 }
 
 function createProduct(product: MenuProductCreate): Promise<Response> {

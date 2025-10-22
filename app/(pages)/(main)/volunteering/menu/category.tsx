@@ -87,7 +87,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
                 </Stack>
             }
 
-            <Grid container columns={ 8 }>
+            <Grid container spacing={2} columns={ 8 }>
 
                 <Grid item xs={ 2 }>
                     <Typography variant="h5">Name</Typography>
