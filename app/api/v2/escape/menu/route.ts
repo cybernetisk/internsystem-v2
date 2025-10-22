@@ -9,24 +9,6 @@ export async function GET(): Promise<NextResponse> {
             }
         }
     );
-
-
-    let nullCategoryProducts = await prisma.menuProduct.findMany(
-        {
-            where: {
-                category_id: {
-                    equals: null
-                }
-            },
-        }
-    );
-    let nullCategory = {
-        name: "Uncategorized",
-        id: null,
-        menu_products: nullCategoryProducts
-    };
-
-    menuCategories.push(nullCategory)
-
+    
     return NextResponse.json(menuCategories);
 }

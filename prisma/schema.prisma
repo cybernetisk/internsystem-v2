@@ -383,7 +383,7 @@ model MenuProduct {
   priceVolunteer Int
   glutenfree     Int           @db.TinyInt
   active         Int           @default(1) @db.TinyInt
-  category_id    Int?
+  category_id    Int
   category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
 }
 

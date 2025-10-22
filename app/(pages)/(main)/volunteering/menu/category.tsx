@@ -50,39 +50,37 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
     return (
         <Stack>
             {
-                props.category.id !== null ? (
-                        <Stack direction="row" justifyContent="space-between">
-                            <Input
-                                type="text"
-                                value={ categoryName }
-                                onChange={ (e) => {
-                                    setCategoryName(e.target.value)
-                                } }
 
-                                style={
-                                    {
-                                        fontSize: "3.75rem"
-                                    }
-                                }
+                <Stack direction="row" justifyContent="space-between">
+                    <Input
+                        type="text"
+                        value={ categoryName }
+                        onChange={ (e) => {
+                            setCategoryName(e.target.value)
+                        } }
 
-                            ></Input>
-                            <Button
-                                disabled={ !hasBeenUpdated }
-                                onClick={ () => {
-                                    updateCategory(
-                                        props.category,
-                                        {name: categoryName}
-                                    ).then(() => {
-                                        setHasBeenUpdated(false);
-                                        props.onUpdate();
-                                    })
-                                }
-                                }
+                        style={
+                            {
+                                fontSize: "3.75rem"
+                            }
+                        }
 
-                            >Update</Button>
-                        </Stack>
-                    )
-                    : <Typography variant="h2">{ props.category.name }</Typography>
+                    ></Input>
+                    <Button
+                        disabled={ !hasBeenUpdated }
+                        onClick={ () => {
+                            updateCategory(
+                                props.category,
+                                {name: categoryName}
+                            ).then(() => {
+                                setHasBeenUpdated(false);
+                                props.onUpdate();
+                            })
+                        }
+                        }
+
+                    >Update</Button>
+                </Stack>
             }
 
 
