@@ -25,6 +25,7 @@ const BUTTON_CONTENT_1 = [
   // { title: "Café shifts", path: "/volunteering/cafe" },
   { title: "Vouchers", path: "/volunteering/logs" },
   { title: "Membership", path: "/volunteering/membership" },
+  { title: "Menu", path: "/volunteering/menu" },
   { title: "Website content", path: "/studio" },
 ];
 
@@ -56,20 +57,20 @@ function VolunteeringPage(params) {
   const [vouchersEarned, setVouchersEarned] = useState(0);
   const [vouchersUsed, setVouchersUsed] = useState(0);
 
-  
+
   useEffect(() => {
     sanityFetch(setPages);
   }, []);
-  
-  
+
+
   useEffect(() => {
-    
+
     fetch("/api/v2/semester")
     .then(res => res.json())
     .then(data => {
       setSemester(data.semester)
     });
-    
+
     fetch("/api/v2/semesterVolunteerInfo")
     .then(res => res.json())
     .then(data => {
@@ -80,9 +81,9 @@ function VolunteeringPage(params) {
       setVouchersUsed(data.vouchersUsed)
 
     })
-    
+
   }, [])
-  
+
   // Semester-based data
   return (
     <Box>
@@ -111,14 +112,14 @@ function VolunteeringPage(params) {
           }) : <></>}
         </Grid>
       </Grid>
-      
+
     </Box>
   );
 }
 
 function createNavigation(semester, paidMemberships, vouchersEarned, vouchersUsed, numVolunteers, volunteerHours) {
-  
-  const buttonGroup1 = createButtons(BUTTON_CONTENT_1);  
+
+  const buttonGroup1 = createButtons(BUTTON_CONTENT_1);
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item md={2} xs>
@@ -172,7 +173,7 @@ function createNavigation(semester, paidMemberships, vouchersEarned, vouchersUse
 }
 
 function createButtons(content) {
-  
+
   const gridItems = content.map((e) => {
     return (
       <Grid item width="100%" key={`grid_${e.title}`}>
@@ -194,7 +195,7 @@ function createButtons(content) {
       </Grid>
     );
   });
-  
+
   return (
     <Grid item container direction="column" spacing={1}>
       {gridItems}
