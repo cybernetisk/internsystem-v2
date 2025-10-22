@@ -82,6 +82,7 @@ export default function SignInPage() {
             fullWidth
             variant="filled"
             label="email"
+            type="email"
             value={email}
             error={error}
             onChange={(event) => setEmail(event.target.value)}
