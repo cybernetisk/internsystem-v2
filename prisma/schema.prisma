@@ -381,8 +381,8 @@ model MenuProduct {
   volume         Float         @db.Float
   price          Int
   priceVolunteer Int
-  glutenfree     Int           @db.TinyInt
-  active         Int           @default(1) @db.TinyInt
+  glutenfree     Boolean
+  active         Boolean       @default(true)
   category_id    Int
   category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
 }
