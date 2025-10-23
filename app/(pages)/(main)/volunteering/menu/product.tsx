@@ -18,7 +18,15 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
     let [isFirst, setIsFirst] = useState<boolean>(true);
 
     let [valid, setValid] = useState<boolean>(false);
-    let [newProduct, setNewProduct] = useState<ProductInputs>(props.product);
+    let [newProduct, setNewProduct] = useState<ProductInputsState>({
+        product: props.product,
+        valid: {
+            name: true,
+            price: true,
+            volume: true,
+            allValid: true,
+        }
+    });
 
 
     useEffect(() => {
@@ -33,16 +41,16 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
     return (
 
         <>
-            <ProductInputs product={ newProduct } onUpdate={ value => {
+            <ProductInputs state={ newProduct } onUpdate={ value => {
                 console.log(value)
-                setValid(value.valid);
-                setNewProduct(value.product);
+                setValid(value.valid.allValid);
+                setNewProduct(value);
             } }></ProductInputs>
 
             <Grid item xs={ 1 }>
                 <Button
                     disabled={ !valid || !hasBeenUpdated }
-                    onClick={ () => updateProduct(props.product, newProduct).then(() => {
+                    onClick={ () => updateProduct(props.product, newProduct.product).then(() => {
                         setHasBeenUpdated(false);
                         props.onUpdate();
                     }) }
@@ -60,40 +68,63 @@ type ProductInputs = {
     glutenfree: boolean,
 };
 
+type ProductInputsState = {
+    product: ProductInputs;
+    valid: {
+        name: boolean;
+        price: boolean;
+        volume: boolean;
+        allValid: boolean;
+    };
+}
+
 function ProductInputs(
     props: {
 
-        product: ProductInputs,
-        onUpdate: (value: {
-            product: ProductInputs
-            valid: boolean
-        }) => void,
+        state: ProductInputsState,
+        onUpdate: (state: ProductInputsState) => void,
 
         validateInputs?: boolean
     }
 ) {
     const validateInputs = props.validateInputs ?? true;
+    const product = props.state.product;
 
-    const nameValid = props.product.name.trim() !== "";
-    const priceValid = props.product.price > 0;
-    const volumeValid = props.product.volume > 0;
+    function isValid(product: ProductInputs): ProductInputsState["valid"] {
+        const name = product.name.trim() !== "";
+        const price = product.price > 0;
+        const volume = product.volume > 0;
+        return {
+            name,
+            price,
+            volume,
+            allValid: name && price && volume,
+        }
+    }
 
-    const valid = nameValid && priceValid && volumeValid;
 
     return (
         <>
             <Grid item xs={ 2 }>
                 <TextField
                     type="text"
-                    value={ props.product.name }
-                    onChange={ e => props.onUpdate({valid, product: {...props.product, name: e.target.value}}) }
+                    value={ product.name }
+                    onChange={ e => {
+                        const newProduct = {...product, name: e.target.value};
+                        props.onUpdate(
+                            {
+                                valid: isValid(newProduct),
+                                product: newProduct
+                            }
+                        );
+                    } }
 
                     label="Product Name"
                     placeholder="Product Name"
 
 
-                    error={ !nameValid && validateInputs }
-                    helperText={ !nameValid && validateInputs ? "Name must be set" : "" }
+                    error={ !props.state.valid.name && validateInputs }
+                    helperText={ !props.state.valid.name && validateInputs ? "Name must be set" : "" }
                 ></TextField>
             </Grid>
 
@@ -101,33 +132,43 @@ function ProductInputs(
             <Grid item xs={ 2 }>
                 <TextField
                     type="number"
-                    value={ props.product.price }
-                    onChange={ e => props.onUpdate({
-                        valid,
-                        product: {...props.product, price: Number(e.target.value)}
-                    }) }
+                    value={ product.price }
+                    onChange={ e => {
+                        const newProduct = {...product, price: Number(e.target.value)};
+                        props.onUpdate(
+                            {
+                                valid: isValid(newProduct),
+                                product: newProduct
+                            }
+                        );
+                    } }
 
                     placeholder="Product Price"
                     label="Product Price"
-                    error={ !priceValid && validateInputs }
-                    helperText={ !priceValid && validateInputs ? "Price must be greater than 0" : "" }
+                    error={ !props.state.valid.price && validateInputs }
+                    helperText={ !props.state.valid.price && validateInputs ? "Price must be greater than 0" : "" }
                 ></TextField>
             </Grid>
 
             <Grid item xs={ 2 }>
                 <TextField
                     type="number"
-                    value={ props.product.volume }
-                    onChange={ e => props.onUpdate({
-                        valid,
-                        product: {...props.product, volume: Number(e.target.value)}
-                    }) }
+                    value={ product.volume }
+                    onChange={ e => {
+                        const newProduct = {...product, volume: Number(e.target.value)};
+                        props.onUpdate(
+                            {
+                                valid: isValid(newProduct),
+                                product: newProduct
+                            }
+                        );
+                    } }
 
                     label="Volume (cL)"
                     placeholder="Volume (cL)"
 
-                    error={ !volumeValid && validateInputs }
-                    helperText={ !volumeValid && validateInputs ? "Volume must be greater than 0" : "" }
+                    error={ !props.state.valid.volume && validateInputs }
+                    helperText={ !props.state.valid.volume && validateInputs ? "Volume must be greater than 0" : "" }
                 ></TextField>
             </Grid>
 
@@ -135,12 +176,17 @@ function ProductInputs(
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={props.product.glutenfree}
+                            checked={ product.glutenfree }
 
-                            onChange={ e => props.onUpdate({
-                                valid,
-                                product: {...props.product, glutenfree: e.target.checked}
-                            }) }
+                            onChange={ e => {
+                                const newProduct = {...product, glutenfree: e.target.checked};
+                                props.onUpdate(
+                                    {
+                                        valid: isValid(newProduct),
+                                        product: newProduct
+                                    }
+                                );
+                            } }
                         />
                     }
                     label={ "Gluten-free" }
@@ -150,14 +196,22 @@ function ProductInputs(
 }
 
 export function NewProduct(props: { onUpdate: () => void, categoryId: number | null }) {
-    const initialState: ProductInputs = {
-        name: "",
-        price: 0,
-        volume: 0,
-        glutenfree: false,
+    const initialState: ProductInputsState = {
+        product: {
+            name: "",
+            price: 0,
+            volume: 0,
+            glutenfree: false,
+        },
+        valid: {
+            name: false,
+            volume: false,
+            allValid: false,
+            price: false
+        },
     };
 
-    let [newProduct, setNewProduct] = useState<ProductInputs>(initialState);
+    let [newProduct, setNewProduct] = useState<ProductInputsState>(initialState);
 
     let [isFirst, setIsFirst] = useState<boolean>(true);
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
@@ -173,15 +227,15 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
 
     return (
         <>
-            <ProductInputs validateInputs={ hasBeenUpdated } product={ newProduct } onUpdate={ (value) => {
-                setNewProduct(value.product);
+            <ProductInputs validateInputs={ hasBeenUpdated } state={ newProduct } onUpdate={ (value) => {
+                setNewProduct(value);
 
             } }/>
 
             <Grid item xs={ 1 }>
                 <Button
                     onClick={ () => createProduct({
-                        ...newProduct,
+                        ...newProduct.product,
                         priceVolunteer: 0,
                         category_id: props.categoryId
                     }).then(() => {
