@@ -1,6 +1,17 @@
 import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { Button, Checkbox, FormControlLabel, Grid, TextField } from "@mui/material";
+import {
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControlLabel,
+    Grid,
+    TextField
+} from "@mui/material";
 import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -11,7 +22,26 @@ function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>
             "Content-Type": "application/json",
         },
         body: JSON.stringify({...product, ...newAttributes})
-    })
+    });
+}
+
+function createProduct(product: MenuProductCreate): Promise<Response> {
+    return fetch("/api/v2/escape/menu/products", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product)
+    });
+}
+
+function deleteProduct(productId: number): Promise<Response> {
+    return fetch(`/api/v2/escape/menu/products/${ productId }`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
 }
 
 export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
@@ -30,6 +60,9 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
             allValid: true,
         }
     });
+
+    let [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+    let [isDeleting, setIsDeleting] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -63,6 +96,30 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
                     } }
 
                 >{ isUpdating ? <CircularProgress/> : <>Update</> }</Button>
+            </Grid>
+
+            <Grid item xs={ 1 }>
+
+                <Button
+                    color="error"
+                    disabled={ isUpdating }
+                    onClick={ () => setDeleteDialogOpen(true) }
+                >
+                    Delete
+                </Button>
+
+                <DeletionConfirmationDialog open={ deleteDialogOpen } onClose={ () => setDeleteDialogOpen(false) }
+                                            onDelete={ () => {
+                                                setIsDeleting(true);
+                                                deleteProduct(props.product.id).then(() => {
+                                                    setIsDeleting(false);
+                                                    setDeleteDialogOpen(false);
+
+                                                    props.onUpdate();
+                                                });
+                                            } }
+                                            isDeleting={ isDeleting }
+                />
             </Grid>
         </>
     )
@@ -199,7 +256,8 @@ function ProductInputs(
                     label={ "Gluten-free" }
                 />
             </Grid>
-        </>)
+        </>
+    )
 }
 
 export function NewProduct(props: { onUpdate: () => void, categoryId: number | null }) {
@@ -266,16 +324,37 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
 
             </Grid>
         </>
-    )
-        ;
+    );
 }
 
-function createProduct(product: MenuProductCreate): Promise<Response> {
-    return fetch("/api/v2/escape/menu/products", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product)
-    });
+
+function DeletionConfirmationDialog(props: {
+    open: boolean,
+    onClose: () => void,
+    onDelete: () => void,
+    isDeleting: boolean
+}) {
+    return (
+        <Dialog
+            open={ props.open }
+            onClose={ props.onClose }
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+                Delete product?
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Are you sure you want to delete the product?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={ props.onClose }>Cancel</Button>
+                <Button onClick={ props.onDelete } color="error">
+                    { props.isDeleting ? <CircularProgress/> : <>Delete</> }
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
 }
