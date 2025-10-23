@@ -2,6 +2,7 @@ import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Button, Checkbox, FormControlLabel, Grid, TextField } from "@mui/material";
 import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
     return fetch("/api/v2/escape/menu/products", {
@@ -16,6 +17,8 @@ function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>
 export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
     let [isFirst, setIsFirst] = useState<boolean>(true);
+
+    let [isUpdating, setIsUpdating] = useState<boolean>(false);
 
     let [valid, setValid] = useState<boolean>(false);
     let [newProduct, setNewProduct] = useState<ProductInputsState>({
@@ -49,13 +52,17 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
 
             <Grid item xs={ 1 }>
                 <Button
-                    disabled={ !valid || !hasBeenUpdated }
-                    onClick={ () => updateProduct(props.product, newProduct.product).then(() => {
-                        setHasBeenUpdated(false);
-                        props.onUpdate();
-                    }) }
+                    disabled={ !valid || !hasBeenUpdated || isUpdating }
+                    onClick={ () => {
+                        setIsUpdating(true);
+                        updateProduct(props.product, newProduct.product).then(() => {
+                            setIsUpdating(false);
+                            setHasBeenUpdated(false);
+                            props.onUpdate();
+                        })
+                    } }
 
-                >Update</Button>
+                >{ isUpdating ? <CircularProgress/> : <>Update</> }</Button>
             </Grid>
         </>
     )
@@ -215,6 +222,10 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
 
     let [isFirst, setIsFirst] = useState<boolean>(true);
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
+
+    let [isCreating, setIsCreating] = useState<boolean>(false);
+
+
     useEffect(() => {
         if (isFirst) {
             setIsFirst(false);
@@ -234,16 +245,25 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
 
             <Grid item xs={ 1 }>
                 <Button
-                    onClick={ () => createProduct({
-                        ...newProduct.product,
-                        priceVolunteer: 0,
-                        category_id: props.categoryId
-                    }).then(() => {
-                        setNewProduct(initialState);
-                        props.onUpdate();
-                    }) }
+                    onClick={ () => {
+                        setIsCreating(true);
+                        createProduct({
+                            ...newProduct.product,
+                            priceVolunteer: 0,
+                            category_id: props.categoryId
+                        }).then(() => {
+                            setNewProduct(initialState);
+                            setIsCreating(false);
 
-                >Create</Button>
+                            setHasBeenUpdated(false);
+                            setIsFirst(true);
+                            props.onUpdate();
+                        });
+
+                    } }
+
+                >{ isCreating ? <CircularProgress/> : <>Create</> }</Button>
+
             </Grid>
         </>
     )
