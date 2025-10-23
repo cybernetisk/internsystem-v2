@@ -244,23 +244,23 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
             } }/>
 
             <Grid item xs={ 1 }>
-                <Button
-                    onClick={ () => {
-                        setIsCreating(true);
-                        createProduct({
-                            ...newProduct.product,
-                            priceVolunteer: 0,
-                            category_id: props.categoryId
-                        }).then(() => {
-                            setNewProduct(initialState);
-                            setIsCreating(false);
+                <Button disabled={ !newProduct.valid.allValid || isCreating }
+                        onClick={ () => {
+                            setIsCreating(true);
+                            createProduct({
+                                ...newProduct.product,
+                                priceVolunteer: 0,
+                                category_id: props.categoryId
+                            }).then(() => {
+                                setNewProduct(initialState);
+                                setIsCreating(false);
 
-                            setHasBeenUpdated(false);
-                            setIsFirst(true);
-                            props.onUpdate();
-                        });
+                                setHasBeenUpdated(false);
+                                setIsFirst(true);
+                                props.onUpdate();
+                            });
 
-                    } }
+                        } }
 
                 >{ isCreating ? <CircularProgress/> : <>Create</> }</Button>
 
