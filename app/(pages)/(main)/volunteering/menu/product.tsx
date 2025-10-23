@@ -1,6 +1,6 @@
 import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { Button, Grid, Input, TextField } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Grid, TextField } from "@mui/material";
 import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
 
 function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
@@ -57,6 +57,7 @@ type ProductInputs = {
     name: string,
     price: number,
     volume: number,
+    glutenfree: boolean,
 };
 
 function ProductInputs(
@@ -129,14 +130,31 @@ function ProductInputs(
                     helperText={ !volumeValid && validateInputs ? "Volume must be greater than 0" : "" }
                 ></TextField>
             </Grid>
+
+            <Grid item xs={ 1 } display="flex" justifyContent="center" alignItems="center">
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={props.product.glutenfree}
+
+                            onChange={ e => props.onUpdate({
+                                valid,
+                                product: {...props.product, glutenfree: e.target.checked}
+                            }) }
+                        />
+                    }
+                    label={ "Gluten-free" }
+                />
+            </Grid>
         </>)
 }
 
 export function NewProduct(props: { onUpdate: () => void, categoryId: number | null }) {
-    const initialState = {
+    const initialState: ProductInputs = {
         name: "",
         price: 0,
         volume: 0,
+        glutenfree: false,
     };
 
     let [newProduct, setNewProduct] = useState<ProductInputs>(initialState);
@@ -165,7 +183,6 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
                     onClick={ () => createProduct({
                         ...newProduct,
                         priceVolunteer: 0,
-                        glutenfree: 0,
                         category_id: props.categoryId
                     }).then(() => {
                         setNewProduct(initialState);

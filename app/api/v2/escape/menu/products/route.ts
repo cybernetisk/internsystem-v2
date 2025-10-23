@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { MenuProduct, Prisma } from "@prisma/client";
 import prismaClient from "@/prisma/prismaClient";
+import { MenuProduct, Prisma } from "@prisma/client";
 import { authOptions } from "@/app/api/utils/authOptions";
 import { getServerSession } from "next-auth";
 import { Auth } from "@/app/api/utils/auth";
@@ -23,7 +23,8 @@ export async function PATCH(
             id: product.id
         },
         data: product
-    })
+    });
+
 
 
     return NextResponse.json(JSON.stringify(newProduct));
