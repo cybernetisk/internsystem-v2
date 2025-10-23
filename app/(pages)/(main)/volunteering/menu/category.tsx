@@ -5,6 +5,7 @@ import { MenuCategory } from "@prisma/client";
 
 import { NewProduct, Product } from "@/app/(pages)/(main)/volunteering/menu/product";
 import { styled } from "@mui/system";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function updateCategory(category: MenuCategoryWithProducts, newAttributes: Partial<MenuCategory>): Promise<Response> {
 
@@ -39,6 +40,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
 
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
     let [isFirst, setIsFirst] = useState<boolean>(true);
+    let [isUpdating, setIsUpdating] = useState<boolean>(false);
 
     const categoryNameInvalid: boolean = categoryName.trim() === "";
 
@@ -71,23 +73,26 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
 
                     ></LargeTextField>
                     <Button
-                        disabled={ !hasBeenUpdated || categoryNameInvalid }
+                        disabled={ !hasBeenUpdated || categoryNameInvalid || isUpdating }
                         onClick={ () => {
+                            setIsUpdating(true);
                             updateCategory(
                                 props.category,
                                 {name: categoryName}
                             ).then(() => {
                                 setHasBeenUpdated(false);
+                                setIsFirst(true);
+                                setIsUpdating(false);
                                 props.onUpdate();
-                            })
+                            });
                         }
                         }
 
-                    >Update</Button>
+                    >{ isUpdating ? <CircularProgress/> : <>Update</> }</Button>
                 </Stack>
             }
 
-            <Grid container spacing={2} columns={ 8 }>
+            <Grid container spacing={ 2 } columns={ 8 }>
 
                 <Grid item xs={ 2 }>
                     <Typography variant="h5">Name</Typography>
@@ -117,6 +122,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
 
 export function NewCategory(props: { onUpdate: () => void }) {
     let [categoryName, setCategoryName] = useState<string>("");
+    let [isCreating, setIsCreating] = useState<boolean>(false);
 
 
     const invalid = categoryName.trim() === "";
@@ -141,15 +147,20 @@ export function NewCategory(props: { onUpdate: () => void }) {
 
                 disabled={ invalid }
 
-                onClick={ () => createCategory(
-                    {name: categoryName}
-                ).then(() => {
-                    setCategoryName("");
-                    props.onUpdate();
-                })
+                onClick={ () => {
+                    setIsCreating(true);
+                    createCategory(
+                        {name: categoryName}
+                    ).then(() => {
+                        setCategoryName("");
+                        setIsCreating(false);
+                        props.onUpdate();
+                    });
+                }
 
                 }
-            >Create</Button>
+            >{ isCreating ? <CircularProgress/> : <>Create</> }</Button>
+
 
         </Stack>
     )
