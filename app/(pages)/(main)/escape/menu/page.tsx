@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, Card, Collapse, Grid, Typography } from "@mui/material";
+import { Divider, Grid, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
+import { MenuProduct } from "@prisma/client";
 
 
-export default function menu() {
+export default function EscapeMenu() {
     const [menuCategories, setMenuCategories] = useState<MenuCategoryWithProducts[]>([]);
 
     useEffect(() => {
@@ -15,7 +16,7 @@ export default function menu() {
     }, []);
 
     return (
-        <div>
+        <Stack direction="column" spacing={ 4 }>
             <Typography
                 variant="h2">
                 Menu
@@ -23,9 +24,13 @@ export default function menu() {
 
             { menuCategories.map((item) =>
 
-                <Category key={ item.id } category={ item }></Category>
+                <Stack direction="column" key={item.id} spacing={1}>
+                    <Category category={ item }></Category>
+                    <Divider/>
+                </Stack>
+
             ) }
-        </div>
+        </Stack>
     )
 }
 
@@ -33,42 +38,44 @@ function Category(props: {
     category: MenuCategoryWithProducts,
 }) {
     const category = props.category;
-    const [expanded, setExpanded] = useState(false);
 
     return (
-        <Card>
+        <Stack >
+            <Typography variant="h4">{ category.name }</Typography>
 
-            <Button
-                fullWidth
-                variant="contained"
-                onClick={ () => setExpanded(!expanded) }
-            >
+            <Grid container rowSpacing={ 1 } columns={ 10 } paddingLeft={ 4 }>
 
-                <Typography variant="h4">{ category.name }</Typography>
-            </Button>
+                {
+                    category.menu_products.map((item) => (
+                        <Product product={ item }/>
+                    ))
+                }
+            </Grid>
+        </Stack>
+    )
 
-            <Collapse in={ expanded }>
-                <Grid container spacing={ 2 } columns={ 3 }>
-                    {
-                        category.menu_products.map((item) =>
-                            <>
-                                <Grid item xs={ 1 }>
-                                    <Typography>{ item.name }</Typography>
-                                </Grid>
-                                <Grid item xs={ 1 }>
-                                    <Typography>{ item.volume } CL</Typography>
-                                </Grid>
-                                <Grid item xs={ 1 }>
-                                    <Typography>{ item.price },-</Typography>
-                                </Grid>
-                            </>
-                        )
-                    }
-                </Grid>
+}
 
+function Product(
+    props: {
+        product: MenuProduct
+    }
+) {
 
-            </Collapse>
-        </Card>
+    const product = props.product;
+
+    return (
+        <>
+            <Grid item xs={ 8 }>
+                <Typography>{ product.name }</Typography>
+            </Grid>
+            <Grid item xs={ 1 }>
+                <Typography>{ product.volume } CL</Typography>
+            </Grid>
+            <Grid item xs={ 1 }>
+                <Typography>{ product.price },-</Typography>
+            </Grid>
+        </>
     )
 
 }
