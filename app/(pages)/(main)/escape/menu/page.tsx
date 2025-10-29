@@ -42,7 +42,7 @@ function Category(props: {
         <Stack>
             <Typography variant="h4">{ category.name }</Typography>
 
-            <Grid container rowSpacing={ 1 } columns={ 10 } paddingLeft={ 4 }>
+            <Grid container rowSpacing={ 1 } columns={10} paddingLeft={ 4 }>
 
                 {
                     category.menu_products.map((item) => (
@@ -65,17 +65,17 @@ function Product(
 
     return (
         <>
-            <Grid item xs={ 8 }>
+            <Grid item xs={ 4 } md={8}>
                 <Typography>
                     { product.name }
 
                     { product.glutenfree ? <sup> (Gluten-free)</sup> : <></> }
                 </Typography>
             </Grid>
-            <Grid item xs={ 1 }>
+            <Grid item md={ 1 } xs={3}>
                 <Typography>{ product.volume } CL</Typography>
             </Grid>
-            <Grid item xs={ 1 }>
+            <Grid item md={ 1 } xs={ 3}>
                 <Typography>{ product.price },-</Typography>
             </Grid>
         </>
