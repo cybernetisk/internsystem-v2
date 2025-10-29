@@ -24,11 +24,10 @@ export default function EscapeMenu() {
 
             { menuCategories.map((item) =>
 
-                <Stack direction="column" key={item.id} spacing={1}>
+                <Stack direction="column" key={ item.id } spacing={ 1 }>
                     <Category category={ item }></Category>
                     <Divider/>
                 </Stack>
-
             ) }
         </Stack>
     )
@@ -40,7 +39,7 @@ function Category(props: {
     const category = props.category;
 
     return (
-        <Stack >
+        <Stack>
             <Typography variant="h4">{ category.name }</Typography>
 
             <Grid container rowSpacing={ 1 } columns={ 10 } paddingLeft={ 4 }>
@@ -67,7 +66,11 @@ function Product(
     return (
         <>
             <Grid item xs={ 8 }>
-                <Typography>{ product.name }</Typography>
+                <Typography>
+                    { product.name }
+
+                    { product.glutenfree ? <sup> (Gluten-free)</sup> : <></> }
+                </Typography>
             </Grid>
             <Grid item xs={ 1 }>
                 <Typography>{ product.volume } CL</Typography>
