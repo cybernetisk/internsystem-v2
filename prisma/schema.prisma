@@ -382,7 +382,7 @@ model MenuProduct {
   price          Int
   priceVolunteer Int
   glutenfree     Boolean
-  active         Boolean       @default(true)
+  hidden         Boolean       @default(false)
   category_id    Int
   category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
 }
