@@ -1,19 +1,16 @@
-"use client";
-
 import { Divider, Grid, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
 import { MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
 import { MenuProduct } from "@prisma/client";
+import prisma from "@/prisma/prismaClient";
 
 
-export default function EscapeMenu() {
-    const [menuCategories, setMenuCategories] = useState<MenuCategoryWithProducts[]>([]);
+export default async function EscapeMenu() {
+    const menu: MenuCategoryWithProducts[] = await prisma.menuCategory.findMany({
+        include: {
+            menu_products: true
+        }
+    });
 
-    useEffect(() => {
-        fetch("/api/v2/escape/menu")
-            .then(res => res.json())
-            .then(categories => setMenuCategories(categories))
-    }, []);
 
     return (
         <Stack direction="column" spacing={ 4 }>
@@ -22,7 +19,7 @@ export default function EscapeMenu() {
                 Menu
             </Typography>
 
-            { menuCategories.map((item) =>
+            { menu.map((item) =>
 
                 <Stack direction="column" key={ item.id } spacing={ 1 }>
                     <Category category={ item }></Category>
@@ -42,11 +39,11 @@ function Category(props: {
         <Stack>
             <Typography variant="h4">{ category.name }</Typography>
 
-            <Grid container rowSpacing={ 1 } columns={10} paddingLeft={ 4 }>
+            <Grid container rowSpacing={ 1 } columns={ 10 } paddingLeft={ 4 }>
 
                 {
                     category.menu_products.map((item) => (
-                        <Product product={ item }/>
+                        <Product product={ item } key={ item.id }/>
                     ))
                 }
             </Grid>
@@ -65,17 +62,17 @@ function Product(
 
     return (
         <>
-            <Grid item xs={ 4 } md={8}>
+            <Grid item xs={ 4 } md={ 8 }>
                 <Typography>
                     { product.name }
 
                     { product.glutenfree ? <sup> (Gluten-free)</sup> : <></> }
                 </Typography>
             </Grid>
-            <Grid item md={ 1 } xs={3}>
+            <Grid item md={ 1 } xs={ 3 }>
                 <Typography>{ product.volume } CL</Typography>
             </Grid>
-            <Grid item md={ 1 } xs={ 3}>
+            <Grid item md={ 1 } xs={ 3 }>
                 <Typography>{ product.price },-</Typography>
             </Grid>
         </>
