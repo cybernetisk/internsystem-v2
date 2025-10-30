@@ -1,3 +1,5 @@
+// This file contains react components for individual categories, and relevant utility functions.
+
 import { useEffect, useState } from "react";
 import { Button, Grid, Input, Stack, TextField, Typography } from "@mui/material";
 import { MenuCategoryCreate, MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
@@ -7,6 +9,8 @@ import { NewProduct, Product } from "@/app/(pages)/(main)/volunteering/menu/prod
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 
+
+// Updates a given category.
 function updateCategory(category: MenuCategoryWithProducts, newAttributes: Partial<MenuCategory>): Promise<Response> {
 
     return fetch("/api/v2/escape/menu/categories", {
@@ -14,10 +18,11 @@ function updateCategory(category: MenuCategoryWithProducts, newAttributes: Parti
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({...category, ...newAttributes, ...{menu_products: undefined}})
+        body: JSON.stringify({...category, ...newAttributes, ...{menu_products: undefined}}) // set menu_products to undefined, because trying to PATCH the category with products makes Prisma angry
     });
 }
 
+// Creates a given category.
 function createCategory(category: MenuCategoryCreate): Promise<Response> {
     return fetch("/api/v2/escape/menu/categories", {
         method: "POST",
@@ -28,28 +33,41 @@ function createCategory(category: MenuCategoryCreate): Promise<Response> {
     });
 }
 
+// a <Textfield> with larger text. Equivalent font-size to <h2>
 const LargeTextField = styled(TextField)({
     "& .MuiOutlinedInput-input": {
         fontSize: "3.75rem",
     }
 })
 
-export function Category(props: { category: MenuCategoryWithProducts, onUpdate: () => void }) {
+export function Category(
+    props: {
+        category: MenuCategoryWithProducts,
+        onUpdate: () => void // called when the category has been updated in the database.
+    }
+) {
 
     let [categoryName, setCategoryName] = useState<string>(props.category.name);
 
-    let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
-    let [isFirst, setIsFirst] = useState<boolean>(true);
-    let [isUpdating, setIsUpdating] = useState<boolean>(false);
-
+    // validate category name. Category name cannot be empty.
     const categoryNameInvalid: boolean = categoryName.trim() === "";
 
+    // these are used to disable the UPDATE button when user has not inputted anything yet.
+    let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
+    let [isFirst, setIsFirst] = useState<boolean>(true);
+
+    // is used for the spinner inside the UPDATE button
+    let [isUpdating, setIsUpdating] = useState<boolean>(false);
+
+
     useEffect(() => {
+        // useEffect is always run once at the start.
         if (isFirst) {
             setIsFirst(false);
             return;
         }
 
+        // this happens when categoryName has been updated for the first time.
         setHasBeenUpdated(true);
     }, [categoryName]);
 
@@ -72,7 +90,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
                         helperText={ categoryNameInvalid ? "Name must not be empty" : "" }
 
                     ></LargeTextField>
-                    <Button
+                    <Button // UPDATE button
                         disabled={ !hasBeenUpdated || categoryNameInvalid || isUpdating }
                         onClick={ () => {
                             setIsUpdating(true);
@@ -88,7 +106,11 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
                         }
                         }
 
-                    >{ isUpdating ? <CircularProgress/> : <>Update</> }</Button>
+                    >
+                        {
+                            isUpdating ? <CircularProgress/> : <>Update</> // show spinner when updating is in progress
+                        }
+                    </Button>
                 </Stack>
             }
 

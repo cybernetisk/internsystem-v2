@@ -78,8 +78,8 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
     return (
 
         <>
+            { /* shared inputs */ }
             <ProductInputs state={ newProduct } onUpdate={ value => {
-                console.log(value)
                 setValid(value.valid.allValid);
                 setNewProduct(value);
             } }></ProductInputs>
@@ -144,6 +144,8 @@ type ProductInputsState = {
     };
 }
 
+// Due to the fact that NewProduct and Product share the same inputs, they are extracted here.
+// This component *does not* keep track of any state.
 function ProductInputs(
     props: {
 
@@ -175,9 +177,9 @@ function ProductInputs(
                 <TextField
                     type="text"
                     value={ product.name }
-                    onChange={ e => {
-                        const newProduct = {...product, name: e.target.value};
-                        props.onUpdate(
+                    onChange={ e => { // all the inputs here are essentially the same.
+                        const newProduct = {...product, name: e.target.value}; // create new product.
+                        props.onUpdate( // propagate upwards.
                             {
                                 valid: isValid(newProduct),
                                 product: newProduct
@@ -354,12 +356,12 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
     );
 }
 
-
+// Dialog to confirm deletion of a product.
 function DeletionConfirmationDialog(props: {
     open: boolean,
-    onClose: () => void,
-    onDelete: () => void,
-    isDeleting: boolean
+    onClose: () => void, // called when "Cancel" is clicked, or the dialog is closed in any other way.
+    onDelete: () => void, // called when "Delete" is clicked.
+    isDeleting: boolean // when true, shows a spinner instead of "Delete" in the button.
 }) {
     return (
         <Dialog

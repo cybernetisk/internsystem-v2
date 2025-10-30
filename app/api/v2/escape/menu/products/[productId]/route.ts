@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/utils/authOptions";
 
 
-// delete a product
+// delete a product with the given id
 export async function DELETE(
     _req: NextRequest,
     context: { params: Promise<{ productId: string }> }

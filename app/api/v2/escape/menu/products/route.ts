@@ -6,6 +6,8 @@ import { authOptions } from "@/app/api/utils/authOptions";
 import { getServerSession } from "next-auth";
 import { Auth } from "@/app/api/utils/auth";
 
+
+// Modify a product. Modifies the product based on the id in the request body.
 export async function PATCH(
     req: NextRequest
 ) {
@@ -30,6 +32,8 @@ export async function PATCH(
     return NextResponse.json(JSON.stringify(newProduct));
 }
 
+
+// Create new product.
 export async function POST(
     req: NextRequest
 ) {
@@ -52,5 +56,6 @@ export async function POST(
 const menuCategoryWithProducts = Prisma.validator<Prisma.MenuCategoryDefaultArgs>()({include: {menu_products: true}})
 export type MenuCategoryWithProducts = Prisma.MenuCategoryGetPayload<typeof menuCategoryWithProducts>
 
+// Some utility types.
 export type MenuProductCreate = Prisma.MenuProductCreateArgs["data"]
 export type MenuCategoryCreate = Prisma.MenuCategoryCreateArgs["data"]

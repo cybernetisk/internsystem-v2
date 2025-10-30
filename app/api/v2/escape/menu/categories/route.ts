@@ -6,6 +6,9 @@ import { getServerSession } from "next-auth";
 import { Auth } from "@/app/api/utils/auth";
 import { authOptions } from "@/app/api/utils/authOptions";
 
+
+
+// Modify a category. Does not allow modifying products inside the category.
 export async function PATCH(
     req: NextRequest
 ) {
@@ -29,6 +32,8 @@ export async function PATCH(
     return NextResponse.json(JSON.stringify(newProduct));
 }
 
+
+// Create a new category.
 export async function POST(
     req: NextRequest
 ) {

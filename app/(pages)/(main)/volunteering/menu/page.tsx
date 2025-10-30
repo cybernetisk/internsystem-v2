@@ -27,7 +27,7 @@ function MenuEditPage() {
                             category={ item }
                             key={ item.id }
                             onUpdate={
-                                refetchMenu
+                                refetchMenu // refetch the menu when somthing has been updated
                             }
                         ></Category>
                     );

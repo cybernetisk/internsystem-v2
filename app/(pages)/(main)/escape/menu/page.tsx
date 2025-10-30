@@ -34,6 +34,7 @@ export default async function EscapeMenu() {
     )
 }
 
+// Individual menu category.
 function Category(props: {
     category: MenuCategoryWithProducts,
 }) {
@@ -56,6 +57,7 @@ function Category(props: {
 
 }
 
+// Individual menu product.
 function Product(
     props: {
         product: MenuProduct
