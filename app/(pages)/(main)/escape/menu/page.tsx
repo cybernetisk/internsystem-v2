@@ -7,7 +7,11 @@ import prisma from "@/prisma/prismaClient";
 export default async function EscapeMenu() {
     const menu: MenuCategoryWithProducts[] = await prisma.menuCategory.findMany({
         include: {
-            menu_products: true
+            menu_products: {
+                where: {
+                    hidden: false
+                }
+            }
         }
     });
 
