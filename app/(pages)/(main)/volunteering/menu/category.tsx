@@ -92,7 +92,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
                 </Stack>
             }
 
-            <Grid container spacing={ 2 } columns={ 9 }>
+            <Grid container spacing={ 2 } columns={ 10 }>
 
                 <Grid item xs={ 2 }>
                     <Typography variant="h5">Name</Typography>
@@ -103,7 +103,7 @@ export function Category(props: { category: MenuCategoryWithProducts, onUpdate: 
                 <Grid item xs={ 2 }>
                     <Typography variant="h5">Volume (cL)</Typography>
                 </Grid>
-                <Grid item xs={ 2 }>
+                <Grid item xs={ 3 }>
                     <div></div>
                 </Grid>
 

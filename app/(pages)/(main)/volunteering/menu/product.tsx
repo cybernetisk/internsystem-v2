@@ -10,7 +10,8 @@ import {
     DialogTitle,
     FormControlLabel,
     Grid,
-    TextField
+    TextField,
+    Tooltip
 } from "@mui/material";
 import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -130,6 +131,7 @@ type ProductInputs = {
     price: number,
     volume: number,
     glutenfree: boolean,
+    hidden: boolean,
 };
 
 type ProductInputsState = {
@@ -256,6 +258,30 @@ function ProductInputs(
                     label={ "Gluten-free" }
                 />
             </Grid>
+
+            <Grid item xs={ 1 } display="flex" justifyContent="center" alignItems="center">
+                <Tooltip title="If this is checked, the item is hidden from the menu.">
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={ product.hidden }
+
+                                onChange={ e => {
+                                    const newProduct = {...product, hidden: e.target.checked};
+                                    props.onUpdate(
+                                        {
+                                            valid: isValid(newProduct),
+                                            product: newProduct
+                                        }
+                                    );
+                                } }
+                            />
+                        }
+                        label="Hidden"
+                    />
+                </Tooltip>
+            </Grid>
+
         </>
     )
 }
@@ -267,6 +293,7 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
             price: 0,
             volume: 0,
             glutenfree: false,
+            hidden: false,
         },
         valid: {
             name: false,
