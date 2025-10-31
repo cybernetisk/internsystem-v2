@@ -1,20 +1,9 @@
 import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
-import {
-    Button,
-    Checkbox,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControlLabel,
-    Grid,
-    TextField,
-    Tooltip
-} from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Grid, TextField, Tooltip } from "@mui/material";
 import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
 import CircularProgress from "@mui/material/CircularProgress";
+import { DeletionConfirmationDialog } from "@/app/components/input/DeletionConfirmationDialog";
 
 function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
     return fetch("/api/v2/escape/menu/products", {
@@ -109,18 +98,23 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
                     Delete
                 </Button>
 
-                <DeletionConfirmationDialog open={ deleteDialogOpen } onClose={ () => setDeleteDialogOpen(false) }
-                                            onDelete={ () => {
-                                                setIsDeleting(true);
-                                                deleteProduct(props.product.id).then(() => {
-                                                    setIsDeleting(false);
-                                                    setDeleteDialogOpen(false);
+                <DeletionConfirmationDialog
+                    open={ deleteDialogOpen }
+                    onClose={ () => setDeleteDialogOpen(false) }
+                    onDelete={ () => {
+                        setIsDeleting(true);
+                        deleteProduct(props.product.id).then(() => {
+                            setIsDeleting(false);
+                            setDeleteDialogOpen(false);
 
-                                                    props.onUpdate();
-                                                });
-                                            } }
-                                            isDeleting={ isDeleting }
-                />
+                            props.onUpdate();
+                        });
+                    } }
+                    showSpinner={ isDeleting }
+                    title={ "Delete product?" }
+                >
+                    Are you sure you want to delete this product?
+                </DeletionConfirmationDialog>
             </Grid>
         </>
     )
@@ -353,37 +347,5 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
 
             </Grid>
         </>
-    );
-}
-
-// Dialog to confirm deletion of a product.
-function DeletionConfirmationDialog(props: {
-    open: boolean,
-    onClose: () => void, // called when "Cancel" is clicked, or the dialog is closed in any other way.
-    onDelete: () => void, // called when "Delete" is clicked.
-    isDeleting: boolean // when true, shows a spinner instead of "Delete" in the button.
-}) {
-    return (
-        <Dialog
-            open={ props.open }
-            onClose={ props.onClose }
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                Delete product?
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    Are you sure you want to delete the product?
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={ props.onClose }>Cancel</Button>
-                <Button onClick={ props.onDelete } color="error">
-                    { props.isDeleting ? <CircularProgress/> : <>Delete</> }
-                </Button>
-            </DialogActions>
-        </Dialog>
     );
 }
