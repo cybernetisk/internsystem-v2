@@ -336,7 +336,7 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
                             setIsCreating(true);
                             createProduct({
                                 ...newProduct.product,
-                                priceVolunteer: 0,
+                                priceVolunteer: newProduct.product.price, // default to price because there is no input for volunteer price yet
                                 category_id: props.categoryId
                             }).then(() => {
                                 setNewProduct(initialState);
