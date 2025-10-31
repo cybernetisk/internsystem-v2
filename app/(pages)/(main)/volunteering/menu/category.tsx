@@ -33,6 +33,12 @@ function createCategory(category: MenuCategoryCreate): Promise<Response> {
     });
 }
 
+function deleteCategory(categoryId: number): Promise<Response> {
+    return fetch(`/api/v2/escape/menu/categories/${ categoryId }`, {
+        method: "DELETE",
+    });
+}
+
 // a <Textfield> with larger text. Equivalent font-size to <h2>
 const LargeTextField = styled(TextField)({
     "& .MuiOutlinedInput-input": {
@@ -73,9 +79,9 @@ export function Category(
 
     return (
         <Stack>
-            {
+            <Grid container spacing={ 2 } columns={ 10 }>
 
-                <Stack direction="row" justifyContent="space-between">
+                <Grid item xs={ 9 }>
                     <LargeTextField
                         type="text"
                         value={ categoryName }
@@ -90,6 +96,9 @@ export function Category(
                         helperText={ categoryNameInvalid ? "Name must not be empty" : "" }
 
                     ></LargeTextField>
+                </Grid>
+
+                <Grid item xs={ 1 } display="flex" alignItems="center">
                     <Button // UPDATE button
                         disabled={ !hasBeenUpdated || categoryNameInvalid || isUpdating }
                         onClick={ () => {
@@ -105,14 +114,14 @@ export function Category(
                             });
                         }
                         }
-
                     >
                         {
                             isUpdating ? <CircularProgress/> : <>Update</> // show spinner when updating is in progress
                         }
                     </Button>
-                </Stack>
-            }
+                </Grid>
+            </Grid>
+
 
             <Grid container spacing={ 2 } columns={ 10 }>
 
