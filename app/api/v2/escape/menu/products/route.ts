@@ -36,15 +36,16 @@ export async function PATCH(
 export async function POST(
     req: NextRequest
 ) {
+    const product: MenuProductCreate = await req.json();
+
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session)
+    const authCheck = new Auth(session, product)
         .requireRoles([])
         .requireParams(["name", "hidden", "price", "volume", "glutenfree", "category_id", "priceVolunteer"]);
 
     if (authCheck.failed) return authCheck.response;
 
 
-    const product: MenuProductCreate = await req.json();
 
     await prisma.menuProduct.create({
         data: product
