@@ -8,6 +8,7 @@ import { MenuCategory } from "@prisma/client";
 import { NewProduct, Product } from "@/app/(pages)/(main)/volunteering/menu/product";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
+import { DeletionConfirmationDialog } from "@/app/components/input/DeletionConfirmationDialog";
 
 
 // Updates a given category.
@@ -66,6 +67,10 @@ export function Category(
     let [isUpdating, setIsUpdating] = useState<boolean>(false);
 
 
+    let [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+    let [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+
     useEffect(() => {
         // useEffect is always run once at the start.
         if (isFirst) {
@@ -81,7 +86,7 @@ export function Category(
         <Stack>
             <Grid container spacing={ 2 } columns={ 10 }>
 
-                <Grid item xs={ 9 }>
+                <Grid item xs={ 8 }>
                     <LargeTextField
                         type="text"
                         value={ categoryName }
@@ -120,6 +125,17 @@ export function Category(
                         }
                     </Button>
                 </Grid>
+
+                <Grid item xs={ 1 } display="flex" alignItems="center">
+                    <Button
+                        color="error"
+                        onClick={ () => {
+                            setDeleteDialogOpen(true);
+                        } }
+                    >
+                        Delete
+                    </Button>
+                </Grid>
             </Grid>
 
 
@@ -147,6 +163,21 @@ export function Category(
 
                 <NewProduct onUpdate={ props.onUpdate } categoryId={ props.category.id }></NewProduct>
             </Grid>
+
+            <DeletionConfirmationDialog
+                open={ deleteDialogOpen }
+                onClose={ () => setDeleteDialogOpen(false) }
+                onDelete={ () => {
+                    setIsDeleting(true);
+                    deleteCategory(props.category.id).then(() => {
+                        props.onUpdate();
+                    });
+                } }
+                showSpinner={ isDeleting }
+                title="Delete category?"
+            >
+                Are you sure you want to delete this category?
+            </DeletionConfirmationDialog>
         </Stack>
     )
 }
@@ -187,9 +218,7 @@ export function NewCategory(props: { onUpdate: () => void }) {
                         setIsCreating(false);
                         props.onUpdate();
                     });
-                }
-
-                }
+                } }
             >{ isCreating ? <CircularProgress/> : <>Create</> }</Button>
 
 
