@@ -12,14 +12,15 @@ import { authOptions } from "@/app/api/utils/authOptions";
 export async function PATCH(
     req: NextRequest
 ) {
+    const category: MenuCategory = await req.json();
 
     const session = await getServerSession(authOptions);
-    const authCheck: Auth = new Auth(session)
-        .requireRoles([]);
+    const authCheck: Auth = new Auth(session, category)
+        .requireRoles([])
+        .requireParams(["id"]); // only id is strictly required
 
     if (authCheck.failed) return authCheck.response;
 
-    const category: MenuCategory = await req.json();
 
     const newProduct = await prismaClient.menuCategory.update({
         where: {
@@ -37,13 +38,15 @@ export async function PATCH(
 export async function POST(
     req: NextRequest
 ) {
+    const category: MenuCategoryCreate = await req.json();
+
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session)
-        .requireRoles([]);
+    const authCheck = new Auth(session, category)
+        .requireRoles([])
+        .requireParams(["name"]);
 
     if (authCheck.failed) return authCheck.response;
 
-    const category: MenuCategoryCreate = await req.json();
 
     const newCategory = await prismaClient.menuCategory.create({
         data: category

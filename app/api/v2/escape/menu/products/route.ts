@@ -11,14 +11,15 @@ import { Auth } from "@/app/api/utils/auth";
 export async function PATCH(
     req: NextRequest
 ) {
+    const product: MenuProduct = await req.json();
+
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session)
-        .requireRoles([]);
+    const authCheck = new Auth(session, product)
+        .requireRoles([])
+        .requireParams(["id"]);
 
     if (authCheck.failed) return authCheck.response;
 
-
-    const product: MenuProduct = await req.json();
 
     const newProduct = await prismaClient.menuProduct.update({
         where: {
@@ -26,8 +27,6 @@ export async function PATCH(
         },
         data: product
     });
-
-
 
     return NextResponse.json(JSON.stringify(newProduct));
 }
@@ -39,7 +38,8 @@ export async function POST(
 ) {
     const session = await getServerSession(authOptions);
     const authCheck = new Auth(session)
-        .requireRoles([]);
+        .requireRoles([])
+        .requireParams(["name", "hidden", "price", "volume", "glutenfree", "category_id", "priceVolunteer"]);
 
     if (authCheck.failed) return authCheck.response;
 
