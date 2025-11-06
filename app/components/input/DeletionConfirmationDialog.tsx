@@ -15,7 +15,6 @@ export type DeletionConfirmationDialogProps = {
 export function DeletionConfirmationDialog(
     props: DeletionConfirmationDialogProps
 ) {
-    console.log(props)
 
     return (
         <Dialog
