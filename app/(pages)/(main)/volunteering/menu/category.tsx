@@ -186,6 +186,18 @@ export function NewCategory(props: { onUpdate: () => void }) {
     let [categoryName, setCategoryName] = useState<string>("");
     let [isCreating, setIsCreating] = useState<boolean>(false);
 
+    let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
+    let [isFirst, setIsFirst] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (isFirst) {
+            setIsFirst(false);
+            return;
+        }
+
+        setHasBeenUpdated(true);
+    }, [categoryName]);
+
 
     const invalid = categoryName.trim() === "";
     return (
@@ -201,13 +213,13 @@ export function NewCategory(props: { onUpdate: () => void }) {
                 style={ {fontSize: "3.75rem"} }
 
                 required
-                error={ invalid }
-                helperText={ invalid ? "Name must not be empty" : "" }
+                error={ invalid && hasBeenUpdated}
+                helperText={ invalid && hasBeenUpdated ? "Name must not be empty" : "" }
             ></TextField>
 
             <Button
 
-                disabled={ invalid }
+                disabled={ invalid || !hasBeenUpdated }
 
                 onClick={ () => {
                     setIsCreating(true);
