@@ -7,7 +7,6 @@ import { authOptions } from "@/app/api/utils/authOptions";
 import { MenuCategoryCreate } from "@/app/api/utils/types/MenuCategoryTypes";
 
 
-
 // Modify a category. Does not allow modifying products inside the category.
 export async function PATCH(
     req: NextRequest
@@ -21,16 +20,22 @@ export async function PATCH(
 
     if (auth.failed) return auth.response;
 
+    try {
 
-    const newProduct = await prismaClient.menuCategory.update({
-        where: {
-            id: category.id
-        },
-        data: category
-    })
+        const newProduct = await prismaClient.menuCategory.update({
+            where: {
+                id: category.id
+            },
+            data: category
+        });
 
-
-    return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
+        return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
+    } catch (e) {
+        return auth.verify(NextResponse.json(
+            {error: `something went wrong: ${ e }`},
+            {status: 500}
+        ));
+    }
 }
 
 
@@ -47,11 +52,17 @@ export async function POST(
 
     if (auth.failed) return auth.response;
 
+    try {
+        const newCategory = await prismaClient.menuCategory.create({
+            data: category
+        });
 
-    const newCategory = await prismaClient.menuCategory.create({
-        data: category
-    });
-
-    // 201 Created
-    return auth.verify(NextResponse.json(JSON.stringify(newCategory), {status: 201}));
+        // 201 Created
+        return auth.verify(NextResponse.json(JSON.stringify(newCategory), {status: 201}));
+    } catch (e) {
+        return auth.verify(NextResponse.json(
+            {error: `something went wrong: ${ e }`},
+            {status: 500}
+        ));
+    }
 }

@@ -21,15 +21,21 @@ export async function PATCH(
 
     if (auth.failed) return auth.response;
 
+    try {
+        const newProduct = await prismaClient.menuProduct.update({
+            where: {
+                id: product.id
+            },
+            data: product
+        });
 
-    const newProduct = await prismaClient.menuProduct.update({
-        where: {
-            id: product.id
-        },
-        data: product
-    });
-
-    return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
+        return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
+    } catch (e) {
+        return auth.verify(NextResponse.json(
+            {error: `something went wrong: ${ e }`},
+            {status: 500}
+        ));
+    }
 }
 
 
@@ -46,13 +52,18 @@ export async function POST(
 
     if (auth.failed) return auth.response;
 
+    try {
+        await prisma.menuProduct.create({
+            data: product
+        });
 
-
-    await prisma.menuProduct.create({
-        data: product
-    });
-
-    // 201 Created
-    return auth.verify(NextResponse.json(JSON.stringify({}), {status: 201}));
+        // 201 Created
+        return auth.verify(NextResponse.json(JSON.stringify({}), {status: 201}));
+    } catch (e) {
+        return auth.verify(NextResponse.json(
+            {error: `something went wrong: ${ e }`},
+            {status: 500}
+        ));
+    }
 }
 

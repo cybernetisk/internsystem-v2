@@ -23,22 +23,28 @@ export async function DELETE(
         return auth.verify(NextResponse.json({error: "categoryId must be an integer"}, {status: 400}));
     }
 
+    try {
+        await prisma.$transaction(async () => {
+            await prisma.menuProduct.deleteMany({
+                where: {
+                    category_id: categoryId
+                }
+            });
 
-    await prisma.$transaction(async () => {
-        await prisma.menuProduct.deleteMany({
-            where: {
-                category_id: categoryId
-            }
+            await prisma.menuCategory.delete(
+                {
+                    where: {
+                        id: categoryId,
+                    },
+                }
+            );
         });
 
-        await prisma.menuCategory.delete(
-            {
-                where: {
-                    id: categoryId,
-                },
-            }
-        );
-    });
-
-    return auth.verify(NextResponse.json({}))
+        return auth.verify(NextResponse.json({}))
+    } catch (e) {
+        return auth.verify(NextResponse.json(
+            {error: `something went wrong: ${ e }`},
+            {status: 500}
+        ));
+    }
 }

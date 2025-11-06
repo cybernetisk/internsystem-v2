@@ -38,6 +38,11 @@ export async function DELETE(
         // see https://www.prisma.io/docs/orm/reference/error-reference#p2015
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2015") {
             return auth.verify(NextResponse.json({error: "Not found"}, {status: 404}));
+        } else {
+            return auth.verify(NextResponse.json(
+                {error: `something went wrong: ${ error }`},
+                {status: 500}
+            ));
         }
     }
 
