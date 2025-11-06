@@ -200,6 +200,19 @@ export function NewCategory(props: { onUpdate: () => void }) {
 
 
     const invalid = categoryName.trim() === "";
+
+    // called when user clicks the CREATE button
+    const createNewCategory = () => {
+        setIsCreating(true);
+        createCategory(
+            {name: categoryName}
+        ).then(() => {
+            setCategoryName("");
+            setIsCreating(false);
+            props.onUpdate();
+        });
+    };
+
     return (
         <Stack justifyContent="space-between" spacing={ 2 }>
             <Typography variant="h3">New Category</Typography>
@@ -221,16 +234,7 @@ export function NewCategory(props: { onUpdate: () => void }) {
 
                 disabled={ invalid || !hasBeenUpdated }
 
-                onClick={ () => {
-                    setIsCreating(true);
-                    createCategory(
-                        {name: categoryName}
-                    ).then(() => {
-                        setCategoryName("");
-                        setIsCreating(false);
-                        props.onUpdate();
-                    });
-                } }
+                onClick={ createNewCategory }
             >{ isCreating ? <CircularProgress/> : <>Create</> }</Button>
 
 
