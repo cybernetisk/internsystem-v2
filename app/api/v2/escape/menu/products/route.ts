@@ -14,11 +14,11 @@ export async function PATCH(
     const product: MenuProduct = await req.json();
 
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session, product)
+    const auth = new Auth(session, product)
         .requireRoles([])
         .requireParams(["id"]);
 
-    if (authCheck.failed) return authCheck.response;
+    if (auth.failed) return auth.response;
 
 
     const newProduct = await prismaClient.menuProduct.update({
@@ -28,7 +28,7 @@ export async function PATCH(
         data: product
     });
 
-    return authCheck.verify(NextResponse.json(JSON.stringify(newProduct)));
+    return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
 }
 
 
@@ -39,11 +39,11 @@ export async function POST(
     const product: MenuProductCreate = await req.json();
 
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session, product)
+    const auth = new Auth(session, product)
         .requireRoles([])
         .requireParams(["name", "hidden", "price", "volume", "glutenfree", "category_id", "priceVolunteer"]);
 
-    if (authCheck.failed) return authCheck.response;
+    if (auth.failed) return auth.response;
 
 
 
@@ -51,7 +51,7 @@ export async function POST(
         data: product
     });
 
-    return authCheck.verify(NextResponse.json(JSON.stringify({})));
+    return auth.verify(NextResponse.json(JSON.stringify({})));
 }
 
 const menuCategoryWithProducts = Prisma.validator<Prisma.MenuCategoryDefaultArgs>()({include: {menu_products: true}})

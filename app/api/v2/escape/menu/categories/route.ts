@@ -15,11 +15,11 @@ export async function PATCH(
     const category: MenuCategory = await req.json();
 
     const session = await getServerSession(authOptions);
-    const authCheck: Auth = new Auth(session, category)
+    const auth: Auth = new Auth(session, category)
         .requireRoles([])
         .requireParams(["id"]); // only id is strictly required
 
-    if (authCheck.failed) return authCheck.response;
+    if (auth.failed) return auth.response;
 
 
     const newProduct = await prismaClient.menuCategory.update({
@@ -30,7 +30,7 @@ export async function PATCH(
     })
 
 
-    return authCheck.verify(NextResponse.json(JSON.stringify(newProduct)));
+    return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
 }
 
 
@@ -41,16 +41,16 @@ export async function POST(
     const category: MenuCategoryCreate = await req.json();
 
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session, category)
+    const auth = new Auth(session, category)
         .requireRoles([])
         .requireParams(["name"]);
 
-    if (authCheck.failed) return authCheck.response;
+    if (auth.failed) return auth.response;
 
 
     const newCategory = await prismaClient.menuCategory.create({
         data: category
     });
 
-    return authCheck.verify(NextResponse.json(JSON.stringify(newCategory)));
+    return auth.verify(NextResponse.json(JSON.stringify(newCategory)));
 }

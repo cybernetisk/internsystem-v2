@@ -14,13 +14,13 @@ export async function DELETE(
     let params = await context.params;
 
     const session = await getServerSession(authOptions);
-    const authCheck = new Auth(session, params)
+    const auth = new Auth(session, params)
         .requireRoles([])
         .requireParams(["productId"]);
 
     const productId = Number(params.productId);
 
-    if (authCheck.failed) return authCheck.response;
+    if (auth.failed) return auth.response;
 
     // verify productId is an integer
     if (isNaN(productId) || !productId) {
@@ -41,5 +41,5 @@ export async function DELETE(
         }
     }
 
-    return authCheck.verify(NextResponse.json(JSON.stringify({})));
+    return auth.verify(NextResponse.json(JSON.stringify({})));
 }
