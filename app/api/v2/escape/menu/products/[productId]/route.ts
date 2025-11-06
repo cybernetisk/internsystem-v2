@@ -24,7 +24,7 @@ export async function DELETE(
 
     // verify productId is an integer
     if (isNaN(productId) || !productId) {
-        return NextResponse.json({error: "productId must be an integer"}, {status: 400});
+        return auth.verify(NextResponse.json({error: "productId must be an integer"}, {status: 400}));
     }
 
     try {
@@ -37,7 +37,7 @@ export async function DELETE(
         // error code P2015 means no product with the provided id exists
         // see https://www.prisma.io/docs/orm/reference/error-reference#p2015
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2015") {
-            return NextResponse.json({error: "Not found"}, {status: 404});
+            return auth.verify(NextResponse.json({error: "Not found"}, {status: 404}));
         }
     }
 
