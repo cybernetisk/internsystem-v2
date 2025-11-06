@@ -40,5 +40,5 @@ export async function DELETE(
         );
     });
 
-    return NextResponse.json({})
+    return auth.verify(NextResponse.json({}))
 }

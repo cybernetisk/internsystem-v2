@@ -41,5 +41,5 @@ export async function DELETE(
         }
     }
 
-    return NextResponse.json(JSON.stringify({}));
+    return authCheck.verify(NextResponse.json(JSON.stringify({})));
 }

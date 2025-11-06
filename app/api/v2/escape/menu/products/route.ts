@@ -28,7 +28,7 @@ export async function PATCH(
         data: product
     });
 
-    return NextResponse.json(JSON.stringify(newProduct));
+    return authCheck.verify(NextResponse.json(JSON.stringify(newProduct)));
 }
 
 
@@ -51,7 +51,7 @@ export async function POST(
         data: product
     });
 
-    return NextResponse.json(JSON.stringify({}));
+    return authCheck.verify(NextResponse.json(JSON.stringify({})));
 }
 
 const menuCategoryWithProducts = Prisma.validator<Prisma.MenuCategoryDefaultArgs>()({include: {menu_products: true}})

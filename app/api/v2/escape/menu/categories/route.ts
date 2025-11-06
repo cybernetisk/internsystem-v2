@@ -30,7 +30,7 @@ export async function PATCH(
     })
 
 
-    return NextResponse.json(JSON.stringify(newProduct));
+    return authCheck.verify(NextResponse.json(JSON.stringify(newProduct)));
 }
 
 
@@ -52,5 +52,5 @@ export async function POST(
         data: category
     });
 
-    return NextResponse.json(JSON.stringify(newCategory));
+    return authCheck.verify(NextResponse.json(JSON.stringify(newCategory)));
 }
