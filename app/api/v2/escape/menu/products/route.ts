@@ -15,7 +15,7 @@ export async function PATCH(
 
     const session = await getServerSession(authOptions);
     const auth = new Auth(session, product)
-        .requireRoles([])
+        .requireRoles(["admin"])
         .requireParams(["id"]);
 
     if (auth.failed) return auth.response;
@@ -40,7 +40,7 @@ export async function POST(
 
     const session = await getServerSession(authOptions);
     const auth = new Auth(session, product)
-        .requireRoles([])
+        .requireRoles(["admin"])
         .requireParams(["name", "hidden", "price", "volume", "glutenfree", "category_id", "priceVolunteer"]);
 
     if (auth.failed) return auth.response;

@@ -12,7 +12,7 @@ export async function DELETE(
 
     let session = await getServerSession(authOptions);
     let auth = new Auth(session, params)
-        .requireRoles([])
+        .requireRoles(["admin"])
         .requireParams(["categoryId"]);
 
     if (auth.failed) return auth.response;

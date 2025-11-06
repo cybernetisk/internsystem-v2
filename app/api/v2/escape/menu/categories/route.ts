@@ -16,7 +16,7 @@ export async function PATCH(
 
     const session = await getServerSession(authOptions);
     const auth: Auth = new Auth(session, category)
-        .requireRoles([])
+        .requireRoles(["admin"])
         .requireParams(["id"]); // only id is strictly required
 
     if (auth.failed) return auth.response;
@@ -42,7 +42,7 @@ export async function POST(
 
     const session = await getServerSession(authOptions);
     const auth = new Auth(session, category)
-        .requireRoles([])
+        .requireRoles(["admin"])
         .requireParams(["name"]);
 
     if (auth.failed) return auth.response;
