@@ -24,14 +24,14 @@ export async function DELETE(
     }
 
     try {
-        await prisma.$transaction(async () => {
-            await prisma.menuProduct.deleteMany({
+        await prisma.$transaction(async transaction => {
+            await transaction.menuProduct.deleteMany({
                 where: {
                     category_id: categoryId
                 }
             });
 
-            await prisma.menuCategory.delete(
+            await transaction.menuCategory.delete(
                 {
                     where: {
                         id: categoryId,
