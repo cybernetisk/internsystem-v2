@@ -20,7 +20,7 @@ export async function DELETE(
     let categoryId = Number(params.categoryId);
     // verify productId is an integer
     if (isNaN(categoryId) || !categoryId) {
-        return NextResponse.json({error: "categoryId must be an integer"}, {status: 400});
+        return auth.verify(NextResponse.json({error: "categoryId must be an integer"}, {status: 400}));
     }
 
 
