@@ -51,7 +51,8 @@ export async function POST(
         data: product
     });
 
-    return auth.verify(NextResponse.json(JSON.stringify({})));
+    // 201 Created
+    return auth.verify(NextResponse.json(JSON.stringify({}), {status: 201}));
 }
 
 const menuCategoryWithProducts = Prisma.validator<Prisma.MenuCategoryDefaultArgs>()({include: {menu_products: true}})

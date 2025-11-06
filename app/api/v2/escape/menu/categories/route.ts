@@ -52,5 +52,6 @@ export async function POST(
         data: category
     });
 
-    return auth.verify(NextResponse.json(JSON.stringify(newCategory)));
+    // 201 Created
+    return auth.verify(NextResponse.json(JSON.stringify(newCategory), {status: 201}));
 }
