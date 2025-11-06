@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MenuCategory } from "@prisma/client";
 import prismaClient from "@/prisma/prismaClient";
-import { MenuCategoryCreate } from "@/app/api/v2/escape/menu/products/route";
 import { getServerSession } from "next-auth";
 import { Auth } from "@/app/api/utils/auth";
 import { authOptions } from "@/app/api/utils/authOptions";
+import { MenuCategoryCreate } from "@/app/api/utils/types/MenuCategoryTypes";
 
 
 

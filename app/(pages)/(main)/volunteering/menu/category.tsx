@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Button, Grid, Input, Stack, TextField, Typography } from "@mui/material";
-import { MenuCategoryCreate, MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
 import { MenuCategory } from "@prisma/client";
 
 import { NewProduct, Product } from "@/app/(pages)/(main)/volunteering/menu/product";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import { DeletionConfirmationDialog } from "@/app/components/input/DeletionConfirmationDialog";
+import { MenuCategoryCreate, MenuCategoryWithProducts } from "@/app/api/utils/types/MenuCategoryTypes";
 
 
 // Updates a given category.

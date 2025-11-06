@@ -2,9 +2,9 @@
 
 import { Stack } from "@mui/material";
 import { useEffect, useState } from "react";
-import { MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
 import authWrapper from "@/app/middleware/authWrapper";
 import { Category, NewCategory } from "@/app/(pages)/(main)/volunteering/menu/category";
+import { MenuCategoryWithProducts } from "@/app/api/utils/types/MenuCategoryTypes";
 
 // require login
 export default authWrapper(MenuEditPage);

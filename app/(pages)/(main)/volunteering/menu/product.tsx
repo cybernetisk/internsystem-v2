@@ -1,9 +1,9 @@
 import { MenuProduct } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Button, Checkbox, FormControlLabel, Grid, TextField, Tooltip } from "@mui/material";
-import { MenuProductCreate } from "@/app/api/v2/escape/menu/products/route";
 import CircularProgress from "@mui/material/CircularProgress";
 import { DeletionConfirmationDialog } from "@/app/components/input/DeletionConfirmationDialog";
+import { MenuProductCreate } from "@/app/api/utils/types/MenuProductTypes";
 
 function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
     return fetch("/api/v2/escape/menu/products", {

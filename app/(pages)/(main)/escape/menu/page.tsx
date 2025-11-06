@@ -1,7 +1,7 @@
 import { Divider, Grid, Stack, Typography } from "@mui/material";
-import { MenuCategoryWithProducts } from "@/app/api/v2/escape/menu/products/route";
 import { MenuProduct } from "@prisma/client";
 import prisma from "@/prisma/prismaClient";
+import { MenuCategoryWithProducts } from "@/app/api/utils/types/MenuCategoryTypes";
 
 
 export default async function EscapeMenu() {

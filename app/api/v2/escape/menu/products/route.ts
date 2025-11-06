@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import prismaClient from "@/prisma/prismaClient";
-import { MenuProduct, Prisma } from "@prisma/client";
+import { MenuProduct } from "@prisma/client";
 import { authOptions } from "@/app/api/utils/authOptions";
 import { getServerSession } from "next-auth";
 import { Auth } from "@/app/api/utils/auth";
+import { MenuProductCreate } from "@/app/api/utils/types/MenuProductTypes";
 
 
 // Modify a product. Modifies the product based on the id in the request body.
@@ -55,9 +56,3 @@ export async function POST(
     return auth.verify(NextResponse.json(JSON.stringify({}), {status: 201}));
 }
 
-const menuCategoryWithProducts = Prisma.validator<Prisma.MenuCategoryDefaultArgs>()({include: {menu_products: true}})
-export type MenuCategoryWithProducts = Prisma.MenuCategoryGetPayload<typeof menuCategoryWithProducts>
-
-// Some utility types.
-export type MenuProductCreate = Prisma.MenuProductCreateArgs["data"]
-export type MenuCategoryCreate = Prisma.MenuCategoryCreateArgs["data"]
