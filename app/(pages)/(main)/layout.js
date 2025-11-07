@@ -3,7 +3,7 @@
 
 import "./../../globals.css";
 
-import { EmojiPeople, Groups, Home } from "@mui/icons-material";
+import { EmojiPeople, Groups, Home, MenuBook } from "@mui/icons-material";
 import {
   Box,
   CssBaseline,
@@ -26,10 +26,11 @@ const NavItems = [
     name: "Volunteering",
     icon: <EmojiPeople />,
   },
+  {id: "escape/menu", path: "escape/menu", name: "Menu", icon: <MenuBook/>}
 ];
 
 export default function AppLayout({ children }) {
-  
+
   const pathname = usePathname();
 
   return (
@@ -61,7 +62,7 @@ export default function AppLayout({ children }) {
               }}
             >
               <Container sx={{ mb: 3 }}>
-                <SessionProvider 
+                <SessionProvider
                 basePath="/api/v2/auth"
                 refetchOnWindowFocus={false}
                 >{children}</SessionProvider>
