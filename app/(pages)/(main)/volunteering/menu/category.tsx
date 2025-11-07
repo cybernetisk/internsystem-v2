@@ -209,6 +209,8 @@ export function NewCategory(props: { onUpdate: () => void }) {
         ).then(() => {
             setCategoryName("");
             setIsCreating(false);
+            setIsFirst(true);
+            setHasBeenUpdated(false);
             props.onUpdate();
         });
     };
