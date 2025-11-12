@@ -44,7 +44,7 @@ function Category(props: {
         <Stack>
             <Typography variant="h4">{ category.name }</Typography>
 
-            <Grid container rowSpacing={ 1 } columns={ 10 } paddingLeft={ {md: 4, xs: 0} }>
+            <Grid container rowSpacing={1} columnSpacing={2} columns={ 10 } paddingLeft={ {md: 4, xs: 0} }>
 
                 {
                     category.menu_products.map((item) => (
@@ -69,7 +69,7 @@ function Product(
     return (
         <>
             <Grid item xs={ 6 } md={ 8 }>
-                <Typography>
+                <Typography style={{overflowWrap: "anywhere", hyphens: "auto"}}>
                     { product.name }
 
                     { product.glutenfree ? <sup> (Gluten-free)</sup> : <></> }
