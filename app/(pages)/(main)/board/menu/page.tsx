@@ -3,7 +3,7 @@
 import { Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import authWrapper from "@/app/middleware/authWrapper";
-import { Category, NewCategory } from "@/app/(pages)/(main)/volunteering/menu/category";
+import { Category, NewCategory } from "@/app/(pages)/(main)/board/menu/category";
 import { MenuCategoryWithProducts } from "@/app/api/utils/types/MenuCategoryTypes";
 
 // require login

@@ -25,7 +25,6 @@ const BUTTON_CONTENT_1 = [
   // { title: "Café shifts", path: "/volunteering/cafe" },
   { title: "Vouchers", path: "/volunteering/logs" },
   { title: "Membership", path: "/volunteering/membership" },
-  { title: "Menu", path: "/volunteering/menu" },
   { title: "Website content", path: "/studio" },
 ];
 

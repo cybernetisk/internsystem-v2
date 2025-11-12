@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button, Grid, Input, Stack, TextField, Typography } from "@mui/material";
 import { MenuCategory } from "@prisma/client";
 
-import { NewProduct, Product } from "@/app/(pages)/(main)/volunteering/menu/product";
+import { NewProduct, Product } from "@/app/(pages)/(main)/board/menu/product";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import { DeletionConfirmationDialog } from "@/app/components/input/DeletionConfirmationDialog";
