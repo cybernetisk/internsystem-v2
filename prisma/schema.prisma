@@ -244,14 +244,14 @@ model ActivateToken {
 }
 
 model Voucher {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   usedAt         DateTime?
   workLogEntryId String
-  loggedDate     DateTime @db.Timestamp(0)
-  expirationDate DateTime @db.Timestamp(0)
+  loggedDate     DateTime  @db.Timestamp(0)
+  expirationDate DateTime  @db.Timestamp(0)
   userId         String
-  workLogEntry   WorkLog  @relation(fields: [workLogEntryId], references: [id], onDelete: Cascade)
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workLogEntry   WorkLog   @relation(fields: [workLogEntryId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([workLogEntryId], map: "Voucher_workLogEntryId_fkey")
   @@index([userId], map: "Voucher_userId_fkey")
@@ -369,15 +369,22 @@ model ShiftCafe {
   @@index([shiftManager], map: "ShiftCafe_shiftWorker_User_idx")
 }
 
+model MenuCategory {
+  id            Int           @id @default(autoincrement())
+  name          String        @db.VarChar(45)
+  menu_products MenuProduct[] @relation("MenuProduct_category")
+}
+
 model MenuProduct {
-  id             Int     @id
-  name           String  @db.VarChar(45)
-  volume         Float   @db.Float
+  id             Int           @id @default(autoincrement())
+  name           String        @db.VarChar(45)
+  volume         Float         @db.Float
   price          Int
   priceVolunteer Int
-  glutenfree     Int     @db.TinyInt
-  active         Int?    @default(1) @db.TinyInt
-  category       String? @db.VarChar(45)
+  glutenfree     Boolean
+  hidden         Boolean       @default(false)
+  category_id    Int
+  category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
 }
 
 model old_users {
