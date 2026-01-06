@@ -110,7 +110,7 @@ function NavElementLargeScreen(item, index, currentPath) {
               key={`link_nav${index}_itemtext`}
               sx={{
                 color:
-                  currentPath == `/${item.path}`
+                  currentPath === `/${item.path}`
                     ? cybTheme.palette.primary.main
                     : cybTheme.palette.text.primary,
               }}
@@ -157,13 +157,15 @@ function NavElementSmallScreen(item, index, iconProps, currentPath) {
                 key={`link_snav${index}_itemtext`}
                 sx={{
                   color:
-                    currentPath == `/${item.path}`
+                    currentPath === `/${item.path}`
                       ? cybTheme.palette.primary.main
                       : cybTheme.palette.text.primary,
+                    textAlign: "center"
                 }}
+
                 primary={
                   <Typography key={`link_snav${index}_typography`} variant="caption">
-                    {item.name == "About CYB" ? "About" : item.name}
+                    {item.name === "About CYB" ? "About" : item.name}
                   </Typography>
                 }
               />
