@@ -7,7 +7,7 @@ import { Category, NewCategory } from "@/app/(pages)/(main)/board/menu/category"
 import { MenuCategoryWithProducts } from "@/app/api/utils/types/MenuCategoryTypes";
 
 // require login
-export default authWrapper(MenuEditPage, "admin");
+export default authWrapper(MenuEditPage, "board");
 
 function MenuEditPage() {
     const [menuCategories, setMenuCategories] = useState<MenuCategoryWithProducts[]>([]);
