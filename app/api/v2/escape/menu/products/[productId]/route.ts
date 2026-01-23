@@ -15,7 +15,7 @@ export async function DELETE(
 
     const session = await getServerSession(authOptions);
     const auth = new Auth(session, params)
-        .requireRoles(["admin"])
+        .requireRoles(["board"])
         .requireParams(["productId"]);
 
     const productId = Number(params.productId);
