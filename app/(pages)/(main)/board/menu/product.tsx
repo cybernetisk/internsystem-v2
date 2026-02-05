@@ -1,11 +1,11 @@
-import { MenuProduct } from "@prisma/client";
-import { useEffect, useState } from "react";
-import { Button, Checkbox, FormControlLabel, Grid, TextField, Tooltip } from "@mui/material";
+import {MenuProduct} from "@prisma/client";
+import {useEffect, useState} from "react";
+import {Button, Checkbox, FormControlLabel, Grid, Stack, TextField, Tooltip} from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { DeletionConfirmationDialog } from "@/app/components/input/DeletionConfirmationDialog";
-import { MenuProductCreate } from "@/app/api/utils/types/MenuProductTypes";
+import {DeletionConfirmationDialog} from "@/app/components/input/DeletionConfirmationDialog";
+import {MenuProductCreate} from "@/app/api/utils/types/MenuProductTypes";
 
-function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
+export function updateProduct(product: MenuProduct, newAttributes: Partial<MenuProduct>): Promise<Response> {
     return fetch("/api/v2/escape/menu/products", {
         method: "PATCH",
         headers: {
@@ -26,7 +26,7 @@ function createProduct(product: MenuProductCreate): Promise<Response> {
 }
 
 function deleteProduct(productId: number): Promise<Response> {
-    return fetch(`/api/v2/escape/menu/products/${ productId }`, {
+    return fetch(`/api/v2/escape/menu/products/${productId}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -34,7 +34,7 @@ function deleteProduct(productId: number): Promise<Response> {
     });
 }
 
-export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
+export function Product(props: { product: MenuProduct, onUpdate: () => void, onMove: (direction: "up" | "down") => void }) {
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
     let [isFirst, setIsFirst] = useState<boolean>(true);
 
@@ -67,41 +67,47 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
     return (
 
         <>
-            { /* shared inputs */ }
-            <ProductInputs state={ newProduct } onUpdate={ value => {
+            <Grid item xs={1}>
+                <Stack direction="column">
+                    <Button onClick={() => props.onMove("up")}>Up</Button>
+                    <Button onClick={() => props.onMove("down")}>Down</Button>
+                </Stack>
+            </Grid>
+            { /* shared inputs */}
+            <ProductInputs state={newProduct} onUpdate={value => {
                 setValid(value.valid.allValid);
                 setNewProduct(value);
-            } }></ProductInputs>
+            }}></ProductInputs>
 
-            <Grid item xs={ 1 }>
+            <Grid item xs={1}>
                 <Button
-                    disabled={ !valid || !hasBeenUpdated || isUpdating }
-                    onClick={ () => {
+                    disabled={!valid || !hasBeenUpdated || isUpdating}
+                    onClick={() => {
                         setIsUpdating(true);
                         updateProduct(props.product, newProduct.product).then(() => {
                             setIsUpdating(false);
                             setHasBeenUpdated(false);
                             props.onUpdate();
                         })
-                    } }
+                    }}
 
-                >{ isUpdating ? <CircularProgress/> : <>Update</> }</Button>
+                >{isUpdating ? <CircularProgress/> : <>Update</>}</Button>
             </Grid>
 
-            <Grid item xs={ 1 }>
+            <Grid item xs={1}>
 
                 <Button
                     color="error"
-                    disabled={ isUpdating }
-                    onClick={ () => setDeleteDialogOpen(true) }
+                    disabled={isUpdating}
+                    onClick={() => setDeleteDialogOpen(true)}
                 >
                     Delete
                 </Button>
 
                 <DeletionConfirmationDialog
-                    open={ deleteDialogOpen }
-                    onClose={ () => setDeleteDialogOpen(false) }
-                    onDelete={ () => {
+                    open={deleteDialogOpen}
+                    onClose={() => setDeleteDialogOpen(false)}
+                    onDelete={() => {
                         setIsDeleting(true);
                         deleteProduct(props.product.id).then(() => {
                             setIsDeleting(false);
@@ -109,9 +115,9 @@ export function Product(props: { product: MenuProduct, onUpdate: () => void }) {
 
                             props.onUpdate();
                         });
-                    } }
-                    showSpinner={ isDeleting }
-                    title={ "Delete product?" }
+                    }}
+                    showSpinner={isDeleting}
+                    title={"Delete product?"}
                 >
                     Are you sure you want to delete this product?
                 </DeletionConfirmationDialog>
@@ -167,11 +173,11 @@ function ProductInputs(
 
     return (
         <>
-            <Grid item xs={ 2 }>
+            <Grid item xs={2}>
                 <TextField
                     type="text"
-                    value={ product.name }
-                    onChange={ e => { // all the inputs here are essentially the same.
+                    value={product.name}
+                    onChange={e => { // all the inputs here are essentially the same.
                         const newProduct = {...product, name: e.target.value}; // create new product.
                         props.onUpdate( // propagate upwards.
                             {
@@ -179,23 +185,23 @@ function ProductInputs(
                                 product: newProduct
                             }
                         );
-                    } }
+                    }}
 
                     label="Product Name"
                     placeholder="Product Name"
 
 
-                    error={ !props.state.valid.name && validateInputs }
-                    helperText={ !props.state.valid.name && validateInputs ? "Name must be set" : "" }
+                    error={!props.state.valid.name && validateInputs}
+                    helperText={!props.state.valid.name && validateInputs ? "Name must be set" : ""}
                 ></TextField>
             </Grid>
 
 
-            <Grid item xs={ 2 }>
+            <Grid item xs={2}>
                 <TextField
                     type="number"
-                    value={ product.price }
-                    onChange={ e => {
+                    value={product.price}
+                    onChange={e => {
                         const newProduct = {...product, price: Number(e.target.value)};
                         props.onUpdate(
                             {
@@ -203,20 +209,20 @@ function ProductInputs(
                                 product: newProduct
                             }
                         );
-                    } }
+                    }}
 
                     placeholder="Product Price"
                     label="Product Price"
-                    error={ !props.state.valid.price && validateInputs }
-                    helperText={ !props.state.valid.price && validateInputs ? "Price must be greater than 0" : "" }
+                    error={!props.state.valid.price && validateInputs}
+                    helperText={!props.state.valid.price && validateInputs ? "Price must be greater than 0" : ""}
                 ></TextField>
             </Grid>
 
-            <Grid item xs={ 2 }>
+            <Grid item xs={2}>
                 <TextField
                     type="number"
-                    value={ product.volume }
-                    onChange={ e => {
+                    value={product.volume}
+                    onChange={e => {
                         const newProduct = {...product, volume: Number(e.target.value)};
                         props.onUpdate(
                             {
@@ -224,23 +230,23 @@ function ProductInputs(
                                 product: newProduct
                             }
                         );
-                    } }
+                    }}
 
                     label="Volume (cL)"
                     placeholder="Volume (cL)"
 
-                    error={ !props.state.valid.volume && validateInputs }
-                    helperText={ !props.state.valid.volume && validateInputs ? "Volume must be greater than 0" : "" }
+                    error={!props.state.valid.volume && validateInputs}
+                    helperText={!props.state.valid.volume && validateInputs ? "Volume must be greater than 0" : ""}
                 ></TextField>
             </Grid>
 
-            <Grid item xs={ 1 } display="flex" justifyContent="center" alignItems="center">
+            <Grid item xs={1} display="flex" justifyContent="center" alignItems="center">
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={ product.glutenfree }
+                            checked={product.glutenfree}
 
-                            onChange={ e => {
+                            onChange={e => {
                                 const newProduct = {...product, glutenfree: e.target.checked};
                                 props.onUpdate(
                                     {
@@ -248,21 +254,21 @@ function ProductInputs(
                                         product: newProduct
                                     }
                                 );
-                            } }
+                            }}
                         />
                     }
-                    label={ "Gluten-free" }
+                    label={"Gluten-free"}
                 />
             </Grid>
 
-            <Grid item xs={ 1 } display="flex" justifyContent="center" alignItems="center">
+            <Grid item xs={1} display="flex" justifyContent="center" alignItems="center">
                 <Tooltip title="If this is checked, the item is hidden from the menu.">
                     <FormControlLabel
                         control={
                             <Checkbox
-                                checked={ product.hidden }
+                                checked={product.hidden}
 
-                                onChange={ e => {
+                                onChange={e => {
                                     const newProduct = {...product, hidden: e.target.checked};
                                     props.onUpdate(
                                         {
@@ -270,7 +276,7 @@ function ProductInputs(
                                             product: newProduct
                                         }
                                     );
-                                } }
+                                }}
                             />
                         }
                         label="Hidden"
@@ -319,14 +325,14 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
 
     return (
         <>
-            <ProductInputs validateInputs={ hasBeenUpdated } state={ newProduct } onUpdate={ (value) => {
+            <ProductInputs validateInputs={hasBeenUpdated} state={newProduct} onUpdate={(value) => {
                 setNewProduct(value);
 
-            } }/>
+            }}/>
 
-            <Grid item xs={ 1 }>
-                <Button disabled={ !newProduct.valid.allValid || isCreating }
-                        onClick={ () => {
+            <Grid item xs={1}>
+                <Button disabled={!newProduct.valid.allValid || isCreating}
+                        onClick={() => {
                             setIsCreating(true);
                             createProduct({
                                 ...newProduct.product,
@@ -341,9 +347,9 @@ export function NewProduct(props: { onUpdate: () => void, categoryId: number | n
                                 props.onUpdate();
                             });
 
-                        } }
+                        }}
 
-                >{ isCreating ? <CircularProgress/> : <>Create</> }</Button>
+                >{isCreating ? <CircularProgress/> : <>Create</>}</Button>
 
             </Grid>
         </>
