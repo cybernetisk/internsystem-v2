@@ -34,7 +34,24 @@ function deleteProduct(productId: number): Promise<Response> {
     });
 }
 
-export function Product(props: { product: MenuProduct, onUpdate: () => void, onMove: (direction: "up" | "down") => void }) {
+export function swapProductOrder(swapId: number, withId: number): Promise<Response> {
+    return fetch(`/api/v2/escape/menu/products/ordering`, {
+        method: "PATCH",
+        body: JSON.stringify({
+            swapId,
+            withId
+        }),
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+}
+
+export function Product(props: {
+    product: MenuProduct,
+    onUpdate: () => void,
+    onMove: (direction: "up" | "down") => void
+}) {
     let [hasBeenUpdated, setHasBeenUpdated] = useState<boolean>(false);
     let [isFirst, setIsFirst] = useState<boolean>(true);
 

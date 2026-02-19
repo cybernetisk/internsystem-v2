@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {Button, Grid, Stack, TextField, Typography} from "@mui/material";
 import {MenuCategory} from "@prisma/client";
 
-import {NewProduct, Product, updateProduct} from "@/app/(pages)/(main)/board/menu/product";
+import {NewProduct, Product, swapProductOrder, updateProduct} from "@/app/(pages)/(main)/board/menu/product";
 import {styled} from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import {DeletionConfirmationDialog} from "@/app/components/input/DeletionConfirmationDialog";
@@ -165,14 +165,10 @@ export function Category(
                                         let toSwapWith = props.category.menu_products[index + delta];
                                         if (!toSwapWith)
                                             return;
-
-                                        updateProduct(item, {ordering: toSwapWith.ordering}).then(
-                                            () => {
-                                                updateProduct(toSwapWith, {ordering: item.ordering}).then(() => {
-                                                    props.onUpdate();
-                                                })
-                                            }
-                                        )
+                                        swapProductOrder(item.id, toSwapWith.id)
+                                            .then(() => {
+                                                props.onUpdate();
+                                            });
                                     }
                                 }
                             ></Product>
