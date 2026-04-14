@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -14,7 +14,7 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "Session_userId_fkey")
+  // @@index([userId], map: "Session_userId_fkey")
 }
 
 model VerificationToken {
@@ -50,7 +50,7 @@ model User {
   Voucher                                Voucher[]
   VoucherBuffer                          VoucherBuffer[]
 
-  @@index([recruitedById], map: "recruitedById_idx")
+  // @@index([recruitedById], map: "recruitedById_idx")
 }
 
 model Role {
@@ -69,7 +69,7 @@ model UserRole {
   user   User   @relation(fields: [userId], references: [id])
 
   @@unique([userId, roleId])
-  @@index([roleId], map: "UserRole_roleId_fkey")
+  // @@index([roleId], map: "UserRole_roleId_fkey")
 }
 
 model WorkGroup {
@@ -78,157 +78,6 @@ model WorkGroup {
   leaderTitle     String            @db.VarChar(45)
   description     String
   UserToWorkGroup UserToWorkGroup[]
-}
-
-model varer_konto {
-  id                       Int               @id
-  innkjopskonto            Int               @db.SmallInt
-  varelagerkonto           Int               @db.SmallInt
-  beholdningsendringskonto Int               @db.SmallInt
-  salgskonto               Int               @db.SmallInt
-  navn                     String            @db.VarChar(30)
-  gruppe                   String            @db.VarChar(20)
-  kommentar                String?           @db.Text
-  varer_raavare            varer_raavare[]
-  varer_salgsvare          varer_salgsvare[]
-}
-
-model varer_leverandor {
-  id                Int                 @id
-  navn              String              @db.VarChar(100)
-  kommentar         String?             @db.Text
-  varer_raavarepris varer_raavarepris[]
-}
-
-model varer_raavare {
-  id                     Int                      @id
-  kategori               String?                  @db.VarChar(50)
-  navn                   String                   @db.VarChar(100)
-  mengde                 Float
-  mengde_svinn           Float
-  enhet                  String                   @db.VarChar(20)
-  innkjopskonto_id       Int
-  status                 String                   @db.VarChar(10)
-  lenket_salgsvare_id    Int?
-  antall                 Float
-  type                   String?                  @db.VarChar(20)
-  varer_konto            varer_konto              @relation(fields: [innkjopskonto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavare_ibfk_1")
-  varer_salgsvare        varer_salgsvare?         @relation(fields: [lenket_salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavare_ibfk_2")
-  varer_raavarepris      varer_raavarepris[]
-  varer_salgsvareraavare varer_salgsvareraavare[]
-  varer_varetellingvare  varer_varetellingvare[]
-
-  @@index([innkjopskonto_id], map: "innkjopskonto_id")
-  @@index([lenket_salgsvare_id], map: "lenket_salgsvare_id")
-}
-
-model varer_raavarepris {
-  id               Int               @id
-  bestillingskode  String?           @db.VarChar(30)
-  pris             Float
-  dato             DateTime          @db.Date
-  leverandor_id    Int?
-  raavare_id       Int
-  pant             Float
-  aktiv            Boolean
-  type             String            @db.VarChar(10)
-  antall           Int
-  varer_leverandor varer_leverandor? @relation(fields: [leverandor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavarepris_ibfk_1")
-  varer_raavare    varer_raavare     @relation(fields: [raavare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_raavarepris_ibfk_2")
-
-  @@index([leverandor_id], map: "leverandor_id")
-  @@index([raavare_id], map: "raavare_id")
-}
-
-model varer_salgskalkyle {
-  id                     Int                      @id
-  navn                   String                   @db.VarChar(30)
-  kommentar              String?                  @db.Text
-  dato                   DateTime                 @db.Date
-  varer_salgskalkylevare varer_salgskalkylevare[]
-}
-
-model varer_salgskalkylevare {
-  id                 Int                @id
-  interngrad         Float?
-  antall             Int
-  kalkyle_id         Int
-  salgsvare_id       Int
-  varer_salgskalkyle varer_salgskalkyle @relation(fields: [kalkyle_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgskalkylevare_ibfk_1")
-  varer_salgsvare    varer_salgsvare    @relation(fields: [salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgskalkylevare_ibfk_2")
-
-  @@index([kalkyle_id], map: "kalkyle_id")
-  @@index([salgsvare_id], map: "salgsvare_id")
-}
-
-model varer_salgsvare {
-  id                     Int                      @id
-  kategori               String?                  @db.VarChar(50)
-  navn                   String                   @db.VarChar(100)
-  salgskonto_id          Int
-  status                 String                   @db.VarChar(10)
-  kassenr                Int?                     @db.SmallInt
-  kassenavn              String?                  @db.VarChar(25)
-  varer_raavare          varer_raavare[]
-  varer_salgskalkylevare varer_salgskalkylevare[]
-  varer_konto            varer_konto              @relation(fields: [salgskonto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvare_ibfk_1")
-  varer_salgsvarepris    varer_salgsvarepris[]
-  varer_salgsvareraavare varer_salgsvareraavare[]
-
-  @@index([salgskonto_id], map: "salgskonto_id")
-}
-
-model varer_salgsvarepris {
-  id              Int             @id
-  status          String          @db.VarChar(3)
-  dato            DateTime        @db.Date
-  mva             Int             @db.SmallInt
-  pris_intern     Int?            @db.SmallInt
-  pris_ekstern    Int?            @db.SmallInt
-  salgsvare_id    Int
-  varer_salgsvare varer_salgsvare @relation(fields: [salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvarepris_ibfk_1")
-
-  @@index([salgsvare_id], map: "salgsvare_id")
-}
-
-model varer_salgsvareraavare {
-  id              Int             @id
-  mengde          Float
-  raavare_id      Int
-  salgsvare_id    Int
-  varer_raavare   varer_raavare   @relation(fields: [raavare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvareraavare_ibfk_1")
-  varer_salgsvare varer_salgsvare @relation(fields: [salgsvare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_salgsvareraavare_ibfk_2")
-
-  @@index([raavare_id], map: "raavare_id")
-  @@index([salgsvare_id], map: "salgsvare_id")
-}
-
-model varer_varetelling {
-  id                    Int                     @id
-  tittel                String                  @db.VarChar(50)
-  kommentar             String?                 @db.Text
-  tid                   DateTime                @db.Timestamp(0)
-  ansvarlig             String                  @db.VarChar(100)
-  is_locked             Boolean
-  varer_varetellingvare varer_varetellingvare[]
-}
-
-model varer_varetellingvare {
-  id                Int               @id
-  sted              String?           @db.VarChar(50)
-  antall            Float
-  kommentar         String?           @db.VarChar(150)
-  raavare_id        Int
-  varetelling_id    Int
-  antallpant        Float?
-  added_by_id       Int?
-  time_added        DateTime          @db.Timestamp(0)
-  time_price        DateTime?         @db.Date
-  varer_varetelling varer_varetelling @relation(fields: [varetelling_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_varetellingvare_ibfk_1")
-  varer_raavare     varer_raavare     @relation(fields: [raavare_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "varer_varetellingvare_raavare")
-
-  @@index([raavare_id], map: "varer_varetellingvare_raavare_idx")
-  @@index([varetelling_id], map: "varetelling_id")
 }
 
 model ActivateToken {
@@ -240,7 +89,7 @@ model ActivateToken {
   userId      String
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "ActivateToken_userId_fkey")
+  // @@index([userId], map: "ActivateToken_userId_fkey")
 }
 
 model Voucher {
@@ -253,8 +102,8 @@ model Voucher {
   workLogEntry   WorkLog   @relation(fields: [workLogEntryId], references: [id], onDelete: Cascade)
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([workLogEntryId], map: "Voucher_workLogEntryId_fkey")
-  @@index([userId], map: "Voucher_userId_fkey")
+  // @@index([workLogEntryId], map: "Voucher_workLogEntryId_fkey")
+  // @@index([userId], map: "Voucher_userId_fkey")
 }
 
 model VoucherBuffer {
@@ -273,9 +122,9 @@ model VoucherLog {
   Semester      Semester @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VoucherLog_Semester")
   LoggedForUser User?    @relation(fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor0")
 
-  @@index([id], map: "logID_idx")
-  @@index([loggedFor], map: "loggedFor_idx")
-  @@index([semesterId], map: "VoucherLog_Semester_idx")
+  // @@index([id], map: "logID_idx")
+  // @@index([loggedFor], map: "loggedFor_idx")
+  // @@index([semesterId], map: "VoucherLog_Semester_idx")
 }
 
 model WorkLog {
@@ -284,7 +133,7 @@ model WorkLog {
   loggedFor     String?
   workedAt      DateTime? @db.Timestamp(0)
   createdAt     DateTime? @default(now()) @db.Timestamp(0)
-  duration      Float?    @db.Float
+  duration      Float?    
   description   String?   @db.VarChar(120)
   semesterId    Int
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
@@ -292,29 +141,29 @@ model WorkLog {
   LoggedForUser User?     @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor")
   Voucher       Voucher[]
 
-  @@index([id], map: "logID_idx")
-  @@index([loggedBy], map: "loggedBy_idx")
-  @@index([loggedFor], map: "loggedFor_idx")
-  @@index([semesterId], map: "WorkLog_Semester_idx")
+  // @@index([id], map: "logID_idx")
+  // @@index([loggedBy], map: "loggedBy_idx")
+  // @@index([loggedFor], map: "loggedFor_idx")
+  // @@index([semesterId], map: "WorkLog_Semester_idx")
 }
 
 model UserMembership {
   id                Int       @id @default(autoincrement())
   lifetime          Boolean   @default(false)
   honorary          Boolean   @default(false)
-  date_joined       DateTime  @default(now()) @db.DateTime(0)
+  date_joined       DateTime  @default(now()) 
   name              String    @db.VarChar(50)
   email             String    @db.VarChar(254)
   seller_id         String
   semester_id       Int
   user_id           String?   @db.VarChar(50)
   uio_username      String?   @db.VarChar(15)
-  date_lifetime     DateTime? @db.DateTime(0)
+  date_lifetime     DateTime? 
   comment           String?   @db.Text
   last_edited_by_id Int?
   Semester          Semester  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserMembership_semester")
 
-  @@index([semester_id], map: "UserMembership_semester_idx")
+  // @@index([semester_id], map: "UserMembership_semester_idx")
 }
 
 model Semester {
@@ -338,23 +187,23 @@ model UserToWorkGroup {
   WorkGroup   WorkGroup @relation(fields: [workGroupId], references: [id], onDelete: Cascade, map: "UserToWorkGroup_B_fkey")
 
   @@id([workGroupId, userId])
-  @@index([userId], map: "UserToWorkGroup_A_fkey_idx")
-  @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
+  // @@index([userId], map: "UserToWorkGroup_A_fkey_idx")
+  // // @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
 }
 
 model Event {
   id          String   @id @db.VarChar(45)
   title       String   @db.VarChar(45)
-  startDate   DateTime @db.DateTime(0)
-  endDate     DateTime @db.DateTime(0)
+  startDate   DateTime 
+  endDate     DateTime 
   description String   @db.VarChar(120)
   location    String?  @db.VarChar(45)
 }
 
 model ShiftCafe {
   id                  String   @id @default(cuid())
-  startAt             DateTime @db.DateTime(0)
-  createdAt           DateTime @default(now()) @db.DateTime(0)
+  startAt             DateTime 
+  createdAt           DateTime @default(now()) 
   shiftPosition       Int
   comment             String?  @db.VarChar(120)
   shiftManager        String?
@@ -364,9 +213,9 @@ model ShiftCafe {
   UserForShiftWorker1 User?    @relation("ShiftCafe_shiftWorker1ToUser", fields: [shiftWorker1], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ShiftCafe_shiftWorker1_User")
   UserForShiftWorker2 User?    @relation("ShiftCafe_shiftWorker2ToUser", fields: [shiftWorker2], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ShiftCafe_shiftWorker2_User")
 
-  @@index([shiftWorker1], map: "ShiftCafe_shiftWorker2_User_idx")
-  @@index([shiftWorker2], map: "ShiftCafe_shiftWorker2_User_idx1")
-  @@index([shiftManager], map: "ShiftCafe_shiftWorker_User_idx")
+  // @@index([shiftWorker1], map: "ShiftCafe_shiftWorker2_User_idx")
+  // @@index([shiftWorker2], map: "ShiftCafe_shiftWorker2_User_idx1")
+  // @@index([shiftManager], map: "ShiftCafe_shiftWorker_User_idx")
 }
 
 model MenuCategory {
@@ -378,7 +227,7 @@ model MenuCategory {
 model MenuProduct {
   id             Int           @id @default(autoincrement())
   name           String        @db.VarChar(45)
-  volume         Float         @db.Float
+  volume         Float         
   price          Int
   priceVolunteer Int
   glutenfree     Boolean
@@ -386,39 +235,4 @@ model MenuProduct {
   category_id    Int
   category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
   ordering       Int?
-}
-
-model old_users {
-  id           Int       @id
-  password     String?   @db.VarChar(128)
-  last_login   DateTime? @db.DateTime(0)
-  is_superuser Boolean?
-  username     String?   @db.VarChar(30)
-  realname     String?   @db.VarChar(60)
-  email        String?   @db.VarChar(254)
-  is_staff     Boolean?
-  is_active    Boolean?
-  date_joined  DateTime? @db.DateTime(0)
-  phone_number String?   @db.VarChar(128)
-}
-
-model old_voucher_logs {
-  id              String    @id @db.VarChar(120)
-  date_issued     DateTime? @db.DateTime(0)
-  date_worked     DateTime? @db.DateTime(0)
-  work_group      String?   @db.VarChar(45)
-  hours           Float?    @db.Float
-  vouchers        Float?    @db.Float
-  comment         String?   @db.VarChar(120)
-  issuing_user_id Int?
-  wallet_id       Int?
-}
-
-model old_voucher_usage {
-  id              String    @id @db.VarChar(45)
-  date_spent      DateTime? @db.DateTime(0)
-  comment         String?   @db.VarChar(200)
-  vouchers        String?   @db.VarChar(45)
-  wallet_id       String?   @db.VarChar(45)
-  issuing_user_id String?   @db.VarChar(45)
 }
