@@ -34,7 +34,7 @@ const SOCIAL_MEDIA = [
   {
     name: "wiki",
     value: "CYB Wiki",
-    link: "https://wiki.cyb.no",
+    link: "https://outline.cyb.no",
     icon: Public,
   },
   {
