@@ -11,6 +11,9 @@ export default async function EscapeMenu() {
             menu_products: {
                 where: {
                     hidden: false
+                },
+                orderBy: {
+                    ordering: "asc"
                 }
             }
         }

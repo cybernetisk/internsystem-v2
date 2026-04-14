@@ -385,6 +385,7 @@ model MenuProduct {
   hidden         Boolean       @default(false)
   category_id    Int
   category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
+  ordering       Int?
 }
 
 model old_users {
