@@ -86,7 +86,10 @@ async function registerUser(email, firstName, lastName) {
 
   const user = await prisma.user.findUnique({
     where: {
-      email: email,
+      email: {
+        equals: user.email,
+          mode: 'insensitive'
+      }
     },
   });
   if (user) {

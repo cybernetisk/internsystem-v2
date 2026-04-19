@@ -21,7 +21,10 @@ export const authOptions = {
     async signIn({ user }) {
       const cybUser = await prisma.user.findFirst({
         where: {
-          email: user.email,
+          email: {
+            equals: user.email,
+            mode: 'insensitive'
+          }
         },
       });
 
@@ -38,7 +41,10 @@ export const authOptions = {
     async session({ session }) {
       const cybUser = await prisma.user.findFirst({
         where: {
-          email: session.user.email,
+          email: {
+            equals: session.user.email,
+            mode: 'insensitive'
+          }
         },
         select: {
           id: true,
