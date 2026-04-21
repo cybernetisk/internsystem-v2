@@ -1,0 +1,13 @@
+services:
+  website:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+      args:
+        - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID}
+        - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET}
+        - NEXT_PUBLIC_SANITY_API_VERSION=${NEXT_PUBLIC_SANITY_API_VERSION}
+
+    ports: ["3005:3005"]
+    env_file: .env
