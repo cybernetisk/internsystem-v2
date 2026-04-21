@@ -6,12 +6,14 @@ services:
 
     ports: ["3005:3005"]
     volumes: [./app:/internsystem-v2/app]
-    env_file: .env.local
+    env_file: .env
+
     depends_on:
       db:
         condition: service_healthy
 
-    command: sh -c "npx prisma db push && npm run dev"
+    command: sh -c "npm run prismapush && npm run prismaseed && npm run dev"
+
 
   db:
     image: postgres:18-alpine

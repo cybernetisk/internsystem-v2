@@ -12,15 +12,16 @@ RUN npm i
 
 FROM base AS dev
 
-WORKDIR /intersystem-v2
+WORKDIR /internsystem-v2
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY ./package.json .
 COPY ./tsconfig.json .
+COPY ./prisma.config.ts .
 COPY ./app ./app
+COPY ./prisma ./prisma
 COPY ./sanity ./sanity
 
-COPY ./prisma/schema.prisma ./prisma/
 RUN npx prisma generate
 
 CMD ["npx", "next", "dev", "-p", "3005"]

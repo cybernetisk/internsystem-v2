@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, {params}) {
   
-  const {token} = params
+  const {token} = await params
   
   const aToken = await prisma.activateToken.findFirst({
     where: {
