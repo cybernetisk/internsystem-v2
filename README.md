@@ -35,10 +35,10 @@ Steps :
 2. Create a file named `.env.development.local` and add the following variables:
 
 ```.env.development.local
-DATABASE_USER = 'internsystem_v2_dev'
-DATABASE_PASS = 'rp_C4N8^ev2I!vS^fbIkEub4'
-DATABASE_SCHEMA = 'ISV2_development'
-DATABASE_URL = "mysql://${DATABASE_USER}:${DATABASE_PASS}@localhost:3307/${DATABASE_SCHEMA}"
+DATABASE_USER='postgres'
+DATABASE_PASS="mysecretpassword"
+DATABASE='internsystem_v2_data'
+DATABASE_URL="postgres://${DATABASE_USER}:${DATABASE_PASS}@localhost:3306/${DATABASE}"
 
 NEXTAUTH_URL = 'http://localhost:3005'
 NEXTAUTH_CALLBACK = '/'

@@ -104,21 +104,19 @@ If you are working on a larger feature with many commits, we want you to make a 
 
 ### Setting up a local database (optional)
 If you want to make changes to the database in you feature, you probably don't want to make changes to the same dev database everybody else are using. To work around this you can set up your own instance of the database. The easiest way to do this is to set up a docker container
-First of all you will need to have docker installed. Once it is installed you can create a docker container from the MYSQL image as follows:
+First of all you will need to have docker installed. Once it is installed you can create a docker container from the Postgres image as follows:
 ```
-docker run --name cybDatabase -e MYSQL_ROOT_PASSWORD='<Strong password here>' -p 3306:3306 -d mysql:latest 
-```
+docker run --name localCybDatabase -p 3306:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:18.3-alpine```
 
-This should create a docker container running a mysql server on your machine. If you have never run a mysql docker container before, it might take some time for the image to download from dockerhub and you may get an error saying that you dont have the mysql image downloaded, it which case you can search for "mysql docker" and find the command for installing the image on the page called dockerhub.
+This should create a docker container running a postgres server on your machine. If you have never run a postgres docker container before, it might take some time for the image to download from dockerhub and you may get an error saying that you dont have the postgres image downloaded, in which case you can search for "mysql docker" and find the command for installing the image on the page called dockerhub.
 
 When the container is up and running all you need to do is change som variables in your projects .env.development.local file. Specifically you need to update the following variables
 ```
-DATABASE_USER = 'root'
-DATABASE_PASS = '<Your strong database password>'
-DATABASE_SCHEMA = 'public'
-DATABASE_URL = "mysql://${DATABASE_USER}:${DATABASE_PASS}@localhost:3306/${DATABASE_SCHEMA}"
+DATABASE_USER='postgres'
+DATABASE_PASS="mysecretpassword"
+DATABASE='internsystem_v2_data'
+DATABASE_URL="postgres://${DATABASE_USER}:${DATABASE_PASS}@localhost:3306/${DATABASE}"
 ```
-Note that the only difference in the DATABASE_URL between using the dev database and your own database is only the port number, so make sure it is correct before continuing
 
 Last thing you need to change to be done setting up your database is to generate all the tables the application needs. This can be done by running a single command while standing in the project directory: 
 ```
