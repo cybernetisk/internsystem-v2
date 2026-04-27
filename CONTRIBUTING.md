@@ -91,7 +91,7 @@ This command will take the state of the branch you are on, presumably your new f
 You have now created a feature branch. While working on the code for the feature, remember to commit often and provide descriptive and short commit messages for the changes made in the commit. When you want to upload the code changes to your GitHub repo, just run `git push` and the code will be sent on its way. This is not the same as making a pull-request tho. See [Creating a pull-request](#creating-a-pull-request) for more info on publishing your code to the cyb repo.
 
 ### Running the site
-To make running the website as frictionless as possible we have created a docker setup with a `docker-compose` file. This makes it so that all you need to do to get the site running along with a database is to run `docker compose up -d` and thats it. Running this should start both a database (or run the container from previous runs of the docker-compose file) and then the website. When starting the website docker will first run commands to initialize the database and then populate it with some nececary data to get the website working.
+To make running the website as easy as possible we have created a docker setup with a `docker-compose` file. All you need to do to get the site running along with a database is to run `docker compose up -d`. This command should both start a database (or run the container from previous runs of the `docker-compose` file) and then the website. When starting the website, docker will first run commands to initialize the database, and then populate it with some necessary data to get the website working.
 
 After you have run this command the website should be avaliable by navigating to `http://localhost:3005`
 
