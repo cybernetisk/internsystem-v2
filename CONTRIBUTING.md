@@ -5,7 +5,7 @@ The main repo has two branches.
 
 ### Main
 This branch is meant to represent the production state of the code. This is the branch from witch the production server will pull the source code and should therefore never have untested code.
-All commits to this branch should be squash-merge commits from the [Development](#development) branch
+All commits to this branch should be ff-merged from the [Development](#development) branch
 
 ### Development
 The development branch is where the action happens. This will be the base of your new feature branches and will also be the branch your pull-requests go to. This is a living and breathing branch and hopefully has frequent commits and merges. Because of this, you should try to keep all feature branches up to date with this branch while developing.
@@ -13,19 +13,21 @@ To make sure you always make new feature-branches from the most up-to-date devel
 This is further described in the [Getting Started](#getting-started) section
 
 ## Getting started
-Note that you'll probably only need to do these first steps once, so if you don't understand what's happening and what stuff is doing, no worries and if you have questions about something, or issues setting up your environment, don't hesitate to ask.
+Note that you'll probably only need to do these first steps once, so if you don't understand what's happening and what the commands are doing, no worries and if you have questions about something, or issues setting up your environment, don't hesitate to ask.
 
 ### Forking the repo
-To get started contributing, make a fork of the cyb repo. If you're new to git and GitHub, forking is a feature in GitHub, where you make your own personal copy of a repo. Here you have both read and write access and you can make whatever changes you want without affecting cyb's repo. To get your changes applied to cyb's repo you need to make a pull-request, but more on that later.
+To get started contributing, make a fork of the cyb repo. If you're new to git and GitHub, forking is a feature in GitHub, where you make your own personal copy of a repo. In your own fork you have both read and write access and you can make whatever changes you want without affecting cyb's repo. To get your changes applied to cyb's repo you need to make a pull-request, but more on that later.
 
 ### Making a local clone of your fork
-When you're done making the fork, you can "download" a clone of the repo to your local machine. This can be done though the git CLI with the following command:
+When you're done making the fork, you can "download" or clone the repo to your local machine. This can be done though the git CLI (Command Line Interface) with the following command:
 
 ```
 git clone <url-to-your-fork>
 ```
 
-This will create a directory on you computer containing the source-code for the project. 
+This url will typically look like: `https://github.com/<your_username>/internsystem-v2.git` or `git@github.com:Sebbben/internsystem-v2.git` if you have set up ssh-keys for you github (which is recomended).
+
+When you have done this, a directory named `internsystem-v2` will be created on your computer containing the source-code for the project. 
 
 ### Setting up tracking of cyb development branch
 From now on, you are going to make feature-branches off of the official cyb development branch. For ease of use, you can set up your local development branch to track the cyb remote's development branch and just pull the new changes before making a new branch.
@@ -37,7 +39,7 @@ You can check that the remote was added successfully by running:
 ```
 git remote
 ```
-You should see "cyb" listed along with "origin", which is the name of your remote fork on GitHub that you made earlier.
+You should see `cyb` listed along with `origin`, which is the name of your remote fork on GitHub that you made earlier.
 
 Now we need to set up your local development branch and set it to track cyb/development
 First you'll need to fetch the branches from cyb by running
@@ -88,6 +90,13 @@ This command will take the state of the branch you are on, presumably your new f
 #### You have now created a feature branch!
 You have now created a feature branch. While working on the code for the feature, remember to commit often and provide descriptive and short commit messages for the changes made in the commit. When you want to upload the code changes to your GitHub repo, just run `git push` and the code will be sent on its way. This is not the same as making a pull-request tho. See [Creating a pull-request](#creating-a-pull-request) for more info on publishing your code to the cyb repo.
 
+### Running the site
+To make running the website as easy as possible we have created a docker setup with a `docker-compose` file. All you need to do to get the site running along with a database is to run `docker compose up -d`. This command should both start a database (or run the container from previous runs of the `docker-compose` file) and then the website. When starting the website, docker will first run commands to initialize the database, and then populate it with some necessary data to get the website working.
+
+After you have run this command the website should be avaliable by navigating to `http://localhost:3005`
+
+To connect to the database run the command: `docker exec -it internsystem-v2-website-1 psql -U postgres`
+
 ### Creating a pull-request
 When you have created a feature branch, you probably want the features you implemented to become a part of the codebase. To do this you can use a pull-request. This can be done in a couple different ways.
 One way is to go to your fork of the cyb repo in GitHub, go to the branch you want to make a pull-request for. There should be some sort of contribute/make pull-request button at the top of the page. If you click this, you will be brought to the pull-request page on cyb's repo.
@@ -101,26 +110,3 @@ If you are working on a larger feature with many commits, we want you to make a 
 
 ### Illustration of git setup
 ![](gitSetup.png)
-
-### Setting up a local database (optional)
-If you want to make changes to the database in you feature, you probably don't want to make changes to the same dev database everybody else are using. To work around this you can set up your own instance of the database. The easiest way to do this is to set up a docker container
-First of all you will need to have docker installed. Once it is installed you can create a docker container from the MYSQL image as follows:
-```
-docker run --name cybDatabase -e MYSQL_ROOT_PASSWORD='<Strong password here>' -p 3306:3306 -d mysql:latest 
-```
-
-This should create a docker container running a mysql server on your machine. If you have never run a mysql docker container before, it might take some time for the image to download from dockerhub and you may get an error saying that you dont have the mysql image downloaded, it which case you can search for "mysql docker" and find the command for installing the image on the page called dockerhub.
-
-When the container is up and running all you need to do is change som variables in your projects .env.development.local file. Specifically you need to update the following variables
-```
-DATABASE_USER = 'root'
-DATABASE_PASS = '<Your strong database password>'
-DATABASE_SCHEMA = 'public'
-DATABASE_URL = "mysql://${DATABASE_USER}:${DATABASE_PASS}@localhost:3306/${DATABASE_SCHEMA}"
-```
-Note that the only difference in the DATABASE_URL between using the dev database and your own database is only the port number, so make sure it is correct before continuing
-
-Last thing you need to change to be done setting up your database is to generate all the tables the application needs. This can be done by running a single command while standing in the project directory: 
-```
-npm run prismapush
-```
