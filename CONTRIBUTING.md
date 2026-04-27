@@ -27,7 +27,7 @@ git clone <url-to-your-fork>
 
 This url will typically look like: `https://github.com/<your_username>/internsystem-v2.git` or `git@github.com:Sebbben/internsystem-v2.git` if you have set up ssh-keys for you github (which is recomended).
 
-When you have done this, a directory named "internsystem-v2" will be created on you computer containing the source-code for the project. 
+When you have done this, a directory named `internsystem-v2` will be created on your computer containing the source-code for the project. 
 
 ### Setting up tracking of cyb development branch
 From now on, you are going to make feature-branches off of the official cyb development branch. For ease of use, you can set up your local development branch to track the cyb remote's development branch and just pull the new changes before making a new branch.
