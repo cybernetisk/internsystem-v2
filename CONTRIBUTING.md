@@ -25,7 +25,7 @@ When you're done making the fork, you can "download" or clone the repo to your l
 git clone <url-to-your-fork>
 ```
 
-This url will typically look like: `https://github.com/<your_username>/internsystem-v2.git` or `git@github.com:Sebbben/internsystem-v2.git` if you have set up ssh-keys for you github (which is recomended).
+This URL will typically look like: `https://github.com/<your_username>/internsystem-v2.git` or `git@github.com:<your_username>/internsystem-v2.git` if you have set up SSH keys on GitHub (which is recommended).
 
 When you have done this, a directory named `internsystem-v2` will be created on your computer containing the source-code for the project. 
 
