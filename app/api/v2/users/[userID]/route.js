@@ -9,9 +9,9 @@ import { authOptions } from "@/app/api/utils/authOptions";
 
 
 export async function GET(req, {params}) {
-    await params
-    const userID = params.userID
     
+    const { userID } = await params
+
     const session = await getServerSession(authOptions)
     const authCheck = new Auth(session)
     .requireRoles([])
@@ -27,8 +27,8 @@ export async function GET(req, {params}) {
 }
 
 export async function PATCH(req, {params}) {
-    await params
-    const userID = params.userID
+    
+    const { userID } = await params
 
     const session = await getServerSession(authOptions)
     const authCheck = new Auth(session)

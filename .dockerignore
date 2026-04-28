@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+out
+
+# Environment files — never in the image
+.env
+.env.*
+!.env.example
+
+# Prisma generated client (regenerated in container)
+prisma/generated
+
+# Sanity Studio build
+sanity/dist
+.sanity
+
+# Dev / tooling
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose*.yml
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.vscode
+.idea
+*.swp
+*.swo
+Thumbs.db
+
+# Tests
+__tests__
+*.test.ts
+*.spec.ts
+coverage
+
+# CI/CD
+.github
+.gitlab-ci.yml
