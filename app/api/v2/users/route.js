@@ -84,10 +84,10 @@ async function registerUser(email, firstName, lastName) {
     return errors.missingFields;
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
       email: {
-        equals: user.email,
+        equals: email,
           mode: 'insensitive'
       }
     },
