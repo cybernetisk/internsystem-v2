@@ -93,7 +93,7 @@ You have now created a feature branch. While working on the code for the feature
 ### Running the site
 To make running the website as easy as possible we have created a docker setup with a `docker-compose` file. All you need to do to get the site running along with a database is to run `docker compose up -d`. This command should both start a database (or run the container from previous runs of the `docker-compose` file) and then the website. When starting the website, docker will first run commands to initialize the database, and then populate it with some necessary data to get the website working.
 
-After you have run this command the website should be avaliable by navigating to `http://localhost:3005`
+After you have run this command the website should be available by navigating to `http://localhost:3005`
 
 To connect to the database run the command: `docker exec -it internsystem-v2-website-1 psql -U postgres`
 
