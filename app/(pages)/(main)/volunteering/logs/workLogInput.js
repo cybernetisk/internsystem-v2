@@ -66,20 +66,11 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
           duration: hours,
           description: description,
           semesterId: session.data.semester.id,
-        }),
-      });
-
-      fetch("/api/v2/workGroups", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          workGroupId: selectedGroup.id,
+          workGroupId: selectedGroup.id
         }),
       });
     }
+    
     setRegisteredFor([]);
     setSelectedGroup(null);
     setHours(0);
