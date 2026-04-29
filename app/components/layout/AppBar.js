@@ -14,22 +14,21 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
-import { SessionProvider } from "next-auth/react";
 import { Component } from "react";
 import { cybTheme } from "./../themeCYB";
 import cybLogo from "./../../icon.png";
 import Image from "next/image";
 import Link from "next/link";
-import LoginButton from "../Login/LoginButton";
+import LoginButton from "../Login/LoginButton.tsx";
 
 export class NavBar extends Component {
   render() {
     const { currentPath, navItems } = this.props;
-    
+
     const iconProps = {
       mt: 0.5
     };
-    
+
     return (
       <AppBar sx={{ position: { xs: "relative", md: "relative" } }}>
         <Toolbar>
@@ -48,9 +47,7 @@ export class NavBar extends Component {
             ))}
 
             <Grid item xs>
-              <SessionProvider basePath="/api/v2/auth">
                 <LoginButton currentPath={currentPath} iconProps={iconProps} />
-              </SessionProvider>
             </Grid>
           </Grid>
 
@@ -84,9 +81,7 @@ export class NavBar extends Component {
             </Grid>
 
             <Grid item sx={{ flexShrink: 1 }}>
-              <SessionProvider basePath="/api/v2/auth">
                 <LoginButton />
-              </SessionProvider>
             </Grid>
           </Grid>
         </Toolbar>
@@ -130,7 +125,7 @@ function NavElementLargeScreen(item, index, currentPath) {
 }
 
 function NavElementSmallScreen(item, index, iconProps, currentPath) {
-  
+
   if (item) {
     return (
       <Link

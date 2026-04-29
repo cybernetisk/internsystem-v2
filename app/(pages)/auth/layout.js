@@ -2,7 +2,6 @@
 "use client"
 
 import { Avatar, Box, CssBaseline, Paper, Stack, ThemeProvider } from "@mui/material";
-import { SessionProvider } from "next-auth/react";
 import { cybTheme } from "@/app/components/themeCYB";
 import Link from "next/link";
 import cybLogo from "./../../icon.png";
@@ -50,7 +49,7 @@ export default function AuthLayout({ children }) {
                 sx={{ minHeight: "100vh" }}
               >
                 <Paper>
-                  <SessionProvider basePath="/api/v2/auth">{children}</SessionProvider>
+                    {children}
                 </Paper>
               </Stack>
             </Box>
