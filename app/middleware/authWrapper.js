@@ -1,34 +1,26 @@
+import {useRouter} from "next/navigation";
+import {PageBuilderSkeleton} from "../components/sanity/PageBuilder";
+import {authClient} from "@/app/api/utils/auth-client.ts";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { PageBuilderSkeleton } from "../components/sanity/PageBuilder";
+export default function authWrapper(WrappedComponent, requiredRole = "", redirect = "/unauthorized") {
+    return function AuthenticatedComponent(props) {
 
-export default function authWrapper(WrappedComponent, requiredRole="", redirect="/unauthorized") {
-  return function AuthenticatedComponent(props) {
-    
-    const router = useRouter();
-    const { data, status } = useSession({
-      required: true,
-      onUnauthenticated() {
-        router.push(redirect);
-      }
-    });
-    
-    if (status == "loading") {
-      return <PageBuilderSkeleton/>
-    }
-    else if (status == "authenticated" && requiredRole != "") {
-      
-      const userRoles = data.user.roles
-      const missingRole = !userRoles.includes(requiredRole)
-      
-      if (missingRole) {
-        router.push(redirect)
-      } 
-    }
-    
+        const router = useRouter();
+        const session = authClient.useSession();
 
-    // show content
-    return <WrappedComponent {...props} />;
-  };
+        if (session.isPending) {
+            return <PageBuilderSkeleton/>
+        } else {
+            const userRoles = session.data.user.roles;
+            const missingRole = !userRoles.includes(requiredRole)
+
+            if (missingRole && !(requiredRole === "")) {
+                router.push(redirect)
+            }
+        }
+
+
+        // show content
+        return <WrappedComponent {...props} />;
+    };
 }
