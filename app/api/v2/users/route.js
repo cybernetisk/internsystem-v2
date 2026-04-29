@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { randomBytes } from "crypto";
 import { mailOptions, transporter } from "@/app/(pages)/auth/email";
-import { Auth } from "../../utils/auth";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/utils/authOptions";
+import { Auth } from "../../utils/oldAuth.js";
+import {auth} from "@/app/api/utils/auth.ts";
+import {headers} from "next/headers";
 
 
 const errors = {
@@ -125,7 +125,7 @@ export async function POST(req) {
 
 export async function GET(req) {
 
-  const session = await getServerSession(authOptions)
+  const session = await auth.api.getSession({headers: await headers()});
   const authCheck = new Auth(session)
   .requireRoles([])
 
