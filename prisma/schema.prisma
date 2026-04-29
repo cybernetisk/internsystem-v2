@@ -8,13 +8,28 @@ datasource db {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  token     String   @unique
+  expiresAt DateTime @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @db.Timestamptz(3)
+  updatedAt DateTime @db.Timestamptz(3)
 
-  // @@index([userId], map: "Session_userId_fkey")
+  @@map("session")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @db.Timestamptz(3)
+  updatedAt  DateTime @db.Timestamptz(3)
+
+  @@map("verification")
 }
 
 model VerificationToken {
