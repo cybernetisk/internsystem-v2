@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -26,14 +26,15 @@ model VerificationToken {
 }
 
 model User {
-  id                                     String            @id @unique(map: "recruitedBy") @default(cuid())
-  email                                  String            @unique
-  emailVerified                          DateTime?
-  active                                 Boolean           @default(false)
-  createdAt                              DateTime          @default(now())
-  updatedAt                              DateTime          @updatedAt
-  firstName                              String?
-  lastName                               String?
+  id            String    @id @unique(map: "recruitedBy") @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  active        Boolean   @default(false)
+  createdAt     DateTime  @db.Timestamptz(3) @default(now())
+  updatedAt     DateTime  @db.Timestamptz(3) @updatedAt
+  name          String
+  image         String?
+
   recruitedById                          String?
   ActivateToken                          ActivateToken[]
   sessions                               Session[]
@@ -133,7 +134,7 @@ model WorkLog {
   loggedFor     String?
   workedAt      DateTime? @db.Timestamp(0)
   createdAt     DateTime? @default(now()) @db.Timestamp(0)
-  duration      Float?    
+  duration      Float?
   description   String?   @db.VarChar(120)
   semesterId    Int
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
@@ -151,14 +152,14 @@ model UserMembership {
   id                Int       @id @default(autoincrement())
   lifetime          Boolean   @default(false)
   honorary          Boolean   @default(false)
-  date_joined       DateTime  @default(now()) 
+  date_joined       DateTime  @default(now())
   name              String    @db.VarChar(50)
   email             String    @db.VarChar(254)
   seller_id         String
   semester_id       Int
   user_id           String?   @db.VarChar(50)
   uio_username      String?   @db.VarChar(15)
-  date_lifetime     DateTime? 
+  date_lifetime     DateTime?
   comment           String?   @db.Text
   last_edited_by_id Int?
   Semester          Semester  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserMembership_semester")
@@ -194,16 +195,16 @@ model UserToWorkGroup {
 model Event {
   id          String   @id @db.VarChar(45)
   title       String   @db.VarChar(45)
-  startDate   DateTime 
-  endDate     DateTime 
+  startDate   DateTime
+  endDate     DateTime
   description String   @db.VarChar(120)
   location    String?  @db.VarChar(45)
 }
 
 model ShiftCafe {
   id                  String   @id @default(cuid())
-  startAt             DateTime 
-  createdAt           DateTime @default(now()) 
+  startAt             DateTime
+  createdAt           DateTime @default(now())
   shiftPosition       Int
   comment             String?  @db.VarChar(120)
   shiftManager        String?
@@ -227,7 +228,7 @@ model MenuCategory {
 model MenuProduct {
   id             Int           @id @default(autoincrement())
   name           String        @db.VarChar(45)
-  volume         Float         
+  volume         Float
   price          Int
   priceVolunteer Int
   glutenfree     Boolean
