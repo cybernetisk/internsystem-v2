@@ -15,6 +15,7 @@
           prisma
           openssl
           nodejs_22
+          docker-compose
         ];
 
         shellHook = ''
