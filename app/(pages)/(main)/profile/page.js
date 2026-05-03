@@ -218,7 +218,7 @@ function section2(props) {
       </Grid>
 
       <Grid item>
-        <Button {...props.buttonProps} onClick={() => signOut()}>
+        <Button {...props.buttonProps} onClick={async () => await authClient.signOut()}>
           sign out
         </Button>
       </Grid>
