@@ -13,6 +13,7 @@ export default function authWrapper(WrappedComponent, requiredRole = "", redirec
             return <PageBuilderSkeleton/>
         }
         else if (!session.data) {
+                // FIXME: react error
                 router.push(redirect);
                 return <></>;
             }

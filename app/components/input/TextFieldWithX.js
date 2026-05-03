@@ -37,7 +37,7 @@ export default class TextFieldWithX extends Component {
             </Tooltip>
           ),
         }}
-        {...this.props}
+        {...this.props} // FIXME: react error
         />
     );
   }
