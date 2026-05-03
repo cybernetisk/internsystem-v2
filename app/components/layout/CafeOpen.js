@@ -18,11 +18,11 @@ export function CafeOpen() {
     );
       
     useEffect(() => {
-        fetch("/api/v2/cafe/isOpen").then(async (res) => {
-            if (res.status == 200) setCafeOpen((await res.json()).isOpen);
+      fetch("/api/v2/cafe/status").then(async (res) => {
+        if (res.status == 200) {
+          setCafeOpen((await res.json()).isOpen);
         }
-
-        )
+      })
     }, [])
 
     return (
