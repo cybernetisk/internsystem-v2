@@ -16,7 +16,7 @@ async function main() {
     }   
   })
   
-  const roles = ["admin", "board"]
+  const roles = ["admin", "board", "cafe-master"]
   for (const role of roles) {
     await prisma.role.upsert({
       where: {name: role},
