@@ -24,10 +24,16 @@ export const auth = betterAuth({
             }
         }),
 
-        // add `roles` to object return from authClient.useSession()
+        // add relations to User object returned from authClient.useSession()
         customSession(async ({user, session}) => {
             const dbUser = await prisma.user.findFirst(
-                {where: {id: user.id}, include: {roles: {include: {role: {select: {name: true}}}}}}
+                {where: {id: user.id},
+                    include: {
+                        roles: {include: {role: {select: {name: true}}}},
+                        recruitedByUser: true,
+                        recruitedUsers: true
+                    }
+                }
             );
 
             return {
