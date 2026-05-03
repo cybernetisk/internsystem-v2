@@ -41,9 +41,12 @@ export class NavBar extends Component {
           <Grid2
             container
             direction="row"
-            alignContent="flex-end"
-            justifyContent="space-between"
-            sx={{ display: { xs: "flex", md: "none" } }}
+            size="grow"
+            sx={{ 
+              display: { xs: "flex", md: "none" },
+              alignContent: "flex-end",
+              justifyContent: "space-between"
+            }}
           >
             {navItems.map((item, i) => (
               <Grid2 size="grow" key={`nav${i}`}>
@@ -65,7 +68,7 @@ export class NavBar extends Component {
             size="grow"
             sx={{ 
               display: { xs: "none", md: "flex" }, 
-              justifyContent: "flex-end" ,
+              justifyContent: "flex-end",
               alignItems: "center"
             }}
           >
