@@ -1,14 +1,10 @@
 
 export function getUserInitials(user: {
-  firstName: string;
-  lastName: string;
+  name: string;
 }) {
   
-  let firstName = user && user.firstName ? user.firstName : "";
-  let lastName = user && user.lastName ? user.lastName : "";
-  let fullName = `${firstName} ${lastName}`;
-  
-  let nameBits = fullName.trim().split(" ");
+
+  let nameBits = user.name.trim().split(" ");
   let firstFirstName = nameBits[0];
   
   let initials = nameBits
@@ -22,13 +18,4 @@ export function getUserInitials(user: {
   .join("");
   
   return `${firstFirstName} ${initials}`;
-}
-
-export function getUserName(user: {
-  firstName: string;
-  lastName: string;
-}) {
-  let firstName = user && user.firstName ? user.firstName : "";
-  let lastName = user && user.lastName ? user.lastName : "";
-  return `${firstName} ${lastName}`;
 }
