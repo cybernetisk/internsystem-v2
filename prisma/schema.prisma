@@ -41,12 +41,12 @@ model VerificationToken {
 }
 
 model User {
-  id            String    @id @unique(map: "recruitedBy") @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  active        Boolean   @default(false)
-  createdAt     DateTime  @db.Timestamptz(3) @default(now())
-  updatedAt     DateTime  @db.Timestamptz(3) @updatedAt
+  id            String   @id @unique(map: "recruitedBy") @default(cuid())
+  email         String   @unique
+  emailVerified Boolean
+  active        Boolean  @default(false)
+  createdAt     DateTime @db.Timestamptz(3) @default(now())
+  updatedAt     DateTime @db.Timestamptz(3) @updatedAt
   name          String
   image         String?
 
