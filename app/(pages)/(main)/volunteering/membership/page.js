@@ -14,9 +14,9 @@ import { PageHeader } from "@/app/components/sanity/PageBuilder";
 import CustomTable from "@/app/components/CustomTable";
 import authWrapper from "@/app/middleware/authWrapper";
 import { format, parseISO } from "date-fns";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import TextFieldWithX from "@/app/components/input/TextFieldWithX";
+import {authClient} from "@/app/api/utils/auth-client.ts";
 
 const MEMBERSHIP_TABLE_HEADERS = [
   {
@@ -53,7 +53,7 @@ const MEMBERSHIP_TABLE_HEADERS = [
 ];
 
 function MembershipPage() {
-  const session = useSession();
+  const session = authClient.useSession();
 
   const [membershipData, setMembershipData] = useState([]);
   const [tableData, setTableData] = useState([]);
