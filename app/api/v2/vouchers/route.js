@@ -69,7 +69,7 @@ async function getVoucherLogs() {
     usedAt: log.usedAt,
     amount: log.amount,
     description: log.description,
-    loggedFor: log.name
+    loggedFor: log.LoggedForUser.name
   })), {status: 200})
 }
 
