@@ -7,51 +7,34 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  IconButton,
   ListItem,
   ListItemButton,
   ListItemText,
-  // Icon,
   Stack,
-  SvgIcon,
   Typography,
 } from "@mui/material";
-import { signIn, useSession } from "next-auth/react";
-import { Person } from "@mui/icons-material";
-import { cybTheme } from "../themeCYB";
-import { useRouter } from "next/navigation";
+import {Person} from "@mui/icons-material";
+import {cybTheme} from "../themeCYB";
 
-import { mdiPenguin } from '@mdi/js';
+import {mdiPenguin} from '@mdi/js';
 import Icon from "@mdi/react";
 import Link from "next/link";
-// import { useEffect, useState } from "react";
+import {authClient} from "@/app/api/utils/auth-client";
 
 export default function LoginButton(props) {
-  
+
   const { currentPath, iconProps } = props;
-  
-  // console.log(currentPath)
-  
-  // const [firstName, setFirstName] = useState("");
-  
-  const router = useRouter();
-  const session = useSession();
-  
-  const handleClick = (event) => {
-    console.log("CLICK")
-    if (session.status == "authenticated") {
-      router.push("/profile");
-    } else {
-      signIn();
-    }
-  };
+
+  const session = authClient.useSession();
 
   const avatarProps = {
     ...iconProps,
     p: 0.8,
     bgcolor: cybTheme.palette.primary.main,
   };
-  
+
+  const buttonLink = session.data !== null ? "/profile" : "/auth/signIn";
+
   const buttonText = () => {
     if (session.data != undefined) {
       let firstName = session.data.user.name.split(" ")[0].replace('-', '‑')
@@ -63,24 +46,26 @@ export default function LoginButton(props) {
     }
     return "Login"
   }
-  
+
   return (
     <>
       {/* Mobile layout */}
       <Box sx={{ display: { xs: "block", md: "none" } }}>
         <ListItem key={`link_item_login`} disablePadding>
-          <ListItemButton key={`link_item_button_login`} onClick={handleClick} sx={{ p: 1 }}>
+          <Link href={buttonLink}>
+
+          <ListItemButton key={`link_item_button_login`} sx={{ p: 1 }}>
             <Stack direction="column" alignItems="center" width="100%">
-              
+
               <Avatar sx={avatarProps}>
-                {session.status == "authenticated" ? (
+                {session.data != undefined ? (
                   <Icon
-                    alt="Image of user"
+
                     path={mdiPenguin}
-                    color={cybTheme.palette.background.main}
+                    color={cybTheme.palette.background.default}
                   />
                 ) : (
-                  <Person color={cybTheme.palette.background.main} />
+                  <Person />
                 )}
               </Avatar>
 
@@ -100,12 +85,16 @@ export default function LoginButton(props) {
               />
             </Stack>
           </ListItemButton>
+          </Link>
         </ListItem>
       </Box>
 
       {/* Computer layout */}
       <Card sx={{ display: { xs: "none", md: "block" } }}>
-        <CardActionArea onClick={handleClick}>
+        <Link href={buttonLink}>
+
+
+        <CardActionArea>
           <CardContent>
             <Stack
               spacing={2}
@@ -121,26 +110,25 @@ export default function LoginButton(props) {
                 {buttonText()}
               </Typography>
 
-              {session.status == "authenticated" ? (
-                <Avatar alt="Image of user" sx={{ ...avatarProps }}>
-                  <Icon
-                    path={mdiPenguin}
-                    color={cybTheme.palette.background.main}
-                  />
+              {session.data != undefined ? (
+                    <Avatar alt="Image of user" sx={{ ...avatarProps }}>
+                      <Icon
+                        path={mdiPenguin}
+                        color={cybTheme.palette.background.default}
+                      />
                 </Avatar>
               ) : (
-                <Avatar sx={{ ...avatarProps }}>
-                  <Person
-                      color={cybTheme.palette.background.main}
-                    // color= sx={{
-                    //   color: cybTheme.palette.background.main
-                    //   }}
-                  />
-                </Avatar>
+
+
+                  <Avatar sx={{...avatarProps}}>
+                      <Person
+                      />
+                  </Avatar>
               )}
             </Stack>
           </CardContent>
         </CardActionArea>
+          </Link>
       </Card>
     </>
   );
