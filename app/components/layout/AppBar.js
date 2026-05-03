@@ -13,14 +13,18 @@ import {
   Grid,
   Typography,
   Stack,
+  Icon,
+  createSvgIcon,
+  Grid2,
 } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
-import { Component } from "react";
+import { Component, useState } from "react";
 import { cybTheme } from "./../themeCYB";
 import cybLogo from "./../../icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import LoginButton from "../Login/LoginButton";
+import { CafeOpen } from "./CafeOpen";
 
 export class NavBar extends Component {
   render() {
@@ -29,12 +33,12 @@ export class NavBar extends Component {
     const iconProps = {
       mt: 0.5
     };
-    
+
     return (
       <AppBar sx={{ position: { xs: "relative", md: "relative" } }}>
         <Toolbar>
           {/* Mobile layout */}
-          <Grid
+          <Grid2
             container
             direction="row"
             alignContent="flex-end"
@@ -42,27 +46,30 @@ export class NavBar extends Component {
             sx={{ display: { xs: "flex", md: "none" } }}
           >
             {navItems.map((item, i) => (
-              <Grid item xs key={`nav${i}`}>
+              <Grid2 size="grow" key={`nav${i}`}>
                 {NavElementSmallScreen(item, i, iconProps, currentPath)}
-              </Grid>
+              </Grid2>
             ))}
 
-            <Grid item xs>
+            <Grid2 size="grow">
               <SessionProvider basePath="/api/v2/auth">
                 <LoginButton currentPath={currentPath} iconProps={iconProps} />
               </SessionProvider>
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
 
           {/* Computer layout */}
-          <Grid
+          <Grid2
             container
             direction="row"
-            justifyContent="flex-end"
-            alignItems="center"
-            sx={{ display: { xs: "none", md: "flex" } }}
+            size="grow"
+            sx={{ 
+              display: { xs: "none", md: "flex" }, 
+              justifyContent: "flex-end" ,
+              alignItems: "center"
+            }}
           >
-            <Grid item>
+            <Grid2>
               <Link href={`/`}>
                 <Avatar
                   sx={{
@@ -73,22 +80,28 @@ export class NavBar extends Component {
                   <Image src={cybLogo} alt="cyb logo" fill />
                 </Avatar>
               </Link>
-            </Grid>
-
-            <Grid item container md xs justifyContent="flex-end" pr={2}>
+            </Grid2>
+            
+            <Grid2 pl={5} container sx={{
+              alignItems: "center"
+            }}>
+              <CafeOpen/>
+            </Grid2>
+            
+            <Grid2 container size="grow" sx={{justifyContent:"flex-end"}} pr={2}>
               <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
                 {navItems.map((item, i) =>
                   NavElementLargeScreen(item, i, currentPath)
                 )}
               </Box>
-            </Grid>
+            </Grid2>
 
-            <Grid item sx={{ flexShrink: 1 }}>
+            <Grid2 size={{sx:{ flexShrink: 1 }}}>
               <SessionProvider basePath="/api/v2/auth">
                 <LoginButton />
               </SessionProvider>
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
         </Toolbar>
       </AppBar>
     );
