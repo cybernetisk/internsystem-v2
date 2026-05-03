@@ -36,12 +36,19 @@ export const auth = betterAuth({
                 }
             );
 
+            const semester = await prisma.semester.findFirst({
+                orderBy: {
+                    id: "desc"
+                }
+            });
+
             return {
                 user: {
                     ...user,
                     ...dbUser,
                     roles: dbUser.roles.map(role => role.role.name)
                 },
+                semester,
                 session
             };
         }),
