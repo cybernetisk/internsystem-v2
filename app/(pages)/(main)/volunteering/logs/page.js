@@ -1,24 +1,15 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Stack,
-  useMediaQuery,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import { format, parseISO } from "date-fns";
-import { useSession } from "next-auth/react";
-import { PageHeader } from "@/app/components/sanity/PageBuilder";
-import { getUserInitials, getUserName } from "@/app/components/textUtil";
-import { cybTheme } from "@/app/components/themeCYB";
+import {Box, Button, Card, CardContent, Grid, Stack, useMediaQuery,} from "@mui/material";
+import {useEffect, useState} from "react";
+import {format, parseISO} from "date-fns";
+import {PageHeader} from "@/app/components/sanity/PageBuilder";
+import {cybTheme} from "@/app/components/themeCYB";
 import authWrapper from "@/app/middleware/authWrapper";
 import CustomTable from "@/app/components/CustomTable";
 import worklogInput from "./workLogInput";
 import voucherLogInput from "./voucherLogInput";
+import {authClient} from "@/app/api/utils/auth-client.ts";
 
 const WORK_TABLE_HEADERS = [
   { id: "workedAt_label", type: "date", name: "work date", flex: 2, sortBy: "workedAt_num" },
@@ -45,18 +36,13 @@ function LogsPage() {
   const [mode, setMode] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
-  const session = useSession();
+  const session = authClient.useSession();
 
   useEffect(() => {
     fetch("/api/v2/users")
       .then(res => res.json())
       .then(data => {
-        setUsers(
-          data.users.map((e) => ({
-            ...e,
-            name: `${e.firstName} ${e.lastName}`
-          }))
-        )
+        setUsers(data.users);
       })
 
     fetch("/api/v2/workGroups")
@@ -163,8 +149,8 @@ function handleWorkLogs(logs, session, setWorkLogs) {
 
   const newWorkLogs = logs.map((log) => ({
     ...log,
-    loggedBy: getUserName(log.LoggedByUser),
-    loggedFor: getUserName(log.LoggedForUser),
+    loggedBy: log.LoggedByUser.name,
+    loggedFor: log.LoggedForUser.name,
     workedAt_num: parseISO(log.workedAt).getTime(),
     workedAt_label: format(parseISO(log.workedAt), "dd.MM HH:mm").toLowerCase(),
   }));
