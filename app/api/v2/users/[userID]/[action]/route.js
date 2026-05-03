@@ -10,7 +10,7 @@ import {headers} from "next/headers";
 export async function POST(req, {params}) {
 
   const args = await req.json()
-  const session = await auth.api.getSession({heders: await headers()});
+  const session = await auth.api.getSession({headers: await headers()});
   const authCheck = new Auth(session, args)
   .requireRoles(["admin"])
 
@@ -103,8 +103,7 @@ async function handleGetWorkLogs(userID) {
       description: true,
       LoggedByUser: {
         select: {
-          firstName: true,
-          lastName: true
+          name: true
         }
       },
     }
