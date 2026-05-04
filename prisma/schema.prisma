@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -67,9 +67,9 @@ model UserRole {
   roleId String
   role   Role   @relation(fields: [roleId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
+  // @@index([roleId], map: "UserRole_roleId_fkey")
 
   @@unique([userId, roleId])
-  // @@index([roleId], map: "UserRole_roleId_fkey")
 }
 
 model WorkGroup {
@@ -78,6 +78,8 @@ model WorkGroup {
   leaderTitle     String            @db.VarChar(45)
   description     String
   UserToWorkGroup UserToWorkGroup[]
+
+  workLogs WorkLog[] @relation("WorkLog_workGroup")
 }
 
 model ActivateToken {
@@ -133,12 +135,14 @@ model WorkLog {
   loggedFor     String?
   workedAt      DateTime? @db.Timestamp(0)
   createdAt     DateTime? @default(now()) @db.Timestamp(0)
-  duration      Float?    
+  duration      Float?
   description   String?   @db.VarChar(120)
   semesterId    Int
+  workGroup     String?
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
   LoggedByUser  User?     @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onUpdate: NoAction, map: "loggedBy")
   LoggedForUser User?     @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor")
+  workgroup     WorkGroup? @relation("WorkLog_workGroup", fields: [workGroup], references: [id], onUpdate: NoAction, map: "workLog")
   Voucher       Voucher[]
 
   // @@index([id], map: "logID_idx")
@@ -151,14 +155,14 @@ model UserMembership {
   id                Int       @id @default(autoincrement())
   lifetime          Boolean   @default(false)
   honorary          Boolean   @default(false)
-  date_joined       DateTime  @default(now()) 
+  date_joined       DateTime  @default(now())
   name              String    @db.VarChar(50)
   email             String    @db.VarChar(254)
   seller_id         String
   semester_id       Int
   user_id           String?   @db.VarChar(50)
   uio_username      String?   @db.VarChar(15)
-  date_lifetime     DateTime? 
+  date_lifetime     DateTime?
   comment           String?   @db.Text
   last_edited_by_id Int?
   Semester          Semester  @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UserMembership_semester")
@@ -185,25 +189,25 @@ model UserToWorkGroup {
   groupLeader Boolean?  @default(false)
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UserToWorkGroup_A_fkey")
   WorkGroup   WorkGroup @relation(fields: [workGroupId], references: [id], onDelete: Cascade, map: "UserToWorkGroup_B_fkey")
-
-  @@id([workGroupId, userId])
   // @@index([userId], map: "UserToWorkGroup_A_fkey_idx")
   // // @@index([workGroupId], map: "_VolunteerToWorkGroup_B_index")
+
+  @@id([workGroupId, userId])
 }
 
 model Event {
   id          String   @id @db.VarChar(45)
   title       String   @db.VarChar(45)
-  startDate   DateTime 
-  endDate     DateTime 
+  startDate   DateTime
+  endDate     DateTime
   description String   @db.VarChar(120)
   location    String?  @db.VarChar(45)
 }
 
 model ShiftCafe {
   id                  String   @id @default(cuid())
-  startAt             DateTime 
-  createdAt           DateTime @default(now()) 
+  startAt             DateTime
+  createdAt           DateTime @default(now())
   shiftPosition       Int
   comment             String?  @db.VarChar(120)
   shiftManager        String?
@@ -227,7 +231,7 @@ model MenuCategory {
 model MenuProduct {
   id             Int           @id @default(autoincrement())
   name           String        @db.VarChar(45)
-  volume         Float         
+  volume         Float
   price          Int
   priceVolunteer Int
   glutenfree     Boolean

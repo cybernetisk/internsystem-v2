@@ -31,34 +31,34 @@ export async function GET(req) {
   
 }
 
-export async function POST(req) {
+// export async function POST(req) {
 
-  const session = await getServerSession(authOptions)
-  const params = await req.json()
-  const authCheck = new Auth(session, params)
-  .requireRoles([])
-  .requireParams(["userId", "workGroupId"])
+//   const session = await getServerSession(authOptions)
+//   const params = await req.json()
+//   const authCheck = new Auth(session, params)
+//   .requireRoles([])
+//   .requireParams(["userId", "workGroupId"])
 
-  if (authCheck.failed) return authCheck.verify(authCheck.response)
+//   if (authCheck.failed) return authCheck.verify(authCheck.response)
   
 
   
-  const { userId, workGroupId } = params;
+//   const { userId, workGroupId } = params;
 
-  try {
-    const res = await prisma.userToWorkGroup.create({
-      data: {
-        userId: userId,
-        workGroupId: workGroupId
-      }
-    })
+//   try {
+//     const res = await prisma.userToWorkGroup.create({
+//       data: {
+//         userId: userId,
+//         workGroupId: workGroupId
+//       }
+//     })
 
-    if (res)
-      return authCheck.verify(NextResponse.json({status: 200}))
+//     if (res)
+//       return authCheck.verify(NextResponse.json({status: 200}))
 
-  } catch (error) {
-    console.log("User to workgroup already exist in database")
-    return authCheck.verify(NextResponse.json({status: 200}))
-  }
+//   } catch (error) {
+//     console.log("User to workgroup already exist in database")
+//     return authCheck.verify(NextResponse.json({status: 200}))
+//   }
 
-}
+// }
