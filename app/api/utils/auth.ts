@@ -7,16 +7,18 @@ import {mailOptions, transporter} from "@/app/(pages)/auth/email";
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql"
-
     }),
 
     basePath: "/api/v2/auth",
 
-
     plugins: [
         magicLink({
             sendMagicLink: async ({email, token, url, metadata}, ctx) => {
-                const html = `Hello. Please verify your email: ${url}`;
+                const html = `Hello. You have successfully created an account at ${process.env.BETTER_AUTH_URL}.
+  
+                  Please verify your email by clicking the following link: <a href="${url}">${url}</a> <br>
+                  If you have not created a user, ignore this message. <br>
+                  You cannot reply to this email.`;
 
                 transporter.sendMail(
                     mailOptions(email, html)
