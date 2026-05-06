@@ -116,6 +116,7 @@ CREATE TABLE "WorkLog" (
     "duration" DOUBLE PRECISION,
     "description" VARCHAR(120),
     "semesterId" INTEGER NOT NULL,
+    "workGroup" TEXT,
 
     CONSTRAINT "WorkLog_pkey" PRIMARY KEY ("id")
 );
@@ -275,6 +276,9 @@ ALTER TABLE "WorkLog" ADD CONSTRAINT "loggedBy" FOREIGN KEY ("loggedBy") REFEREN
 
 -- AddForeignKey
 ALTER TABLE "WorkLog" ADD CONSTRAINT "loggedFor" FOREIGN KEY ("loggedFor") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "WorkLog" ADD CONSTRAINT "workLog" FOREIGN KEY ("workGroup") REFERENCES "WorkGroup"("id") ON DELETE SET NULL ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "UserMembership" ADD CONSTRAINT "UserMembership_semester" FOREIGN KEY ("semester_id") REFERENCES "Semester"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
