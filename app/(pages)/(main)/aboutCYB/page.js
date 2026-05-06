@@ -112,7 +112,7 @@ const card = (list) => {
             <Typography
               variant="subtitle2"
               key={"card_content_t2_" + p.title}
-              color="GrayText"
+              color="text.secondary"
               gutterBottom
             >
               {p.name ? p.name : ":("}

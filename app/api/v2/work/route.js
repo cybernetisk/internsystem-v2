@@ -12,7 +12,7 @@ export async function POST(req) {
   const params = await req.json()
   const authCheck = new Auth(session, params)
     .requireRoles([])
-    .requireParams(["loggedBy", "loggedFor", "workedAt", "duration", "description", "semesterId"])
+    .requireParams(["loggedBy", "loggedFor", "workedAt", "duration", "description", "semesterId", "workGroupId"])
 
   if (authCheck.failed) return authCheck.verify(authCheck.response)
 
@@ -26,7 +26,8 @@ export async function POST(req) {
         workedAt: params.workedAt,
         duration: params.duration,
         description: params.description,
-        semesterId: params.semesterId
+        semesterId: params.semesterId,
+        workGroup: params.workGroupId
       }
     });
 
