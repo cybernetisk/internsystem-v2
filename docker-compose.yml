@@ -13,7 +13,7 @@ services:
       db:
         condition: service_healthy
 
-    command: sh -c "npm run prismapush && npm run prismaseed && npm run dev"
+    command: sh -c "npx prisma migrate dev && npm run prismaseed && npm run dev"
 
 
   db:
