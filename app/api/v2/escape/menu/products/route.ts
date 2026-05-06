@@ -2,10 +2,10 @@ import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/prisma/prismaClient";
 import prismaClient from "@/prisma/prismaClient";
 import {MenuProduct} from "@prisma/client";
-import {authOptions} from "@/app/api/utils/authOptions";
-import {getServerSession} from "next-auth";
-import {Auth} from "@/app/api/utils/auth";
+import {Auth} from "@/app/api/utils/oldAuth";
 import {MenuProductCreate} from "@/app/api/utils/types/MenuProductTypes";
+import {auth} from "@/app/api/utils/auth";
+import {headers} from "next/headers";
 
 
 // Modify a product. Modifies the product based on the id in the request body.
@@ -14,12 +14,12 @@ export async function PATCH(
 ) {
     const product: MenuProduct = await req.json();
 
-    const session = await getServerSession(authOptions);
-    const auth = new Auth(session, product)
+    const session = await auth.api.getSession({headers: await headers()});
+    const authCheck = new Auth(session, product)
         .requireRoles(["board"])
         .requireParams(["id"]);
 
-    if (auth.failed) return auth.response;
+    if (authCheck.failed) return authCheck.response;
 
     try {
         const newProduct = await prismaClient.menuProduct.update({
@@ -29,9 +29,9 @@ export async function PATCH(
             data: product
         });
 
-        return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
+        return authCheck.verify(NextResponse.json(JSON.stringify(newProduct)));
     } catch (e) {
-        return auth.verify(NextResponse.json(
+        return authCheck.verify(NextResponse.json(
             {error: `something went wrong: ${e}`},
             {status: 500}
         ));
@@ -45,12 +45,12 @@ export async function POST(
 ) {
     const product: MenuProductCreate = await req.json();
 
-    const session = await getServerSession(authOptions);
-    const auth = new Auth(session, product)
+    const session = await auth.api.getSession({headers: await headers()});
+    const authCheck = new Auth(session, product)
         .requireRoles(["board"])
         .requireParams(["name", "hidden", "price", "volume", "glutenfree", "category_id", "priceVolunteer"]);
 
-    if (auth.failed) return auth.response;
+    if (authCheck.failed) return authCheck.response;
 
     try {
         const newProduct = await prisma.menuProduct.create({
@@ -67,9 +67,9 @@ export async function POST(
         })
 
         // 201 Created
-        return auth.verify(NextResponse.json(JSON.stringify({}), {status: 201}));
+        return authCheck.verify(NextResponse.json(JSON.stringify({}), {status: 201}));
     } catch (e) {
-        return auth.verify(NextResponse.json(
+        return authCheck.verify(NextResponse.json(
             {error: `something went wrong: ${e}`},
             {status: 500}
         ));

@@ -3,12 +3,12 @@
 import {Box, Button, Grid, Skeleton, TextField, Typography} from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import {useEffect, useState} from "react";
-import {cybTheme} from "./../../../components/themeCYB";
-import {signIn, useSession} from "next-auth/react";
+import {cybTheme} from "@/app/components/themeCYB.js";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {normalizeEmail} from "./../../../components/Login/authUtil";
+import {normalizeEmail} from "@/app/components/Login/authUtil.js";
 import SnackbarAlert from "@/app/components/feedback/snackbarAlert";
+import {authClient} from "@/app/api/utils/auth-client.ts";
 
 
 export default function SignInPage() {
@@ -20,15 +20,12 @@ export default function SignInPage() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [severity, setSeverity] = useState("")
 
-    const session = useSession()
+    const session = authClient.useSession()
     const router = useRouter()
-
-    // wrap in useEffect because i don't know
     useEffect(() => {
-        if (session.status === "authenticated") {
-            router.push("/");
-        }
-    });
+        if (session.data)
+            router.push("/")
+    })
 
 
     const handleLogin = async () => {
@@ -44,13 +41,11 @@ export default function SignInPage() {
         }
 
         const normalizedEmail = normalizeEmail(email);
-
-        const response = await signIn("email", {
+        const response = await authClient.signIn.magicLink({
             email: normalizedEmail,
-            redirect: false,
         });
 
-        if (response.error == null) {
+        if (!response.error) {
             setError(false)
             setSeverity("success")
             setResponse(`Email sent to ${normalizedEmail}`);

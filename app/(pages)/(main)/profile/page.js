@@ -15,9 +15,9 @@ import {
 import { PageHeader } from "@/app/components/sanity/PageBuilder"
 import authWrapper from "@/app/middleware/authWrapper"
 import CustomAutoComplete from "@/app/components/input/CustomAutocomplete";
-import { signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import {authClient} from "@/app/api/utils/auth-client.ts";
 
 const RECRUIT_TABLE_HEADERS = [
   { id: "workedAt", name: "work date", sortBy: "workedAt_num", flex: 2 },
@@ -28,19 +28,18 @@ const RECRUIT_TABLE_HEADERS = [
 
 function ProfilePage() {
   
-  const session = useSession();
+  const session = authClient.useSession();
   const router = useRouter()
   
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [recruitLogs, setRecruitLogs] = useState([]);
   const [recruitHours, setRecruitHours] = useState([]);
   
   const [selectedRecruiter, setSelectedRecruiter] = useState(
-    session.data.user.RecruitedByUser
+    session.data.user
   );
-  
+
   const email = session.data.user.email;
   const userRoles = session.data.user.roles;
   const recruiter = session.data.user.recruitedByUser;
@@ -62,9 +61,8 @@ function ProfilePage() {
   
   // queries database for user data
   useEffect(() => {
-    if (session.data != undefined) {
-      setFirstName(session.data.user.firstName)
-      setLastName(session.data.user.lastName)
+    if (session.data.user !== undefined) {
+      setName(session.data.user.name)
       setSelectedRecruiter(recruiter);
     }
   }, [session])
@@ -77,8 +75,7 @@ function ProfilePage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        firstName: firstName,
-        lastName: lastName,
+        name: name,
       }),
     }).then(() => window.location.reload());
 
@@ -97,7 +94,7 @@ function ProfilePage() {
 
     
   }
-  
+
     
   const buttonProps = {
     fullWidth: true,
@@ -124,11 +121,9 @@ function ProfilePage() {
         >
           <Grid item xs={12} md={5}>
             {section1({
-              firstName,
-              lastName,
+              name,
               email,
-              setFirstName,
-              setLastName,
+              setName,
               handleUpdateData,
               buttonProps,
             })}
@@ -171,8 +166,7 @@ function section1(props) {
           <Grid item md={4}>
             <Stack spacing={2}>
               <Typography variant="body1">User details</Typography>
-              {CheckedTextField( "First name", props.firstName, props.setFirstName)}
-              {CheckedTextField("Last name", props.lastName, props.setLastName)}
+              {CheckedTextField( "Name", props.name, props.setName)}
               {CheckedTextField("Email", props.email, () => {}, true)}
               <Button {...props.buttonProps} onClick={props.handleUpdateData}>
                 Update
@@ -205,7 +199,7 @@ function section2(props) {
                 ))}
 
                 <Typography variant="body1">
-                  {props.userRoles.length == 0 ? "none" : ""}
+                  {props.userRoles.length === 0 ? "none" : ""}
                 </Typography>
               </Box>
               {BoardRedirectButton(
@@ -224,7 +218,7 @@ function section2(props) {
       </Grid>
 
       <Grid item>
-        <Button {...props.buttonProps} onClick={() => signOut()}>
+        <Button {...props.buttonProps} onClick={async () => await authClient.signOut()}>
           sign out
         </Button>
       </Grid>
@@ -241,7 +235,7 @@ function section3(props) {
             <Stack direction="column" spacing={2}>
               <CustomAutoComplete
                 label="Who recruited you?"
-                dataLabel="firstName"
+                dataLabel="name"
                 subDataLabel="email"
                 data={props.users}
                 value={props.selectedRecruiter}

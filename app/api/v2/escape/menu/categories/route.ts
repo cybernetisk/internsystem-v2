@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MenuCategory } from "@prisma/client";
 import prismaClient from "@/prisma/prismaClient";
-import { getServerSession } from "next-auth";
-import { Auth } from "@/app/api/utils/auth";
-import { authOptions } from "@/app/api/utils/authOptions";
+import { Auth } from "@/app/api/utils/oldAuth";
 import { MenuCategoryCreate } from "@/app/api/utils/types/MenuCategoryTypes";
+import {auth} from "@/app/api/utils/auth";
+import { headers } from "next/headers";
 
 
 // Modify a category. Does not allow modifying products inside the category.
@@ -13,12 +13,12 @@ export async function PATCH(
 ) {
     const category: MenuCategory = await req.json();
 
-    const session = await getServerSession(authOptions);
-    const auth: Auth = new Auth(session, category)
+    const session = await auth.api.getSession({headers: await headers()});
+    const authCheck: Auth = new Auth(session, category)
         .requireRoles(["board"])
         .requireParams(["id"]); // only id is strictly required
 
-    if (auth.failed) return auth.response;
+    if (authCheck.failed) return authCheck.response;
 
     try {
 
@@ -29,9 +29,9 @@ export async function PATCH(
             data: category
         });
 
-        return auth.verify(NextResponse.json(JSON.stringify(newProduct)));
+        return authCheck.verify(NextResponse.json(JSON.stringify(newProduct)));
     } catch (e) {
-        return auth.verify(NextResponse.json(
+        return authCheck.verify(NextResponse.json(
             {error: `something went wrong: ${ e }`},
             {status: 500}
         ));
@@ -45,12 +45,12 @@ export async function POST(
 ) {
     const category: MenuCategoryCreate = await req.json();
 
-    const session = await getServerSession(authOptions);
-    const auth = new Auth(session, category)
+    const session = await auth.api.getSession({headers: await headers()});
+    const authCheck = new Auth(session, category)
         .requireRoles(["board"])
         .requireParams(["name"]);
 
-    if (auth.failed) return auth.response;
+    if (authCheck.failed) return authCheck.response;
 
     try {
         const newCategory = await prismaClient.menuCategory.create({
@@ -58,9 +58,9 @@ export async function POST(
         });
 
         // 201 Created
-        return auth.verify(NextResponse.json(JSON.stringify(newCategory), {status: 201}));
+        return authCheck.verify(NextResponse.json(JSON.stringify(newCategory), {status: 201}));
     } catch (e) {
-        return auth.verify(NextResponse.json(
+        return authCheck.verify(NextResponse.json(
             {error: `something went wrong: ${ e }`},
             {status: 500}
         ));

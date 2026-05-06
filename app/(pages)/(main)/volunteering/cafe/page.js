@@ -160,7 +160,7 @@ function CafePage() {
                   <Stack spacing={2}>
                     <CustomAutoComplete
                       label="Shift manager"
-                      dataLabel="firstName"
+                      dataLabel="name"
                       subDataLabel="email"
                       data={users}
                       value={shiftManager}
@@ -169,7 +169,7 @@ function CafePage() {
                     />
                     <CustomAutoComplete
                       label="Volunteer"
-                      dataLabel="firstName"
+                      dataLabel="name"
                       subDataLabel="email"
                       data={users}
                       value={shiftWorker1}
@@ -178,7 +178,7 @@ function CafePage() {
                     />
                     <CustomAutoComplete
                       label="Volunteer"
-                      dataLabel="firstName"
+                      dataLabel="name"
                       subDataLabel="email"
                       data={users}
                       value={shiftWorker2}

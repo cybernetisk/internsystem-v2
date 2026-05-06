@@ -1,14 +1,14 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { Auth } from "../../utils/auth";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/utils/authOptions";
+import { Auth } from "../../utils/oldAuth.js";
+import {auth} from "@/app/api/utils/auth.ts";
+import {headers} from "next/headers";
 
 
 export async function POST(req) {
 
-  const session = await getServerSession(authOptions)
+  const session = await auth.api.getSession({headers: await headers()})
   const params = await req.json()
   const authCheck = new Auth(session, params)
     .requireRoles([])
@@ -89,7 +89,7 @@ export async function POST(req) {
 
 export async function GET(req) {
 
-  const session = await getServerSession(authOptions)
+  const session = await auth.api.getSession({headers: await headers()})
   const authCheck = new Auth(session)
     .requireRoles([])
 
@@ -99,8 +99,8 @@ export async function GET(req) {
     const semester = await prisma.Semester.findFirst({ select: { id: true }, orderBy: { id: "desc" } })
     const workLogs = await prisma.WorkLog.findMany({
       select: {
-        LoggedByUser: { select: { firstName: true, lastName: true, id: true } },
-        LoggedForUser: { select: { firstName: true, lastName: true, id: true } },
+        LoggedByUser: { select: { name: true, id: true } },
+        LoggedForUser: { select: { name: true, id: true } },
         workedAt: true,
         duration: true,
         description: true

@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../utils/authOptions";
-import { NextRequest, NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 const NOT_AUTHORIZED = NextResponse.json({error: "Not authorized"}, {status: 403})
 const NOT_SIGNED_IN = NextResponse.json({error: "Not logged in"}, {status: 401})
@@ -13,9 +11,9 @@ const MISSING_PARAMS = NextResponse.json({error: "Malformed request, missing par
  *  3. Check the failed attribute to check if the auth-check failed or not
  *  4. Fetch the reponse attribute which contain a NextResponse if the checks failed
  *  5. Return response wrapped with this class' verify function to add 'X-Auth-Checked' header to response
- * 
- * @param {Object} session 
- * @param {Object} params (Optional) Must be passed for requireParams function to work   
+ *
+ * @param {Object} session
+ * @param {Object} params (Optional) Must be passed for requireParams function to work
  */
 export class Auth {
     constructor(session, params = null) {
@@ -31,7 +29,7 @@ export class Auth {
     */
     requireRoles(permittedRoles) {
         if (this.failed) return this
-        
+
         if (this.session === null) {
             this.response = NOT_SIGNED_IN
             this.failed = true
@@ -45,10 +43,10 @@ export class Auth {
         if (permittedRoles.some(role => this.session.user.roles.includes(role))) {
             return this
         }
-        
+
         this.response = NOT_AUTHORIZED
         this.failed = true
-        
+
         return this
     }
 
@@ -58,7 +56,7 @@ export class Auth {
     */
     requireParams(params) {
         if (this.params === null) throw new Error("params attribute is required to be set by constructor to use this function")
-            
+
         if (this.failed) return this
 
         const givenParams = this.params
@@ -80,12 +78,12 @@ export class Auth {
      */
     requireOwnership(owner) {
         if (this.failed) return this
-    
+
         if (this.session.user.roles.includes("admin")) return this // Admin buypass on ownership requirement
         if (this.session.user.id === owner) { // Checking to see if userID is equal in stead of checking not null in case this.session is null which would give false positive
             return this
         }
-        
+
         this.failed = true
         this.response = NOT_AUTHORIZED
         return this

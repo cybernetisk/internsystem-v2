@@ -53,13 +53,7 @@ function AdminPage({ props }) {
     fetch("/api/v2/users")
     .then(res => res.json())
     .then((data) => {
-      const users = data.users.map((e) => {
-        return {
-          ...e,
-          name: `${e.firstName} ${e.lastName ? e.lastName : ""}`,
-        };
-      })
-      setUsers(users)
+      setUsers(data.users)
     })
   }, []);
   
@@ -102,7 +96,7 @@ function AdminPage({ props }) {
       })
       
     }
-  }  
+  }
 
   return (
     <Box>

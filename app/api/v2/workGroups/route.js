@@ -1,14 +1,14 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { Auth } from "../../utils/auth";
-import { authOptions } from "@/app/api/utils/authOptions";
-import { getServerSession } from "next-auth";
+import { Auth } from "../../utils/oldAuth.js";
+import {auth} from "@/app/api/utils/auth.ts";
+import {headers} from "next/headers";
 
 
 export async function GET(req) {
   
-  const session = await getServerSession(authOptions)
+  const session = await auth.api.getSession({headers: await headers()})
   const authCheck = new Auth(session)
   .requireRoles([])
 
@@ -31,9 +31,9 @@ export async function GET(req) {
   
 }
 
-// export async function POST(req) {
+// export async function POST(req) {
 
-//   const session = await getServerSession(authOptions)
+//  const session = await auth.api.getSession({headers: await headers()})
 //   const params = await req.json()
 //   const authCheck = new Auth(session, params)
 //   .requireRoles([])

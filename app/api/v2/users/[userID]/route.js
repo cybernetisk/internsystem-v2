@@ -1,10 +1,9 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { Auth } from "@/app/api/utils/auth";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/utils/authOptions";
-
+import { Auth } from "@/app/api/utils/oldAuth.js";
+import {auth} from "@/app/api/utils/auth.ts";
+import {headers} from "next/headers";
 
 
 
@@ -12,7 +11,7 @@ export async function GET(req, {params}) {
     
     const { userID } = await params
 
-    const session = await getServerSession(authOptions)
+    const session = await auth.api.getSession({headers: await headers()})
     const authCheck = new Auth(session)
     .requireRoles([])
     .requireOwnership(userID)
@@ -30,7 +29,7 @@ export async function PATCH(req, {params}) {
     
     const { userID } = await params
 
-    const session = await getServerSession(authOptions)
+    const session = await auth.api.getSession({headers: await headers()})
     const authCheck = new Auth(session)
     .requireRoles([])
     .requireOwnership(userID)
@@ -42,11 +41,10 @@ export async function PATCH(req, {params}) {
     
     const result = {}
 
-    for (let [arg, val] of Object.entries(args)) {
+    for (let [arg, val] of Object.entries(args)) {
         result[arg] = false
         switch (arg) {
-            case "firstName":
-            case "lastName":
+            case "name":
             case "recruitedById":
                 let res = await updateField(arg, val, userID)
                 if (res)
