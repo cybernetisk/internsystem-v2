@@ -240,7 +240,7 @@ model MenuProduct {
 model CafeStatus {
   id    Int      @id
   open  Boolean
-  start DateTime?
-  end   DateTime? 
+  start String?
+  end   String? 
   emoji String?   @db.Char()
 }

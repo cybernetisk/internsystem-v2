@@ -40,23 +40,39 @@ export class NavBar extends Component {
           {/* Mobile layout */}
           <Grid2
             container
-            direction="row"
+            direction="column"
             size="grow"
-            sx={{ 
-              display: { xs: "flex", md: "none" },
-              alignContent: "flex-end",
+            sx={{
+              display: {md: "none" },
+              alignContent: "center",
               justifyContent: "space-between"
             }}
           >
-            {navItems.map((item, i) => (
-              <Grid2 size="grow" key={`nav${i}`}>
-                {NavElementSmallScreen(item, i, iconProps, currentPath)}
+            <Grid2
+              container
+              direction="row"
+              // size="grow"
+              sx={{
+                width: "100%",
+                display: { md: "none" },
+                alignItems: "center",
+                justifyContent: "space-around"
+              }}
+            >
+              {navItems.map((item, i) => (
+                <Grid2 size="grow" key={`nav${i}`}>
+                  {NavElementSmallScreen(item, i, iconProps, currentPath)}
+                </Grid2>
+              ))}
+              <Grid2 size="grow">
+                <SessionProvider basePath="/api/v2/auth">
+                  <LoginButton currentPath={currentPath} iconProps={iconProps} />
+                </SessionProvider>
               </Grid2>
-            ))}
-
-            <Grid2 size="grow">
+            </Grid2>
+            <Grid2 container size="grow" sx={{alignItems: "center", justifyContent: "center"}}>
               <SessionProvider basePath="/api/v2/auth">
-                <LoginButton currentPath={currentPath} iconProps={iconProps} />
+                <CafeOpen/>
               </SessionProvider>
             </Grid2>
           </Grid2>
@@ -88,7 +104,9 @@ export class NavBar extends Component {
             <Grid2 pl={5} container sx={{
               alignItems: "center"
             }}>
-              <CafeOpen/>
+              <SessionProvider basePath="/api/v2/auth">
+                <CafeOpen/>
+              </SessionProvider>
             </Grid2>
             
             <Grid2 container size="grow" sx={{justifyContent:"flex-end"}} pr={2}>
