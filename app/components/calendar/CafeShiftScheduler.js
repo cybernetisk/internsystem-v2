@@ -72,7 +72,7 @@ export default function CafeShiftScheduler(props) {
     setFocusedDay(modeOperations[mode](focusedDay, 1));
   }
 
-  const getDayColor = (day, check, inactiveColor="GrayText") => {
+  const getDayColor = (day, check, inactiveColor="text.secondary") => {
     if (isToday(day)) return cybTheme.palette.primary.main;
     if (!check(day, focusedDay)) return inactiveColor;
     return "";

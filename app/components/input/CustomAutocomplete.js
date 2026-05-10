@@ -107,7 +107,7 @@ export default class CustomAutoComplete extends Component {
                   <Typography
                     key={`option_box_email_${props.id}`}
                     variant="caption"
-                    color="GrayText"
+                    color="text.secondary"
                   >
                     {option[subDataLabel]}
                   </Typography>

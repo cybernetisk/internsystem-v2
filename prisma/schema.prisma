@@ -78,6 +78,8 @@ model WorkGroup {
   leaderTitle     String            @db.VarChar(45)
   description     String
   UserToWorkGroup UserToWorkGroup[]
+
+  workLogs WorkLog[] @relation("WorkLog_workGroup")
 }
 
 model ActivateToken {
@@ -136,9 +138,11 @@ model WorkLog {
   duration      Float?
   description   String?   @db.VarChar(120)
   semesterId    Int
+  workGroup     String?
   Semester      Semester  @relation(fields: [semesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "WorkLog_Semester")
   LoggedByUser  User?     @relation("WorkLog_loggedByToUser", fields: [loggedBy], references: [id], onUpdate: NoAction, map: "loggedBy")
   LoggedForUser User?     @relation("WorkLog_loggedForToUser", fields: [loggedFor], references: [id], onUpdate: NoAction, map: "loggedFor")
+  workgroup     WorkGroup? @relation("WorkLog_workGroup", fields: [workGroup], references: [id], onUpdate: NoAction, map: "workLog")
   Voucher       Voucher[]
 
   // @@index([id], map: "logID_idx")
