@@ -63,11 +63,10 @@ export async function POST(req) {
         const opens = params.opens;
         const closes = params.closes;
         const emoji = params.emoji;
+
         if (opens.match(/^\d{2}\:\d{2}$/) === null) return authCheck.verify(NextResponse.json({error: "opens field must match /^\d{2}\:\d{2}$/"}, {status: 400}));
         if (closes.match(/^\d{2}\:\d{2}$/) === null) return authCheck.verify(NextResponse.json({error: "closes field must match /^\d{2}\:\d{2}$/"}, {status: 400}));
         if (typeof(emoji) !== "string" || emoji.length !== 1) return authCheck.verify(NextResponse.json({error: "emoji must be string of length 1"}, {status: 400}));
-
-        if (opens >= closes) return authCheck.verify(NextResponse.json({error: "Opening time must be after closing time"}, {status: 400}));
 
         await prisma.cafeStatus.update({
             where: {id: 0},
