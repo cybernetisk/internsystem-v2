@@ -240,3 +240,12 @@ model MenuProduct {
   category       MenuCategory? @relation("MenuProduct_category", fields: [category_id], references: [id])
   ordering       Int?
 }
+
+model CafeStatus {
+  id    Int      @id
+  open  Boolean
+  start DateTime?
+  end   DateTime? 
+  emoji String?   @db.Char()
+  updated DateTime @updatedAt
+}

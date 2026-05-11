@@ -6,6 +6,7 @@ export const cybTheme = createTheme({
     mode: "dark",
     primary: {
       main: "#d2a30e",
+      disabled: "#96760b"
     },
     secondary: {
       main: "#ac0bce",
@@ -14,7 +15,7 @@ export const cybTheme = createTheme({
       main: "#ffe358",
     },
     background: {
-      // paper: "#181817",
+      main: "#181817",
     },
   },
 });
