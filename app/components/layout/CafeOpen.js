@@ -73,7 +73,7 @@ export function CafeOpen() {
         borderRadius: '10px',
         boxShadow: 24,
         display: "grid",
-        gridTemplateRows: '1fr .5fr auto auto auto 1fr',
+        gridTemplateRows: '1fr .5fr auto auto auto .5fr .5fr',
         alignItems: 'center',
         justifyItems: 'center'
     };
@@ -143,7 +143,9 @@ export function CafeOpen() {
           <Button type="submit" variant="text" sx={{width: "70%", height: 50, bgcolor: "#333", marginBottom: "10px"}}>
               Confim
           </Button>
-
+          <Button variant="text" onClick={() => {setIsModalOpen(false)}} sx={{width: "70%", height: 50, bgcolor: "#333", marginBottom: "10px"}}>
+              cancel  
+          </Button>
         </Grid2>
 
       </form>
