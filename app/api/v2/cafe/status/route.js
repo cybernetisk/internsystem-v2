@@ -11,6 +11,11 @@ export async function GET() {
         where: {id:0},
     });
 
+    if (cafeStatus.open) {
+        if (new Date(Date.now()) > cafeStatus.end) {
+            cafeStatus.open = false;
+        }
+    }
 
     return authCheck.verify(
         NextResponse.json({
@@ -60,12 +65,17 @@ export async function POST(req) {
             }
         })
     } else {
-        const opens = params.opens;
-        const closes = params.closes;
+        let opens;
+        let closes;
         const emoji = params.emoji;
 
-        if (opens.match(/^\d{2}\:\d{2}$/) === null) return authCheck.verify(NextResponse.json({error: "opens field must match /^\d{2}\:\d{2}$/"}, {status: 400}));
-        if (closes.match(/^\d{2}\:\d{2}$/) === null) return authCheck.verify(NextResponse.json({error: "closes field must match /^\d{2}\:\d{2}$/"}, {status: 400}));
+        try {
+            opens = new Date(params.opens);
+            closes = new Date(params.closes);
+        } catch (e){
+            console.log(e)
+        }
+
         if (typeof(emoji) !== "string" || emoji.length !== 1) return authCheck.verify(NextResponse.json({error: "emoji must be string of length 1"}, {status: 400}));
 
         await prisma.cafeStatus.update({
@@ -74,7 +84,7 @@ export async function POST(req) {
                 open: true,
                 start: opens,
                 end: closes,
-                emoji: emoji
+                emoji: emoji,
             }
         })
         

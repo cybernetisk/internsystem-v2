@@ -25,13 +25,16 @@ export function CafeOpen() {
       'OpenIndicator'
     );
 
+    const ISOTimeStringTo24hTime = (str) => new Date(str).toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" })
+
     useEffect(() => {
       fetch("/api/v2/cafe/status").then(async (res) => {
         if (res.status == 200) {
           const data = await res.json()
           setCafeOpen(data.isOpen);
+
           setOpenText(
-            `open (${data.opens} - ${data.closes}) ${data.emoji}`
+            `open (${ISOTimeStringTo24hTime(data.opens)} - ${ISOTimeStringTo24hTime(data.closes)}) ${data.emoji}`
           )
         }
       })
@@ -42,7 +45,7 @@ export function CafeOpen() {
     return (
         <>
         <OpenIndicator/>
-        <Typography pl={1}>Cafè {cafeOpen ? openText : "closed"}</Typography>
+        <Typography pl={1}>Café {cafeOpen ? openText : "closed"}</Typography>
 
         {!session?.data?.user?.roles.includes("cafe-master") ? "" : 
         <>
@@ -83,6 +86,15 @@ export function CafeOpen() {
 
     formdata.set("isOpen", checked);
 
+    let opens = new Date();
+    opens.setHours(formdata.get("opens").split(":")[0], formdata.get("opens").split(":")[1], 0, 0)
+    
+    let closes = new Date();
+    closes.setHours(formdata.get("closes").split(":")[0], formdata.get("closes").split(":")[1], 0, 0)
+
+    formdata.set("opens", opens.toISOString())
+    formdata.set("closes", closes.toISOString())
+  
     fetch(e.target.action, {
       method: "POST",
       body: formdata

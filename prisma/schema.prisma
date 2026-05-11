@@ -244,7 +244,8 @@ model MenuProduct {
 model CafeStatus {
   id    Int      @id
   open  Boolean
-  start String?
-  end   String? 
+  start DateTime?
+  end   DateTime? 
   emoji String?   @db.Char()
+  updated DateTime @updatedAt
 }
