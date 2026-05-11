@@ -50,8 +50,8 @@ export async function POST(req) {
     if (authCheck.failed) {
         return authCheck.verify(NextResponse.json({error: "Not authorized"}, {status: 403}))
     }
-
     // User is autorized and has passed the correct parameters
+
     const isOpen = params.isOpen === "true";
 
     if (!isOpen) {
@@ -65,17 +65,12 @@ export async function POST(req) {
             }
         })
     } else {
-        let opens;
-        let closes;
+        const opens = new Date(params.opens);
+        const closes = new Date(params.closes);
         const emoji = params.emoji;
 
-        try {
-            opens = new Date(params.opens);
-            closes = new Date(params.closes);
-        } catch (e){
-            console.log(e)
-        }
-
+        if (isNaN(opens.valueOf())) return authCheck.verify(NextResponse.json({error: "opens must be a valid time string"}, {status: 400}))
+        if (isNaN(closes.valueOf())) return authCheck.verify(NextResponse.json({error: "closes must be a valid time string"}, {status: 400}))
         if (typeof(emoji) !== "string" || emoji.length !== 1) return authCheck.verify(NextResponse.json({error: "emoji must be string of length 1"}, {status: 400}));
 
         await prisma.cafeStatus.update({
