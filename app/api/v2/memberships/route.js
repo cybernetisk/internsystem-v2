@@ -13,7 +13,7 @@ export async function GET(req) {
   .requireRoles([])
 
   if (authCheck.failed) return authCheck.response
-  
+
   
   try {
       const semester = await prisma.UserMembership.findMany({
@@ -52,6 +52,8 @@ export async function POST(req) {
   const authCheck = new Auth(session, params)
   .requireRoles([])
   .requireParams(["name", "email", "comment", "seller_id", "semester_id"])
+
+  throw new Error("test");
 
   if (authCheck.failed) return authCheck.response
 

@@ -4,6 +4,7 @@ import prisma from "@/prisma/prismaClient";
 import {prismaAdapter} from "@better-auth/prisma-adapter";
 import {customSession, magicLink} from "better-auth/plugins";
 import {mailOptions, transporter} from "@/app/(pages)/auth/email";
+import {captureException} from "@sentry/nextjs";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -11,11 +12,20 @@ export const auth = betterAuth({
     }),
 
     basePath: "/api/v2/auth",
+    hooks: {
+        after: createAuthMiddleware(async ctx => {
+            const returned = ctx.context.returned;
+
+            // only log INTERNAL_SERVER_ERROR's and other non-APIError's (which would cause an INTERNAL_SERVER_ERROR)
+            if ((returned instanceof APIError && returned.status === "INTERNAL_SERVER_ERROR") || ((returned instanceof Error) && !(returned instanceof APIError))) {
+                captureException(returned, {tags: {"better-auth.error": true}});
+            }
+        }),
+    },
 
     plugins: [
         magicLink({
             sendMagicLink: async ({email, token, url, metadata}, ctx) => {
-
                 const existingUser = await prisma.user.findFirst({
                     where: {
                         email

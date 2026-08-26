@@ -24,6 +24,9 @@ COPY ./prisma.config.ts .
 COPY ./sanity*.js .
 COPY ./next.config.mjs .
 
+COPY ./instrumentation.ts ./instrumentation.ts
+COPY ./sentry.*.config.ts ./
+
 COPY ./app ./app
 COPY ./prisma ./prisma
 COPY ./sanity ./sanity
@@ -52,6 +55,9 @@ COPY ./tsconfig.json .
 COPY ./prisma.config.ts .
 COPY ./sanity*.js .
 COPY ./next.config.mjs .
+
+COPY ./instrumentation.ts ./instrumentation.ts
+COPY ./sentry.*.config.ts ./
 
 COPY ./app ./app
 COPY ./prisma ./prisma

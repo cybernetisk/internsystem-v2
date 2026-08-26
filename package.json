@@ -30,6 +30,7 @@
     "@sanity/structure": "^2.36.2",
     "@sanity/vision": "^5.20.0",
     "@sanity/visual-editing": "^5.3.4",
+    "@sentry/nextjs": "^10.71.0",
     "better-auth": "^1.6.9",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
