@@ -12,7 +12,7 @@
     "prismaseed": "dotenv -e .env npx prisma db seed"
   },
   "dependencies": {
-    "@better-auth/prisma-adapter": "^1.6.9",
+    "@better-auth/prisma-adapter": "1.6.33",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mdi/js": "^7.4.47",
@@ -30,7 +30,7 @@
     "@sanity/structure": "^2.36.2",
     "@sanity/vision": "^5.20.0",
     "@sanity/visual-editing": "^5.3.4",
-    "better-auth": "^1.6.9",
+    "better-auth": "1.6.33",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
     "dotenv-cli": "^7.3.0",
