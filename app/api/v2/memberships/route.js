@@ -50,7 +50,7 @@ export async function POST(req) {
     const session = await auth.api.getSession({ headers: await headers() })
     const params = await req.json()
     const authCheck = new Auth(session, params)
-        .requireRoles(["Master"])
+        .requireRoles(["Master", "board"])
         .requireParams(["name", "email", "comment", "seller_id", "semester_id"])
 
     if (authCheck.failed) return authCheck.response

@@ -11,80 +11,87 @@ export async function POST(req) {
     const session = await auth.api.getSession({ headers: await headers() })
     const params = await req.json()
     const authCheck = new Auth(session, params)
-        .requireRoles(["Master"])
+        .requireRoles(["Master", "board"])
         .requireParams(["loggedBy", "loggedFor", "workedAt", "duration", "description", "semesterId", "workGroupId"])
 
     if (authCheck.failed) return authCheck.verify(authCheck.response)
 
+    let success
 
+    try {
+        success = await prisma.$transaction(async (transaction) => {
+            const workLogEntry = await transaction.workLog.create({
+                data: {
+                    loggedBy: params.loggedBy,
+                    loggedFor: params.loggedFor,
+                    workedAt: params.workedAt,
+                    duration: params.duration,
+                    description: params.description,
+                    semesterId: params.semesterId,
+                    workGroup: params.workGroupId
+                }
+            });
 
-    const success = await prisma.$transaction(async (transaction) => {
-        const workLogEntry = await transaction.workLog.create({
-            data: {
-                loggedBy: params.loggedBy,
-                loggedFor: params.loggedFor,
-                workedAt: params.workedAt,
-                duration: params.duration,
-                description: params.description,
-                semesterId: params.semesterId,
-                workGroup: params.workGroupId
+            const voucherBuffer = (await transaction.VoucherBuffer.findFirst({
+                select: {
+                    buffer: true
+                },
+                where: {
+                    userId: params.loggedFor
+                }
+            }))?.buffer;
+
+            const numVouchersToLog = (params.duration / 2) + (voucherBuffer ?? 0); // TODO: Update to make vouchers per hour ajustable and not hardcoded
+
+            const loggedDate = new Date();
+            const workLogId = workLogEntry.id;
+
+            const voucherExpirationDate = (await transaction.Semester.findFirst({
+                select: {
+                    voucherExpirationDate: true
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            })).voucherExpirationDate
+
+            const voucherData = [];
+            for (let i = 0; i < Math.floor(numVouchersToLog); i++) {
+                voucherData.push({
+                    userId: params.loggedFor,
+                    loggedDate: loggedDate,
+                    expirationDate: voucherExpirationDate,
+                    workLogEntryId: workLogId
+                })
             }
-        });
 
-        const voucherBuffer = (await transaction.VoucherBuffer.findFirst({
-            select: {
-                buffer: true
-            },
-            where: {
-                userId: params.loggedFor
-            }
-        }))?.buffer;
-
-        const numVouchersToLog = (params.duration / 2) + (voucherBuffer ?? 0); // TODO: Update to make vouchers per hour ajustable and not hardcoded
-
-        const loggedDate = new Date();
-        const workLogId = workLogEntry.id;
-
-        const voucherExpirationDate = (await transaction.Semester.findFirst({
-            select: {
-                voucherExpirationDate: true
-            },
-            orderBy: {
-                id: 'desc'
-            }
-        })).voucherExpirationDate
-
-        const voucherData = [];
-        for (let i = 0; i < Math.floor(numVouchersToLog); i++) {
-            voucherData.push({
-                userId: params.loggedFor,
-                loggedDate: loggedDate,
-                expirationDate: voucherExpirationDate,
-                workLogEntryId: workLogId
+            await transaction.Voucher.createMany({
+                data: voucherData
             })
-        }
 
-        await transaction.Voucher.createMany({
-            data: voucherData
+            await transaction.VoucherBuffer.upsert({
+                where: {
+                    userId: params.loggedFor
+                },
+                update: {
+                    buffer: numVouchersToLog % 1 // Set buffer to amount of partial vouchers
+                },
+                create: {
+                    userId: params.loggedFor,
+                    buffer: numVouchersToLog % 1
+                }
+            })
+            return true
         })
+    } catch (error) {
+        return authCheck.verify(NextResponse.json({ errorMsg: "Registering failed", user: params.loggedFor }, { status: 500 }))
+    }
 
-        await transaction.VoucherBuffer.upsert({
-            where: {
-                userId: params.loggedFor
-            },
-            update: {
-                buffer: numVouchersToLog % 1 // Set buffer to amount of partial vouchers
-            },
-            create: {
-                userId: params.loggedFor,
-                buffer: numVouchersToLog % 1
-            }
-        })
-        return true
-    })
-
-    if (success)
+    if (success) {
         return authCheck.verify(NextResponse.json({ status: 200 }))
+    } else {
+        return authCheck.verify(NextResponse.json({ errorMsg: "Registering failed", user: params.loggedFor }, { status: 500 }))
+    }
 }
 
 export async function GET(req) {
