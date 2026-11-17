@@ -98,6 +98,9 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
             setResponse("Registering failed for " + failedUsers + " user(s)")
             setSnackbarOpen(true)
             setSeverity("error")
+            setTimeout(() => {
+                setRefresh("");
+            }, 3000);
             return
         }
 
@@ -107,7 +110,7 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
         setDescription("");
         setRefresh("");
 
-        setResponse("Work registered for " + responses.length + "user(s)")
+        setResponse("Work registered for " + responses.length + " user(s)")
         setSeverity("success")
         setSnackbarOpen(true)
     };
