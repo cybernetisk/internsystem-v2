@@ -107,10 +107,9 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
         setDescription("");
         setRefresh("");
 
-        setRequestResponse("Work registered.");
-        setTimeout(() => {
-            setRequestResponse("");
-        }, 5000);
+        setResponse("Work registered for " + responses.length + "user(s)")
+        setSeverity("success")
+        setSnackbarOpen(true)
     };
 
     const switchEndInputMethod = () => {
@@ -231,17 +230,6 @@ export default function workLogInput(session, users, workGroups, setRefresh) {
                     Register work
                 </Button>
             </Stack>
-            <Typography variant="subtitle1">
-                {requestResponse != "" ? (
-                    requestResponse
-                ) : (
-                    <Skeleton
-                        animation={false}
-                        variant="text"
-                        sx={{ bgcolor: "inherit" }}
-                    />
-                )}
-            </Typography>
             <Grid item>
                 <Typography variant="caption">
                     {response != "" ? (
