@@ -97,6 +97,8 @@ async function handlePostRoles(userID, args) {
 }
 
 async function handleRegisterVouchers(userId, amount) {
+    if (amount > 10) return NextResponse.json({ error: "F*ck off, too many vouchers" }, { status: 400 })
+
     const loggedDate = new Date();
 
     let success

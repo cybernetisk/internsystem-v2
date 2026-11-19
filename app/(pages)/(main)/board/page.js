@@ -38,6 +38,14 @@ export default function BoardPage() {
     }, []);
 
     const handleClick = async () => {
+        const isInvalid = validateVoucherRequest(
+            registeredFor,
+            amount,
+            setRegisteredForError,
+            setAmountError
+        );
+        if (isInvalid) return;
+
         let responses = []
         for (let user of registeredFor) {
             let res = await fetch(`/api/v2/users/${user.id}/vouchers`, {
@@ -57,7 +65,7 @@ export default function BoardPage() {
         for (let res of responses) {
             if (res.ok) continue
             const data = await res.json()
-            if (res.status == 403) {
+            if (res.status == 403 || res.status == 400) {
                 setResponse(data.error)
                 setSnackbarOpen(true)
                 setSeverity("error")
@@ -71,9 +79,6 @@ export default function BoardPage() {
             setResponse("Registering failed for " + names.toString() + " user(s)")
             setSnackbarOpen(true)
             setSeverity("error")
-            setTimeout(() => {
-                setRefresh("");
-            }, 3000);
             return
         }
 
@@ -134,7 +139,7 @@ export default function BoardPage() {
                                 setValue={(value) => {
                                     setAmount(value);
                                 }}
-                                check={(data) => data.match(/[^0-9.]/) || data.match(/[.]{2,}/g)}
+                                check={(data) => data.match(/[^0-9]+/)}
                                 error={amountError}
                             />
 
@@ -153,4 +158,24 @@ export default function BoardPage() {
             </Stack>
         </Box>
     );
+}
+
+function validateVoucherRequest(
+    registeredFor,
+    amount,
+    setRegisteredForError,
+    setAmountError
+) {
+    // Define an object to store the errors
+    const errors = {
+        registeredForError: registeredFor.length == 0,
+        amountError: Number.isNaN(amount) || amount <= 0 || amount > 10
+    };
+
+    // Update the error states using the setters
+    setRegisteredForError(errors.registeredForError);
+    setAmountError(errors.amountError);
+
+    // Return true if any error exists
+    return Object.values(errors).some((error) => error);
 }
