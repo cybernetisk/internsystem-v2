@@ -12,21 +12,23 @@ export async function POST(req, { params }) {
     const args = await req.json()
     const session = await auth.api.getSession({ headers: await headers() });
     const authCheck = new Auth(session, args)
-        .requireRoles(["admin"])
 
     if (authCheck.failed) return authCheck.verify(authCheck.response)
-
 
     const { userID, action } = await params
 
     if (userID) {
         switch (action) {
             case "roles":
-                authCheck.requireParams(["roles"])
+                authCheck
+                    .requireRoles(["admin"])
+                    .requireParams(["roles"])
                 if (authCheck.failed) return authCheck.verify(authCheck.response)
                 return authCheck.verify(await handlePostRoles(userID, args))
             case "vouchers":
-                authCheck.requireParams(["amount"])
+                authCheck
+                    .requireRoles(["board"])
+                    .requireParams(["amount"])
                 if (authCheck.failed) return authCheck.verify(authCheck.response)
                 return authCheck.verify(await handleRegisterVouchers(userID, args.amount))
         }
@@ -97,30 +99,35 @@ async function handlePostRoles(userID, args) {
 async function handleRegisterVouchers(userId, amount) {
     const loggedDate = new Date();
 
-    const success = await prisma.$transaction(async (transaction) => {
-        const voucherExpirationDate = (await transaction.Semester.findFirst({
-            select: {
-                voucherExpirationDate: true
-            },
-            orderBy: {
-                id: 'desc'
+    let success
+    try {
+        success = await prisma.$transaction(async (transaction) => {
+            const voucherExpirationDate = (await transaction.Semester.findFirst({
+                select: {
+                    voucherExpirationDate: true
+                },
+                orderBy: {
+                    id: 'desc'
+                }
+            })).voucherExpirationDate
+
+            const voucherData = [];
+            for (let i = 0; i < Math.floor(amount); i++) {
+                voucherData.push({
+                    userId: userId,
+                    loggedDate: loggedDate,
+                    expirationDate: voucherExpirationDate
+                })
             }
-        })).voucherExpirationDate
 
-        const voucherData = [];
-        for (let i = 0; i < Math.floor(amount); i++) {
-            voucherData.push({
-                userId: userId,
-                loggedDate: loggedDate,
-                expirationDate: voucherExpirationDate
+            await transaction.Voucher.createMany({
+                data: voucherData
             })
-        }
-
-        await transaction.Voucher.createMany({
-            data: voucherData
+            return true
         })
-        return true
-    })
+    } catch (error) {
+        return NextResponse.json({ userId: userId }, { status: 500 })
+    }
 
     if (success) {
         return NextResponse.json({}, { status: 200 })
