@@ -1,8 +1,9 @@
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
-const NOT_AUTHORIZED = NextResponse.json({error: "Not authorized"}, {status: 403})
-const NOT_SIGNED_IN = NextResponse.json({error: "Not logged in"}, {status: 401})
-const MISSING_PARAMS = NextResponse.json({error: "Malformed request, missing params"}, {status: 400})
+const NOT_AUTHORIZED = () => NextResponse.json({ errorMsg: "Not authorized" }, { status: 403 })
+const NOT_SIGNED_IN = () => NextResponse.json({ errorMsg: "Not logged in" }, { status: 401 })
+const MISSING_PARAMS = () => NextResponse.json({ errorMsg: "Malformed request, missing params" }, { status: 400 })
+const MISSING_ROLES = () => NextResponse.json({ errorMsg: "Missing required roles" }, { status: 403 })
 
 /**
  * This class is meant to be used in a chain-fassion
@@ -31,7 +32,7 @@ export class Auth {
         if (this.failed) return this
 
         if (this.session === null) {
-            this.response = NOT_SIGNED_IN
+            this.response = NOT_SIGNED_IN()
             this.failed = true
             return this
         }
@@ -44,7 +45,7 @@ export class Auth {
             return this
         }
 
-        this.response = NOT_AUTHORIZED
+        this.response = MISSING_ROLES()
         this.failed = true
 
         return this
@@ -60,9 +61,9 @@ export class Auth {
         if (this.failed) return this
 
         const givenParams = this.params
-        for (const reqParam of params){
-            if (!(reqParam in givenParams)){
-                this.response = MISSING_PARAMS
+        for (const reqParam of params) {
+            if (!(reqParam in givenParams)) {
+                this.response = MISSING_PARAMS()
                 this.failed = true
                 break
             }
@@ -85,7 +86,7 @@ export class Auth {
         }
 
         this.failed = true
-        this.response = NOT_AUTHORIZED
+        this.response = NOT_AUTHORIZED()
         return this
     }
 
